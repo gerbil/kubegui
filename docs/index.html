@@ -1,2 +1,123 @@
-test2
-docs
+<html>
+  <head>
+    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
+    <link
+      rel="stylesheet"
+      as="style"
+      onload="this.rel='stylesheet'"
+      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Manrope%3Awght%40400%3B500%3B700%3B800&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900"
+    />
+
+    <title>KubeUI application</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
+
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  </head>
+  <body>
+    <div class="relative flex size-full min-h-screen flex-col bg-slate-50 group/design-root overflow-x-hidden" style='font-family: Manrope, "Noto Sans", sans-serif;'>
+      <div class="layout-container flex h-full grow flex-col">
+        <div class="px-40 flex flex-1 justify-center py-5">
+          <div class="layout-content-container flex flex-col max-w-[960px] flex-1">
+            <div class="@container">
+              <div class="flex flex-col gap-6 px-4 py-10 @[480px]:gap-8 @[864px]:flex-row">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl @[480px]:h-auto @[480px]:min-w-[400px] @[864px]:w-full"
+                  style='background-image: url("https://cdn.usegalileo.ai/stability/1c81e3f3-4b1f-481b-a3d8-f4d8442300d3.png");'
+                ></div>
+                <div class="flex flex-col gap-6 @[480px]:min-w-[400px] @[480px]:gap-8 @[864px]:justify-center">
+                  <div class="flex flex-col gap-2 text-left">
+                    <h1
+                      class="text-[#0e141b] text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]"
+                    >
+                      Kubernetes UI application for your business
+                    </h1>
+                    <h2 class="text-[#0e141b] text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal">
+                      Discover the power of Kubernetes with our user-friendly UI application <strong>for only 25$ per year</strong>. Get started today.
+                    </h2>
+                  </div>
+                  <div class="flex-wrap gap-3 flex">
+                    <button
+                      class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#1980e6] text-slate-50 text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]"
+                    >
+                      <span class="truncate">Download</span>
+                    </button>
+                    <button
+                      class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#e7edf3] text-[#0e141b] text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]"
+                    >
+                      <span class="truncate">Buy</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
+                  style='background-image: url("https://cdn.usegalileo.ai/stability/abdb7f9b-599a-4247-8948-fe2d76db3232.png");'
+                ></div>
+                <div>
+                  <p class="text-[#0e141b] text-base font-medium leading-normal">Super fast</p>
+                  <p class="text-[#4e7397] text-sm font-normal leading-normal">
+                    Written in GO (using official kubernetes go-client). It's super fast and lightweight.
+                  </p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
+                  style='background-image: url("https://cdn.usegalileo.ai/sdxl10/cdbd071b-4824-4ea0-bd9d-456310845839.png");'
+                ></div>
+                <div>
+                  <p class="text-[#0e141b] text-base font-medium leading-normal">No dependecies</p>
+                  <p class="text-[#4e7397] text-sm font-normal leading-normal">
+                    KubeUI does not have external dependencies. It's a single binary that you can run on any platform. Even in air-gapped environments.
+                  </p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
+                  style='background-image: url("https://cdn.usegalileo.ai/stability/5a1b260f-ca1e-4332-8704-95526395a148.png");'
+                ></div>
+                <div>
+                  <p class="text-[#0e141b] text-base font-medium leading-normal">Logs, events and pods terminal</p>
+                  <p class="text-[#4e7397] text-sm font-normal leading-normal">
+                    We got everything you need to manage your kubernetes cluster. Highlighted logs, ordered events, custom baked pod terminal and more.
+                  </p>
+                </div>
+              </div>
+              <div class="flex flex-col gap-3 pb-3">
+                <div
+                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
+                  style='background-image: url("https://cdn.usegalileo.ai/stability/bc9323de-5780-464a-b051-4346d55feb9d.png");'
+                ></div>
+                <div>
+                  <p class="text-[#0e141b] text-base font-medium leading-normal">Simple and effecient UI</p>
+                  <p class="text-[#4e7397] text-sm font-normal leading-normal">
+                    Multicluster support, easy to use and navigate. We got you covered with our simple and efficient UI.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <footer class="flex justify-center">
+          <div class="flex max-w-[960px] flex-1 flex-col">
+            <footer class="flex flex-col gap-6 px-5 py-10 text-center @container">
+              <div class="flex flex-wrap items-center justify-center gap-6 @[480px]:flex-row @[480px]:justify-around">
+                <a class="text-[#4e7397] text-base font-normal leading-normal min-w-40" href="#">Research Suite</a>
+                <a class="text-[#4e7397] text-base font-normal leading-normal min-w-40" href="#">Research Hub</a>
+                <a class="text-[#4e7397] text-base font-normal leading-normal min-w-40" href="#">Insights</a>
+                <a class="text-[#4e7397] text-base font-normal leading-normal min-w-40" href="#">Audience</a>
+                <a class="text-[#4e7397] text-base font-normal leading-normal min-w-40" href="#">Pricing</a>
+                <a class="text-[#4e7397] text-base font-normal leading-normal min-w-40" href="#">Sign In</a>
+                <a class="text-[#4e7397] text-base font-normal leading-normal min-w-40" href="#">Get Started</a>
+              </div>
+            </footer>
+          </div>
+        </footer>
+      </div>
+    </div>
+  </body>
+</html>
