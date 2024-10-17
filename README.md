@@ -3,4 +3,4 @@
 ## Scope:
 - Application releases
 - Website src
-- Issues/Bugs/Conversations hub
+- Issues/Bugs/Discussions hub
