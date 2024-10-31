@@ -20,15 +20,7 @@
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/zoomist@2/zoomist.css" />    
-    <script src="https://cdn.jsdelivr.net/npm/zoomist@2/zoomist.umd.js"></script>
-    <script>
-    const zoomist = new Zoomist('.zoomist-container', {
-      maxScale: 4,
-      bounds: true,
-      slider: true,
-      zoomer: true
-    })
-    </script>
+    <script src="https://cdn.jsdelivr.net/npm/zoomist@2/zoomist.umd.js"></script>   
   </head>
   <body>
     <div class="relative flex size-full min-h-screen flex-col bg-slate-50 group/design-root overflow-x-hidden" style='font-family: Manrope, "Noto Sans", sans-serif;'>
@@ -138,5 +130,15 @@
         </div>        
       </div>
     </div>
+
+    <script>
+      const zoomist = new Zoomist('.zoomist-container', {
+        maxScale: 4,
+        bounds: true,
+        slider: true,
+        zoomer: true
+      })
+    </script>
+    
   </body>
 </html>
