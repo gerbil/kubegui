@@ -6,7 +6,7 @@
   background: #e98f32;
 }
 
-.zoomist-container {
+.zoomist-container1, .zoomist-container2, .zoomist-container3 {
   width: 100%;
   max-width: 600px;
 }
