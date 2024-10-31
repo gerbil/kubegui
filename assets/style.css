@@ -5,3 +5,20 @@
 .btn.buy:hover {
   background: #fec121;
 }
+
+.zoomist-container {
+  width: 100%;
+  max-width: 600px;
+}
+
+.zoomist-image {
+  width: 100%;
+  aspect-ratio: 1;
+}
+
+.zoomist-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
