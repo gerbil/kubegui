@@ -84,16 +84,14 @@
                   </p>
                 </div>
               </div>
-              <div class="flex flex-col gap-3 pb-3">
-               
+              <div class="flex flex-col gap-3 pb-3">               
                 <div class="zoomist-container">                 
                   <div class="zoomist-wrapper">                   
                     <div class="zoomist-image">                     
                       <img src="assets/logs.png" />
                     </div>
                   </div>
-                </div>
-                
+                </div>                
                 <div>
                   <p class="text-[#0e141b] text-base font-medium leading-normal">No dependecies</p>
                   <p class="text-[#4e7397] text-sm font-normal leading-normal">
@@ -102,10 +100,13 @@
                 </div>
               </div>
               <div class="flex flex-col gap-3 pb-3">
-                <div
-                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
-                  style='background-image: url("assets/exec.png");'
-                ></div>
+               <div class="zoomist-container">                 
+                  <div class="zoomist-wrapper">                   
+                    <div class="zoomist-image">                     
+                      <img src="assets/exec" />
+                    </div>
+                  </div>
+                </div>
                 <div>
                   <p class="text-[#0e141b] text-base font-medium leading-normal">Logs, events and pods terminal</p>
                   <p class="text-[#4e7397] text-sm font-normal leading-normal">
@@ -114,10 +115,13 @@
                 </div>
               </div>
               <div class="flex flex-col gap-3 pb-3">
-                <div
-                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
-                  style='background-image: url("assets/details.png");'
-                ></div>
+               <div class="zoomist-container">                 
+                  <div class="zoomist-wrapper">                   
+                    <div class="zoomist-image">                     
+                      <img src="assets/details" />
+                    </div>
+                  </div>
+                </div>
                 <div>
                   <p class="text-[#0e141b] text-base font-medium leading-normal">Simple and effecient UI</p>
                   <p class="text-[#4e7397] text-sm font-normal leading-normal">
@@ -135,7 +139,7 @@
       const zoomist = new Zoomist('.zoomist-container', {
         maxScale: 4,
         bounds: true,
-        slider: true,
+        slider: false,
         zoomer: true
       })
     </script>
