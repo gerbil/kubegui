@@ -18,6 +18,17 @@
     <link rel="shortcut icon" href="assets/favicon.ico" />
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/zoomist@2/zoomist.css" />    
+    <script src="https://cdn.jsdelivr.net/npm/zoomist@2/zoomist.umd.js"></script>
+    <script>
+    const zoomist = new Zoomist('.zoomist-container', {
+      maxScale: 4,
+      bounds: true,
+      slider: true,
+      zoomer: true
+    })
+    </script>
   </head>
   <body>
     <div class="relative flex size-full min-h-screen flex-col bg-slate-50 group/design-root overflow-x-hidden" style='font-family: Manrope, "Noto Sans", sans-serif;'>
@@ -82,10 +93,15 @@
                 </div>
               </div>
               <div class="flex flex-col gap-3 pb-3">
-                <div
-                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
-                  style='background-image: url("assets/logs.png");'
-                ></div>
+               
+                <div class="zoomist-container">                 
+                  <div class="zoomist-wrapper">                   
+                    <div class="zoomist-image">                     
+                      <img src="assets/logs.png" />
+                    </div>
+                  </div>
+                </div>
+                
                 <div>
                   <p class="text-[#0e141b] text-base font-medium leading-normal">No dependecies</p>
                   <p class="text-[#4e7397] text-sm font-normal leading-normal">
