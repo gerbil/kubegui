@@ -1,3 +1,7 @@
 .btn.download:hover {
   background: #1363b3;
 }
+
+.btn.buy:hover {
+  background: #e7edf3;
+}
