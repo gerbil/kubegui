@@ -1,115 +1,484 @@
-<html>
-  <head>
-    <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="" />
-    <link
-      rel="stylesheet"
-      as="style"
-      onload="this.rel='stylesheet'"
-      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Manrope%3Awght%40400%3B500%3B700%3B800&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900"
-    />
+<!DOCTYPE html>
+<html lang="en">
 
-    <title>KubeUI application</title>
-    <link rel="shortcut icon" href="assets/favicon.ico" />
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>KubeUI - Kuberneted admin desktop application</title>
+        <link rel="shortcut icon" href="assets/images/favicon.ico">
+        <link rel="stylesheet" href="assets/css/tailwind.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js" integrity="sha512-7x3zila4t2qNycrtZ31HO0NnJr8kg2VI67YLoRSyi9hGhRN66FHYWr7Axa9Y1J9tGYHVBPqIjSE1ogHrJTz51g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <link href="assets/css/lightbox.css" rel="stylesheet" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script src="assets/js/lightbox.js"></script>
+    </head>
 
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-  </head>
-  <body>
-    <div class="relative flex size-full min-h-screen flex-col bg-slate-50 group/design-root overflow-x-hidden" style='font-family: Manrope, "Noto Sans", sans-serif;'>
-      <div class="layout-container flex h-full grow flex-col">
-        <div class="px-40 flex flex-1 justify-center py-5">
-          <div class="layout-content-container flex flex-col max-w-[1960px] flex-1">
-            <div class="@container">
-              <div class="flex flex-col gap-6 px-4 py-10 @[480px]:gap-8 @[864px]:flex-row">
-              <!-- video -->
-                <div
-                  class="background-repeat: no-repeat; width: 100%;" style='background-image: url("assets/big.png");'
-                ></div>
-                <div class="flex flex-col gap-6 @[480px]:min-w-[400px] @[480px]:gap-8 @[577px]:justify-center">
-                  <div class="flex flex-col gap-2 text-left">
-                    <h1
-                      class="text-[#0e141b] text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]"
-                    >
-                      Kubernetes UI application for your daily needs
-                    </h1>
-                    <br/>
-                    <br/>
-                    <h2 class="text-[#0e141b] text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal">
-                      Discover the power of Kubernetes with our user-friendly UI application <strong>(25$/year)</strong>.
-                    </h2>
-                    <h3 class="text-[#0e141b] text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal">
-                      * KubeUI is free for personal usage.<br/> Comercial usage requires a license.<br/>Click on the button below to download or buy the application.
-                    </h3>
-                    <br/>
-                    <br/>
-                  </div>
-                  <div class="flex-wrap gap-3 flex">
-                    <button
-                      class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#1980e6] text-slate-50 text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]"
-                    >
-                      <span class="truncate">Download</span>
-                    </button>
-                    <button
-                      class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#e7edf3] text-[#0e141b] text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]"
-                    >
-                      <span class="truncate" onclick="window.open('https://buy.stripe.com/cN2cNAfJs5It8CY8ww', '_blank');">Buy</span>
-                    </button>
-                  </div>
+    <body class="bg-gray-100">
+        
+        <section class="py-10 md:py-16">
+
+            <div class="container max-w-screen-xl mx-auto px-4">
+
+                <nav class="flex items-center justify-between mb-20">
+                    <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-5">KubeUI</h1>
+
+                    <button class="px-7 py-3 md:px-9 md:py-4 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500" onclick="window.open('https://github.com/gerbil/kubeui-public/releases/latest/download/kubeui-windows-x86_64.zip', '_blank');">Free download</button>
+                </nav>
+
+                <div class="text-center">
+                    <div class="flex justify-center mb-16">
+                        <img src="assets/images/big.png" />
+                    </div>
+
+                    <h6 class="font-medium text-gray-600 text-lg md:text-2xl uppercase mb-8">Free for personal use.<br/>Commercial usage requires a license.</h6>
+
+                    <h1 class="font-normal text-gray-900 text-4xl md:text-7xl leading-none mb-8">Now with multi cluster support!</h1>
+
+                    <p class="font-normal text-gray-600 text-md md:text-xl mb-16">No external dependencies. KubeUI can work even in `air gapped` environments.</p>
+
+                    <a href="#" class="px-7 py-3 md:px-9 md:py-4 font-medium md:font-semibold bg-gray-700 text-gray-50 text-sm rounded-md hover:bg-gray-50 hover:text-gray-700 transition ease-linear duration-500" onclick="window.open('https://buy.stripe.com/cN2cNAfJs5It8CY8ww', '_blank');">Buy only for $50 a year</a>
                 </div>
-              </div>
+
             </div>
-            <div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
-              <div class="flex flex-col gap-3 pb-3">
-                <div
-                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
-                  style='background-image: url("https://cdn.usegalileo.ai/stability/abdb7f9b-599a-4247-8948-fe2d76db3232.png");'
-                ></div>
-                <div>
-                  <p class="text-[#0e141b] text-base font-medium leading-normal">Super fast</p>
-                  <p class="text-[#4e7397] text-sm font-normal leading-normal">
-                    Written in GO (using official kubernetes go-client). It's super fast and lightweight.
-                  </p>
+
+        </section>
+
+        <section class="py-10 md:py-16">
+
+            <div class="container max-w-screen-xl mx-auto px-4">
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-gray-50 px-8 py-10 rounded-md">
+                        <nav class="flex items-center justify-between">
+                          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+                            <i data-feather="layout"></i>
+                          </div>
+                          <div class="w-20 flex justify-center rounded-md mb-4">                            
+                            <a href="assets/images/details.png" data-lightbox="logs"><img src="assets/images/details.png" class="bg-gray-100 rounded-md p-1" /></a>
+                          </div>
+                        </nav>
+
+                        <h4 class="font-medium text-gray-700 text-lg mb-4">Effective UI/UX design</h4>
+
+                        <p class="font-normal text-gray-500 text-md">Connect to your clusters to see real time state and resources using simple UI with auto-refresh enabled.</p>
+                    </div>
+                    
+                    <div class="bg-gray-50 px-8 py-10 rounded-md">
+                       <nav class="flex items-center justify-between">
+                          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+                            <i data-feather="file-text"></i>
+                          </div>
+                          <div class="w-20 flex justify-center rounded-md mb-4">                            
+                            <a href="assets/images/logs.png" data-lightbox="logs"><img src="assets/images/logs.png" class="bg-gray-100 rounded-md p-1" /></a>
+                          </div>
+                        </nav>
+
+                        <h4 class="font-medium text-gray-700 text-lg mb-4">Logs with syntax highlighting</h4>
+
+                        <p class="font-normal text-gray-500 text-md">Logs highlighting helps to view a log (of any type) with an error/warning syntax, color scheme & extensible severity levels.</p>
+                    </div>
+                    
+                    <div class="bg-gray-50 px-8 py-10 rounded-md">
+                        <nav class="flex items-center justify-between">
+                          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+                            <i data-feather="command"></i>
+                          </div>
+                          <div class="w-20 flex justify-center rounded-md mb-4">                            
+                            <a href="assets/images/exec.png" data-lightbox="logs"><img src="assets/images/exec.png" class="bg-gray-100 rounded-md p-1" /></a>
+                          </div>
+                        </nav>
+
+                        <h4 class="font-medium text-gray-700 text-lg mb-4">One click Pod shell access</h4>
+
+                        <p class="font-normal text-gray-500 text-md">No more unnecessary connections, only direct client to pod communication.</p>
+                    </div>
                 </div>
-              </div>
-              <div class="flex flex-col gap-3 pb-3">
-                <div
-                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
-                  style='background-image: url("https://cdn.usegalileo.ai/sdxl10/cdbd071b-4824-4ea0-bd9d-456310845839.png");'
-                ></div>
-                <div>
-                  <p class="text-[#0e141b] text-base font-medium leading-normal">No dependecies</p>
-                  <p class="text-[#4e7397] text-sm font-normal leading-normal">
-                    KubeUI does not have external dependencies. It's a single binary that you can run on any platform. Even in air-gapped environments.
-                  </p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+                    <div class="bg-gray-50 px-8 py-10 rounded-md">
+                        <nav class="flex items-center justify-between">
+                          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+                            <i data-feather="activity"></i>
+                          </div>
+                          <div class="w-20 flex justify-center rounded-md mb-4">                            
+                            <a href="assets/images/metrics.png" data-lightbox="logs"><img src="assets/images/metrics.png" class="bg-gray-100 rounded-md p-1" /></a>
+                          </div>
+                        </nav>
+
+                        <h4 class="font-medium text-gray-700 text-lg mb-4">Performance metrics</h4>
+
+                        <p class="font-normal text-gray-500 text-md">Integrated Nodes and Pods metrics (metrics-server required).</p>
+                    </div>
+                    
+                    <div class="bg-gray-50 px-8 py-10 rounded-md">
+                       <nav class="flex items-center justify-between">
+                          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+                            <i data-feather="wind"></i>
+                          </div>
+                          <div class="w-20 flex justify-center rounded-md mb-4">                            
+                            <a href="assets/images/events.png" data-lightbox="logs"><img src="assets/images/events.png" class="bg-gray-100 rounded-md p-1" /></a>
+                          </div>
+                        </nav>
+
+                        <h4 class="font-medium text-gray-700 text-lg mb-4">Events aggregation</h4>
+
+                        <p class="font-normal text-gray-500 text-md">Deployments centric events viewer.</p>
+                    </div>
+                    
+                    <div class="bg-gray-50 px-8 py-10 rounded-md">
+                        <nav class="flex items-center justify-between">
+                          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+                            <i data-feather="edit"></i>
+                          </div>
+                          <div class="w-20 flex justify-center rounded-md mb-4">                            
+                            <a href="assets/images/edit.png" data-lightbox="logs"><img src="assets/images/edit.png" class="bg-gray-100 rounded-md p-1" /></a>
+                          </div>
+                        </nav>
+
+                        <h4 class="font-medium text-gray-700 text-lg mb-4">Resoruce editor with YAML validation</h4>
+
+                        <p class="font-normal text-gray-500 text-md">Simple and effective yaml editor with solarized theme support and included linters.</p>
+                    </div>
                 </div>
-              </div>
-              <div class="flex flex-col gap-3 pb-3">
-                <div
-                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
-                  style='background-image: url("https://cdn.usegalileo.ai/stability/5a1b260f-ca1e-4332-8704-95526395a148.png");'
-                ></div>
-                <div>
-                  <p class="text-[#0e141b] text-base font-medium leading-normal">Logs, events and pods terminal</p>
-                  <p class="text-[#4e7397] text-sm font-normal leading-normal">
-                    We got everything you need to manage your kubernetes cluster. Highlighted logs, ordered events, custom baked pod terminal and more.
-                  </p>
-                </div>
-              </div>
-              <div class="flex flex-col gap-3 pb-3">
-                <div
-                  class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl"
-                  style='background-image: url("https://cdn.usegalileo.ai/stability/bc9323de-5780-464a-b051-4346d55feb9d.png");'
-                ></div>
-                <div>
-                  <p class="text-[#0e141b] text-base font-medium leading-normal">Simple and effecient UI</p>
-                  <p class="text-[#4e7397] text-sm font-normal leading-normal">
-                    Multicluster support, easy to use and navigate. We got you covered with our simple and efficient UI.
-                  </p>
-                </div>
-              </div>
+
             </div>
-          </div>
-        </div>        
-      </div>
-    </div>
-  </body>
+
+        </section>
+
+        <section class="py-10 md:py-16">
+
+            <div class="container max-w-screen-xl mx-auto px-4">
+
+                <div class="flex flex-col lg:flex-row justify-between">
+                    <div class="mb-10 lg:mb-0" style="min-width: 300px; margin-right: 250px;">
+                        <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-5">Unique features</h1>
+
+                        <p class="font-normal text-gray-500 text-xs md:text-base">KubeUI specifics provided out-of-the box.</p>
+                    </div>
+
+                    <div class="space-y-24">
+                        <div class="flex space-x-6">
+                            <h1 class="font-normal text-gray-700 text-3xl md:text-4xl">01</h1>
+
+                            <span class="w-28 h-0.5 bg-gray-300 mt-5"></span>
+
+                            <div>
+                                <h1 class="font-normal text-gray-700 text-3xl md:text-4xl mb-5">Custom Resource creation</h1>
+
+                                <p class="font-normal text-gray-500 text-sm md:text-base">Custom Resouce generation from existing definition manifests.<br/>Any available CRD provides a schema used within KubeUI to automagically generate Custom Resource example.<br/>Just click on 'Add resource' button on top to try it out!</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-6">
+                            <h1 class="font-normal text-gray-700 text-3xl md:text-4xl">02</h1>
+
+                            <span class="w-28 h-0.5 bg-gray-300 mt-5"></span>
+
+                            <div>
+                                <h1 class="font-normal text-gray-700 text-3xl md:text-4xl mb-5">Official Go library used</h1>
+
+                                <p class="font-normal text-gray-500 text-sm md:text-base">Lightweight desktop application written in GO (wails). Official Kubernetes client provides compatibility with latest K8S versions. Kubeconfig is the only thing required!</p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex space-x-6">
+                            <h1 class="font-normal text-gray-700 text-3xl md:text-4xl">03</h1>
+
+                            <span class="w-28 h-0.5 bg-gray-300 mt-5"></span>
+
+                            <div>
+                                <h1 class="font-normal text-gray-700 text-3xl md:text-4xl mb-5">Demo API Generator</h1>
+
+                                <p class="font-normal text-gray-500 text-sm md:text-base">A dummy data free and documented API generator to facilitate <br> the process of testing the front-end portion of projects.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="py-10 md:py-16">
+
+            <div class="container max-w-screen-xl mx-auto px-4">
+
+                <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-5">Roadmap</h1>
+
+                <p class="font-normal text-gray-500 text-xs md:text-base mb-20">Below is an official product roadmap.</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-gray-50 px-8 py-10 rounded-md">
+                        <h4 class="font-medium text-gray-700 text-lg mb-4">2024'Q4 – 2025'Q1</h4>
+
+                        <p class="font-normal text-gray-500 text-md mb-4">MacOS support.</p>
+
+                        <div class="relative">
+                            <h6 class="font-semibold text-gray-500 text-md relative z-10">Github discussion</h6>
+                            <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 px-8 py-10 rounded-md">
+                        <h4 class="font-medium text-gray-700 text-lg mb-4">2015 – 2016</h4>
+
+                        <p class="font-normal text-gray-500 text-md mb-4">Lorem ipsum dolor sit amet, consectetur <br> adipiscing elit, sed do eiusmod tempor <br> incididunt ut labore et dolore magna aliqua.</p>
+
+                        <div class="relative">
+                            <h6 class="font-semibold text-gray-500 text-md relative z-10">See the place here</h6>
+                            <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 px-8 py-10 rounded-md">
+                        <h4 class="font-medium text-gray-700 text-lg mb-4">2015 – 2016</h4>
+
+                        <p class="font-normal text-gray-500 text-md mb-4">Lorem ipsum dolor sit amet, consectetur <br> adipiscing elit, sed do eiusmod tempor <br> incididunt ut labore et dolore magna aliqua.</p>
+
+                        <div class="relative">
+                            <h6 class="font-semibold text-gray-500 text-md relative z-10">See the place here</h6>
+                            <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 px-8 py-10 rounded-md">
+                        <h4 class="font-medium text-gray-700 text-lg mb-4">2015 – 2016</h4>
+
+                        <p class="font-normal text-gray-500 text-md mb-4">Lorem ipsum dolor sit amet, consectetur <br> adipiscing elit, sed do eiusmod tempor <br> incididunt ut labore et dolore magna aliqua.</p>
+
+                        <div class="relative">
+                            <h6 class="font-semibold text-gray-500 text-md relative z-10">See the place here</h6>
+                            <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 px-8 py-10 rounded-md">
+                        <h4 class="font-medium text-gray-700 text-lg mb-4">2015 – 2016</h4>
+
+                        <p class="font-normal text-gray-500 text-md mb-4">Lorem ipsum dolor sit amet, consectetur <br> adipiscing elit, sed do eiusmod tempor <br> incididunt ut labore et dolore magna aliqua.</p>
+
+                        <div class="relative">
+                            <h6 class="font-semibold text-gray-500 text-md relative z-10">See the place here</h6>
+                            <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
+                        </div>
+                    </div>
+
+                    <div class="bg-gray-50 px-8 py-10 rounded-md">
+                        <h4 class="font-medium text-gray-700 text-lg mb-4">2015 – 2016</h4>
+
+                        <p class="font-normal text-gray-500 text-md mb-4">Lorem ipsum dolor sit amet, consectetur <br> adipiscing elit, sed do eiusmod tempor <br> incididunt ut labore et dolore magna aliqua.</p>
+
+                        <div class="relative">
+                            <h6 class="font-semibold text-gray-500 text-md relative z-10">See the place here</h6>
+                            <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="py-10 md:py-16">
+
+            <div class="container max-w-screen-xl mx-auto px-4">
+
+                <div class="text-center">
+                    <h1 class="font-normal text-gray-300 text-3xl md:text-6xl lg:text-7xl mb-20 md:mb-32 lg:mb-48">Please do not measure your skills in <br> percentages!</h1>
+
+                    <p class="font-medium text-gray-700 text-xs md:text-base">In my many years of experience, I use @laravel for backend projects and @vuejs for <br> front-end projects. I’m an avid programmer, so I create designs based on the <br> weekend @figmadesign.</p>
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="py-10 md:py-16">
+
+            <div class="container max-w-screen-xl mx-auto px-4">
+
+                <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-5">Experience</h1>
+
+                <p class="font-normal text-gray-500 text-xs md:text-base mb-20">Below is a summary of the places I studied</p>
+
+                <div class="flex flex-col lg:flex-row justify-between">
+                    <div class="space-y-8 md:space-y-16 mb-16 md:mb-0">
+                        <h6 class="font-medium text-gray-400 text-base uppercase">Company</h6>
+
+                        <p class="font-semibold text-gray-600 text-base">Massa Fames <span class="font-normal text-gray-300">/ New York</span></p>
+
+                        <p class="font-semibold text-gray-600 text-base">Massa Fames <span class="font-normal text-gray-300">/ New York</span></p>
+
+                        <p class="font-semibold text-gray-600 text-base">Massa Fames <span class="font-normal text-gray-300">/ New York</span></p>
+
+                        <p class="font-semibold text-gray-600 text-base">Massa Fames <span class="font-normal text-gray-300">/ New York</span></p>
+
+                        <p class="font-semibold text-gray-600 text-base">Massa Fames <span class="font-normal text-gray-300">/ New York</span></p>
+                    </div>
+
+                    <div class="space-y-8 md:space-y-16 mb-16 md:mb-0">
+                        <h6 class="font-medium text-gray-400 text-base uppercase">Position</h6>
+
+                        <p class="font-normal text-gray-400 text-base">Junior Front-End Developer</p>
+
+                        <p class="font-normal text-gray-400 text-base">Junior Front-End Developer</p>
+
+                        <p class="font-normal text-gray-400 text-base">Junior Front-End Developer</p>
+
+                        <p class="font-normal text-gray-400 text-base">Junior Front-End Developer</p>
+
+                        <p class="font-normal text-gray-400 text-base">Junior Front-End Developer</p>
+                    </div>
+
+                    <div class="space-y-8 md:space-y-16">
+                        <h6 class="font-medium text-gray-400 text-base uppercase">Year</h6>
+
+                        <p class="font-normal text-gray-400 text-base">2016</p>
+
+                        <p class="font-normal text-gray-400 text-base">2016</p>
+
+                        <p class="font-normal text-gray-400 text-base">2016</p>
+
+                        <p class="font-normal text-gray-400 text-base">2016</p>
+
+                        <p class="font-normal text-gray-400 text-base">2016</p>
+                    </div>
+                </div>
+                
+            </div>
+
+        </section>
+
+        <section class="py-10 md:py-16">
+
+            <div class="container max-w-screen-xl mx-auto px-4">
+
+                <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-5">Brands</h1>
+
+                <p class="font-normal text-gray-500 text-xs md:text-base mb-10 md:mb-20">Below is a summary of the places I studied</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+                    <img src="assets/images/brand-1.png" alt="images">
+
+                    <img src="assets/images/brand-2.png" alt="images">
+
+                    <img src="assets/images/brand-3.png" alt="images">
+
+                    <img src="assets/images/brand-4.png" alt="images">
+
+                    <img src="assets/images/brand-5.png" alt="images">
+
+                    <img src="assets/images/brand-6.png" alt="images">
+                </div>
+
+            </div>
+
+        </section>
+
+        <section class="py-10 md:py-16">
+
+            <div class="container max-w-screen-xl mx-auto px-4">
+
+                <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-5">Testimonial</h1>
+
+                <p class="font-normal text-gray-500 text-xs md:text-base mb-10 md:mb-20">Below is a summary of the places I studied</p>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="bg-gray-50 px-8 py-10 rounded-md">
+
+                        <p class="font-normal text-gray-500 text-md mb-4">Lorem ipsum dolor sit amet, consectetur <br> adipiscing elit, sed do eiusmod tempor <br> incididunt ut labore et dolore magna aliqua.</p>
+
+                        <h6 class="font-semibold text-gray-500 text-md">Stephan Clark <span class="font-medium text-gray-300 text-sm">- CEO at EarlyBird</span></h6>
+                    </div>
+
+                    <div class="bg-gray-50 px-8 py-10 rounded-md">
+
+                        <p class="font-normal text-gray-500 text-md mb-4">Lorem ipsum dolor sit amet, consectetur <br> adipiscing elit, sed do eiusmod tempor <br> incididunt ut labore et dolore magna aliqua.</p>
+
+                        <h6 class="font-semibold text-gray-500 text-md">Stephan Clark <span class="font-medium text-gray-300 text-sm">- CEO at EarlyBird</span></h6>
+                    </div>
+
+                    <div class="bg-gray-50 px-8 py-10 rounded-md">
+
+                        <p class="font-normal text-gray-500 text-md mb-4">Lorem ipsum dolor sit amet, consectetur <br> adipiscing elit, sed do eiusmod tempor <br> incididunt ut labore et dolore magna aliqua.</p>
+
+                        <h6 class="font-semibold text-gray-500 text-md">Stephan Clark <span class="font-medium text-gray-300 text-sm">- CEO at EarlyBird</span></h6>
+                    </div>
+
+                    <div class="bg-gray-50 px-8 py-10 rounded-md">
+
+                        <p class="font-normal text-gray-500 text-md mb-4">Lorem ipsum dolor sit amet, consectetur <br> adipiscing elit, sed do eiusmod tempor <br> incididunt ut labore et dolore magna aliqua.</p>
+
+                        <h6 class="font-semibold text-gray-500 text-md">Stephan Clark <span class="font-medium text-gray-300 text-sm">- CEO at EarlyBird</span></h6>
+                    </div>
+
+                    <div class="bg-gray-50 px-8 py-10 rounded-md">
+
+                        <p class="font-normal text-gray-500 text-md mb-4">Lorem ipsum dolor sit amet, consectetur <br> adipiscing elit, sed do eiusmod tempor <br> incididunt ut labore et dolore magna aliqua.</p>
+
+                        <h6 class="font-semibold text-gray-500 text-md">Stephan Clark <span class="font-medium text-gray-300 text-sm">- CEO at EarlyBird</span></h6>
+                    </div>
+
+                    <div class="bg-gray-50 px-8 py-10 rounded-md">
+
+                        <p class="font-normal text-gray-500 text-md mb-4">Lorem ipsum dolor sit amet, consectetur <br> adipiscing elit, sed do eiusmod tempor <br> incididunt ut labore et dolore magna aliqua.</p>
+
+                        <h6 class="font-semibold text-gray-500 text-md">Stephan Clark <span class="font-medium text-gray-300 text-sm">- CEO at EarlyBird</span></h6>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+        <footer class="py-10 md:py-16 mb-20 md:mb-40 lg::mb-52">
+
+            <div class="container max-w-screen-xl mx-auto px-4">
+
+                <div class="text-center">
+                    <h1 class="font-medium text-gray-700 text-4xl md:text-5xl mb-5">Testimonial</h1>
+
+                    <p class="font-normal text-gray-400 text-md md:text-lg mb-20">I’m not currently taking on new client work but feel free to contact me for any <br> other inquiries.</p>
+
+                    <div class="flex items-center justify-center space-x-8">
+                        <a href="#" class="w-16 h-16 flex items-center justify-center rounded-full hover:bg-gray-200 transition ease-in-out duration-500">
+                            <i data-feather="twitter" class="text-gray-500 hover:text-gray-800 transition ease-in-out duration-500"></i>
+                        </a>
+    
+                        <a href="#" class="w-16 h-16 flex items-center justify-center rounded-full hover:bg-gray-200 transition ease-in-out duration-500">
+                            <i data-feather="dribbble" class="text-gray-500 hover:text-gray-700 transition ease-in-out duration-500"></i>
+                        </a>
+    
+                        <a href="#" class="w-16 h-16 flex items-center justify-center rounded-full hover:bg-gray-200 transition ease-in-out duration-500">
+                            <i data-feather="facebook" class="text-gray-500 hover:text-gray-700 transition ease-in-out duration-500"></i>
+                        </a>
+    
+                        <a href="#" class="w-16 h-16 flex items-center justify-center rounded-full hover:bg-gray-200 transition ease-in-out duration-500">
+                            <i data-feather="codepen" class="text-gray-500 hover:text-gray-700 transition ease-in-out duration-500"></i>
+                        </a>
+    
+                        <a href="#" class="w-16 h-16 flex items-center justify-center rounded-full hover:bg-gray-200 transition ease-in-out duration-500">
+                            <i data-feather="at-sign" class="text-gray-500 hover:text-gray-700 transition ease-in-out duration-500"></i>
+                        </a>
+    
+                        <a href="#" class="w-16 h-16 flex items-center justify-center rounded-full hover:bg-gray-200 transition ease-in-out duration-500">
+                            <i data-feather="instagram" class="text-gray-500 hover:text-gray-700 transition ease-in-out duration-500"></i>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+
+        </footer>
+
+
+        <script>
+            feather.replace()
+        </script>
+
+    </body>
 </html>
