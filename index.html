@@ -5,156 +5,227 @@
       rel="stylesheet"
       as="style"
       onload="this.rel='stylesheet'"
-      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Manrope%3Awght%40400%3B500%3B700%3B800&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900"
-    />
-    <link
-      rel="stylesheet"
-      as="style"
-      onload="this.rel='stylesheet'"
-      href="assets/style.css"
+      href="https://fonts.googleapis.com/css2?display=swap&amp;family=Noto+Sans%3Awght%40400%3B500%3B700%3B900&amp;family=Space+Grotesk%3Awght%40400%3B500%3B700"
     />
 
-    <title>KubeUI - Kubernetes desktop application</title>
-    <link rel="shortcut icon" href="assets/favicon.ico" />
+    <title>KubeUI</title>
+    <link rel="icon" type="image/x-icon" href="data:image/x-icon;base64," />
 
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/zoomist@2/zoomist.css" />    
-    <script src="https://cdn.jsdelivr.net/npm/zoomist@2/zoomist.umd.js"></script>   
   </head>
   <body>
-    <div class="relative flex size-full min-h-screen flex-col bg-slate-50 group/design-root overflow-x-hidden" style='font-family: Manrope, "Noto Sans", sans-serif;'>
-      <div class="layout-container flex h-full grow flex-col">
-        <div class="px-40 flex flex-1 justify-center py-5">
-          <div class="layout-content-container flex flex-col max-w-[1960px] flex-1">
-            <div class="@container">
-              <div class="flex flex-col gap-6 px-4 py-10 @[480px]:gap-8 @[864px]:flex-row">
-                <div class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl">
-                  <img src="assets/big.png"/>
-                </div>
-                <div class="flex flex-col gap-6 @[480px]:min-w-[400px] @[480px]:gap-8 @[577px]:justify-center">
-                  <div class="flex flex-col gap-2 text-left">
-                    <h1 class="text-[#0e141b] text-4xl font-black leading-tight tracking-[-0.033em] @[480px]:text-5xl @[480px]:font-black @[480px]:leading-tight @[480px]:tracking-[-0.033em]">
-                      Kubernetes admin UI for your daily needs!                     
-                    </h1>
-                    <h2>Connect to your clusters to see real time state and resources.</h2>
-                    <br/>
-                    <ul>
-                      <li>- No external dependencies!</li>
-                      <li>- Simple UI with auto-refresh.</li>
-                      <li>- Pods state, logs, shell exec, resource consumption and much more.</li>
-                      <li>- Air-gapped mode</li>
-                      <li>- Built on Golang based on official Kubernetes client</li>
-                    </ul>
-                    <br/>
-                    <h2 class="text-[#0e141b] text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal">
-                      User-friendly UI application for <strong>50$ a year</strong>
-                    </h2>                    
-                    <br/>
-                  </div>
-                  <div class="flex-wrap gap-3 flex">
-                    <button class="btn download flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#1980e6] text-slate-50 text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]">
-                      <span class="truncate" onclick="window.open('https://github.com/gerbil/kubeui-public/releases/latest/download/kubeui-windows-x86_64.zip', '_blank');">Download</span>
-                    </button>
-                    <button class="btn buy flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 @[480px]:h-12 @[480px]:px-5 bg-[#e7edf3] text-[#0e141b] text-sm font-bold leading-normal tracking-[0.015em] @[480px]:text-base @[480px]:font-bold @[480px]:leading-normal @[480px]:tracking-[0.015em]">
-                      <span class="truncate" onclick="window.open('https://buy.stripe.com/cN2cNAfJs5It8CY8ww', '_blank');">Buy</span>
-                    </button>
-                    <br/>
-                    <h3 class="text-[#0e141b] text-sm font-normal leading-normal @[480px]:text-base @[480px]:font-normal @[480px]:leading-normal" style="margin: 70px 0 0 -235px;">
-                      * KubeUI is free for personal usage.<br/> 
-                      Comercial usage requires a license.<br/
-                      Click on the buttons above to download/buy the application.
-                    </h3>
-                  </div>
-                </div>
+    <div
+      class="relative flex size-full min-h-screen flex-col bg-white justify-between group/design-root overflow-x-hidden"
+      style='font-family: "Space Grotesk", "Noto Sans", sans-serif;'
+    >
+      <div>
+        <div class="flex items-center bg-white p-4 pb-2 justify-between">
+          <h2 class="text-[#111518] text-lg font-bold leading-tight tracking-[-0.015em] flex-1">Kubernetes desktop client application</h2>
+          <div class="flex w-12 items-center justify-end">
+            <button
+              class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 bg-transparent text-[#111518] gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0"
+            >
+              <div class="text-[#111518]" data-icon="ShoppingBag" data-size="24px" data-weight="regular">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                  <path
+                    d="M216,40H40A16,16,0,0,0,24,56V200a16,16,0,0,0,16,16H216a16,16,0,0,0,16-16V56A16,16,0,0,0,216,40Zm0,160H40V56H216V200ZM176,88a48,48,0,0,1-96,0,8,8,0,0,1,16,0,32,32,0,0,0,64,0,8,8,0,0,1,16,0Z"
+                  ></path>
+                </svg>
+              </div>
+            </button>
+          </div>
+        </div>
+        <div class="@container">
+          <div class="@[480px]:px-4 @[480px]:py-3">
+            <div
+              class="bg-cover bg-center flex flex-col justify-end overflow-hidden bg-white @[480px]:rounded-xl min-h-[218px]"
+              style='background-image: linear-gradient(0deg, rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0) 25%), url("/assets/big.png");'
+            >
+              <div class="flex p-4"><p class="text-white tracking-light text-[28px] font-bold leading-tight">Kubernetes Desktop Client</p></div>
+            </div>
+          </div>
+        </div>
+        <h2 class="text-[#111518] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Kubernetes admin application with multi cluster support!</h2>
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
+          <div class="flex flex-1 gap-3 rounded-lg border border-[#dbe1e6] bg-white p-4 flex-col">
+            <div class="text-[#111518]" data-icon="DesktopTower" data-size="24px" data-weight="regular">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                <path
+                  d="M24,96v72a8,8,0,0,0,8,8h80a8,8,0,0,1,0,16H96v16h16a8,8,0,0,1,0,16H64a8,8,0,0,1,0-16H80V192H32A24,24,0,0,1,8,168V96A24,24,0,0,1,32,72h80a8,8,0,0,1,0,16H32A8,8,0,0,0,24,96ZM208,64H176a8,8,0,0,0,0,16h32a8,8,0,0,0,0-16Zm0,32H176a8,8,0,0,0,0,16h32a8,8,0,0,0,0-16Zm40-48V208a16,16,0,0,1-16,16H152a16,16,0,0,1-16-16V48a16,16,0,0,1,16-16h80A16,16,0,0,1,248,48ZM232,208V48H152V208h80Zm-40-40a12,12,0,1,0,12,12A12,12,0,0,0,192,168Z"
+                ></path>
+              </svg>
+            </div>
+            <div class="flex flex-col gap-1">
+              <h2 class="text-[#111518] text-base font-bold leading-tight">No installation required.</h2>
+              <p class="text-[#60778a] text-sm font-normal leading-normal">Free for personal use. Commercial usage requires a license.</p>
+            </div>
+          </div>
+          <div class="flex flex-1 gap-3 rounded-lg border border-[#dbe1e6] bg-white p-4 flex-col">
+            <div class="text-[#111518]" data-icon="CloudArrowUp" data-size="24px" data-weight="regular">
+              <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" fill="currentColor" viewBox="0 0 256 256">
+                <path
+                  d="M248,128a87.34,87.34,0,0,1-17.6,52.81,8,8,0,1,1-12.8-9.62A71.34,71.34,0,0,0,232,128a72,72,0,0,0-144,0,8,8,0,0,1-16,0,88,88,0,0,1,3.29-23.88C74.2,104,73.1,104,72,104a48,48,0,0,0,0,96H96a8,8,0,0,1,0,16H72A64,64,0,1,1,81.29,88.68,88,88,0,0,1,248,128Zm-90.34-5.66a8,8,0,0,0-11.32,0l-32,32a8,8,0,0,0,11.32,11.32L144,147.31V208a8,8,0,0,0,16,0V147.31l18.34,18.35a8,8,0,0,0,11.32-11.32Z"
+                ></path>
+              </svg>
+            </div>
+            <div class="flex flex-col gap-1">
+              <h2 class="text-[#111518] text-base font-bold leading-tight">No external dependencies!</h2>
+              <p class="text-[#60778a] text-sm font-normal leading-normal">KubeUI can work even in `air gapped` environments.</p>
+            </div>
+          </div>
+        </div>
+        <h2 class="text-[#111518] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Features</h2>
+        <div class="flex overflow-y-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
+          <div class="flex items-stretch p-4 gap-3">
+            <div class="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-60">
+              <div
+                class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+                style='background-image: url("/assets/details.png");'
+              ></div>
+              <div>
+                <p class="text-[#111518] text-base font-medium leading-normal">Pods, deployments and other objects lists.</p>
+                <p class="text-[#60778a] text-sm font-normal leading-normal">Kubeconfig is the only thing required.</p>
               </div>
             </div>
-            <div class="grid grid-cols-[repeat(auto-fit,minmax(158px,1fr))] gap-3 p-4">
-              <div class="flex flex-col gap-3 pb-3">
-                <div class="w-full bg-center bg-no-repeat aspect-video bg-cover rounded-xl">
-                  <script src="https://fast.wistia.com/player.js" async></script>
-                  <script src="https://fast.wistia.com/embed/aerent0k3e.js" async type="module"></script>
-                  <style>wistia-player[media-id='aerent0k3e']:not(:defined) { background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/aerent0k3e/swatch'); display: block; filter: blur(5px); padding-top:62.5%; }</style> 
-                  <wistia-player media-id="a52xcz0y2s"></wistia-player>
-                </div>
-                <div>
-                  <p class="text-[#0e141b] text-base font-medium leading-normal">Solid and fast</p>
-                  <p class="text-[#4e7397] text-sm font-normal leading-normal">
-                    Lightweight desktop application written in GO (wails). Official kubernetes client provides compatibility with latest k8s versions. Kubeconfig is the only thing required.
-                  </p>
-                </div>
+            <div class="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-60">
+              <div
+                class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+                style='background-image: url("/assets/logs.png);'
+              ></div>
+              <div>
+                <p class="text-[#111518] text-base font-medium leading-normal">Logs</p>
+                <p class="text-[#60778a] text-sm font-normal leading-normal">Syntax highlighted log viewer.</p>
               </div>
-              <div class="flex flex-col gap-3 pb-3">               
-                <div class="zoomist-container1">                 
-                  <div class="zoomist-wrapper">                   
-                    <div class="zoomist-image">                     
-                      <img src="assets/logs.png" />
-                    </div>
-                  </div>
-                </div>                
-                <div>
-                  <p class="text-[#0e141b] text-base font-medium leading-normal">No dependecies</p>
-                  <p class="text-[#4e7397] text-sm font-normal leading-normal">
-                    Single binary that you can run on any platform (available only for Windows as on Q4'2024). Even in `air-gapped` environments!
-                  </p>
-                </div>
-              </div>
-              <div class="flex flex-col gap-3 pb-3">
-               <div class="zoomist-container2">                 
-                  <div class="zoomist-wrapper">                   
-                    <div class="zoomist-image">                     
-                      <img src="assets/exec.png" />
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <p class="text-[#0e141b] text-base font-medium leading-normal">Logs, events and pods terminal</p>
-                  <p class="text-[#4e7397] text-sm font-normal leading-normal">
-                    We got everything you need to manage your kubernetes clusters. Multi cluster support, syntax highlighted log viewer, fine grained events display, one click pod shell access and much more!
-                  </p>
-                </div>
-              </div>
-              <div class="flex flex-col gap-3 pb-3">
-               <div class="zoomist-container3">                 
-                  <div class="zoomist-wrapper">                   
-                    <div class="zoomist-image">                     
-                      <img src="assets/details.png" />
-                    </div>
-                  </div>
-                </div>
-                <div>
-                  <p class="text-[#0e141b] text-base font-medium leading-normal">Simple and effecient UI</p>
-                  <p class="text-[#4e7397] text-sm font-normal leading-normal">
-                    Precise admin interface with one click access to all required features and workload details (including perfomance stats from metrics-server).
-                  </p>
-                </div>
+            </div>
+            <div class="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-60">
+              <div
+                class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-xl flex flex-col"
+                style='background-image: url("/assets/exec.png");'
+              ></div>
+              <div>
+                <p class="text-[#111518] text-base font-medium leading-normal">Exec</p>
+                <p class="text-[#60778a] text-sm font-normal leading-normal">One click Pod shell access.</p>
               </div>
             </div>
           </div>
-        </div>        
+        </div>
+        <h2 class="text-[#111518] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Pricing</h2>
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(228px,1fr))] gap-2.5 px-4 py-3 @3xl:grid-cols-4">
+          <div class="flex flex-1 flex-col gap-4 rounded-xl border border-solid border-[#dbe1e6] bg-white p-6 max-w-[480px]">
+            <div class="flex flex-col gap-1">
+              <h1 class="text-[#111518] text-base font-bold leading-tight">Starter</h1>
+              <span class="text-[#111518] text-4xl font-black leading-tight tracking-[-0.033em]">Free</span>
+            </div>
+            <button
+              class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-bold leading-normal tracking-[0.015em]"
+            >
+              <span class="truncate" onclick="window.open('https://github.com/gerbil/kubeui-public/releases/latest/download/kubeui-windows-x86_64.zip', '_blank');">Get Started</span>
+            </button>
+            <div class="flex flex-col gap-2">
+              <div class="text-[13px] font-normal leading-normal flex gap-3 text-[#111518]">
+                <div class="text-[#111518]" data-icon="Check" data-size="20px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path>
+                  </svg>
+                </div>
+                Unlimited clusters
+              </div>
+              <div class="text-[13px] font-normal leading-normal flex gap-3 text-[#111518]">
+                <div class="text-[#111518]" data-icon="Check" data-size="20px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path>
+                  </svg>
+                </div>
+                1 user
+              </div>
+              <div class="text-[13px] font-normal leading-normal flex gap-3 text-[#111518]">
+                <div class="text-[#111518]" data-icon="Check" data-size="20px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path>
+                  </svg>
+                </div>
+                Non commercial usage
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="grid grid-cols-[repeat(auto-fit,minmax(228px,1fr))] gap-2.5 px-4 py-3 @3xl:grid-cols-4">
+          <div class="flex flex-1 flex-col gap-4 rounded-xl border border-solid border-[#dbe1e6] bg-white p-6 max-w-[480px]">
+            <div class="flex flex-col gap-1">
+              <h1 class="text-[#111518] text-base font-bold leading-tight">Starter</h1>
+              <span class="text-[#111518] text-4xl font-black leading-tight tracking-[-0.033em]">Premium</span>
+            </div>
+            <button
+              class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-[#f0f2f5] text-[#111518] text-sm font-bold leading-normal tracking-[0.015em]"
+            >
+              <span class="truncate" onclick="window.open('https://buy.stripe.com/cN2cNAfJs5It8CY8ww', '_blank');">Buy</span>
+            </button>
+            <div class="flex flex-col gap-2">
+              <div class="text-[13px] font-normal leading-normal flex gap-3 text-[#111518]">
+                <div class="text-[#111518]" data-icon="Check" data-size="20px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path>
+                  </svg>
+                </div>
+                Everything from Starter pack
+              </div>
+              <div class="text-[13px] font-normal leading-normal flex gap-3 text-[#111518]">
+                <div class="text-[#111518]" data-icon="Check" data-size="20px" data-weight="regular">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="20px" height="20px" fill="currentColor" viewBox="0 0 256 256">
+                    <path d="M229.66,77.66l-128,128a8,8,0,0,1-11.32,0l-56-56a8,8,0,0,1,11.32-11.32L96,188.69,218.34,66.34a8,8,0,0,1,11.32,11.32Z"></path>
+                  </svg>
+                </div>
+                Commercial usage license
+              </div>              
+            </div>
+          </div>
+        </div>
+        <h2 class="text-[#111518] text-[22px] font-bold leading-tight tracking-[-0.015em] px-4 pb-3 pt-5">Unique ingredients</h2>
+        <div class="flex overflow-y-auto [-ms-scrollbar-style:none] [scrollbar-width:none] [&amp;::-webkit-scrollbar]:hidden">
+          <div class="flex items-stretch p-4 gap-3">
+            <div class="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-40">
+              <div
+                class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-xl flex flex-col"
+                style='background-image: url("https://cdn.usegalileo.ai/sdxl10/96948c20-f2c4-4ca1-becc-78b18a637600.png");'
+              ></div>
+              <div>
+                <p class="text-[#111518] text-base font-medium leading-normal">Custom resource generator</p>
+                <p class="text-[#60778a] text-sm font-normal leading-normal">CR example auto-generation based on existing CRDs.</p>
+              </div>
+            </div>
+            <div class="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-40">
+              <div
+                class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-xl flex flex-col"
+                style='background-image: url("https://cdn.usegalileo.ai/sdxl10/c9c23f46-b3c2-47c7-9332-4adddc234803.png");'
+              ></div>
+              <div>
+                <p class="text-[#111518] text-base font-medium leading-normal">Deployments</p>
+                <p class="text-[#60778a] text-sm font-normal leading-normal">Manage your deployments.</p>
+              </div>
+            </div>
+            <div class="flex h-full flex-1 flex-col gap-4 rounded-lg min-w-40">
+              <div
+                class="w-full bg-center bg-no-repeat aspect-[3/4] bg-cover rounded-xl flex flex-col"
+                style='background-image: url("https://cdn.usegalileo.ai/sdxl10/55ca5c4f-9633-4e9e-b448-648949c6cac6.png");'
+              ></div>
+              <div>
+                <p class="text-[#111518] text-base font-medium leading-normal">Load Balancing</p>
+                <p class="text-[#60778a] text-sm font-normal leading-normal">Control traffic to your apps.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="flex px-4 py-3">
+          <button
+            class="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-12 px-5 flex-1 bg-[#f0f2f5] text-[#111518] text-base font-bold leading-normal tracking-[0.015em]"
+          >
+            <span class="truncate">Buy Now</span>
+          </button>
+        </div>
+        <div class="h-5 bg-white"></div>
       </div>
     </div>
-
-    <script>
-      const zoomist1 = new Zoomist('.zoomist-container1', {
-        maxScale: 4,
-        bounds: true,
-        slider: false,
-        zoomer: true
-      })
-      const zoomist2 = new Zoomist('.zoomist-container2', {
-        maxScale: 4,
-        bounds: true,
-        slider: false,
-        zoomer: true
-      })
-      const zoomist3 = new Zoomist('.zoomist-container3', {
-        maxScale: 4,
-        bounds: true,
-        slider: false,
-        zoomer: true
-      })
-    </script>
-    
   </body>
 </html>
