@@ -15,6 +15,7 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js" integrity="sha512-7x3zila4t2qNycrtZ31HO0NnJr8kg2VI67YLoRSyi9hGhRN66FHYWr7Axa9Y1J9tGYHVBPqIjSE1ogHrJTz51g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <link href="assets/css/lightbox.css" rel="stylesheet" />
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@simondmc/popup-js@1.4.2/popup.min.js"></script>
         <script src="assets/js/lightbox.js"></script>
     </head>
 
@@ -25,10 +26,12 @@
             <div class="container max-w-screen-xl mx-auto px-4">
 
                 <nav class="flex items-center justify-between mb-20">
-                    <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-5">KubeUI</h1>
-                    <span style="margin-right: auto; position: relative; top: -15px; left: 15px; font-size: smaller; line-height: normal;">// Kubernetes admin desktop application</span>
+                    <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-5">KubeUI</h1>                
 
-                    <button class="px-7 py-3 md:px-9 md:py-4 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500" onclick="window.open('https://github.com/gerbil/kubeui-public/releases/latest/download/kubeui-windows-x86_64.zip', '_blank');">Free download</button>
+                    <div>
+                      <button class="px-7 py-3 md:px-9 md:py-4 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500" onclick="window.open('https://github.com/gerbil/kubeui-public/releases/latest/download/kubeui-windows-x86_64.zip', '_blank');" title="By downloading app, you agree with our terms and conditions">Free download</button>
+                      <div onclick="popup.show();" style="cursor: pointer; position: relative; left: 20px; top: 5px; text-decoration:underline; text-decoration-style: dotted; color: grey;">Terms & Conditions<div>
+                    </div>   
                 </nav>
 
                 <div class="text-center">
@@ -285,9 +288,35 @@
 
         </footer>
 
-
         <script>
             feather.replace()
+
+            const popup = new Popup({
+              id: "disclaimer",
+              title: "Disclaimer",
+              content:
+                  "Copyright (c) 2024, Jurijs Kobecs. All rights reserved.<br/>Redistribution and use in source and binary forms, with or without modification, are not permitted.<br/>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JURIJS KOBECS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.",
+              sideMargin: "2.9vw",
+              titleColor: "#fff",
+              textColor: "#fff",
+              backgroundColor: "#6b7280",
+              closeColor: "#fff",
+              fontSizeMultiplier: 0.6,
+              linkColor: "#888",
+              font: "Poppins",
+              css: `
+              .popup {
+                background-color: transparent !important;
+              }
+              .popup-title {
+                background-color: font-weight: 200 !important;
+                font-size: min(35px, 11vw);
+                margin-top: 1vh !important;
+              }
+              .popup.disclaimer .popup-header {
+                margin-bottom: 0% !important;
+              }`
+          });
         </script>
 
     </body>
