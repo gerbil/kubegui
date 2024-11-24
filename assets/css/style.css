@@ -1,4 +1,4 @@
-html {
+html, body {
   overscroll-behavior: none;
   max-width: 100%;
   overflow-x: hidden;
