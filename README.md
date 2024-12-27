@@ -1,4 +1,4 @@
-# KubeUI.app public repo
+# KubeGUI.io public repo
 
 ## Scope:
 - Application releases
