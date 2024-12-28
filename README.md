@@ -1,4 +1,4 @@
-# KubeGUI.io public repo
+# KubeGUI - Kubernetes UI / admin desktop application
 
 ## Scope:
 - Application releases
