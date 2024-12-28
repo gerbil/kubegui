@@ -2,6 +2,29 @@
 
 Official website - https://kubegui.io
 
+Comparison table: 
+| Feature                            | KubeGUI | Kubernetes dashboard | LENS | k9s |
+|------------------------------------|---------|----------------------|------|-----|
+| Desktop version                    | +       | -                    | +    | -   |
+| Multi cluster support              | +       | -                    | +    | -   |
+| Large cluster views support        | +       | -                    | -    | +   |
+| No 3rd party dependecies           | +       | -                    | -    | -   |
+| Workload views                     | +       | +                    | +    | +   |
+| Workload yaml error check (linter) | +       | -                    | -    | -   |
+| Resource creation templates        | +       | -                    | -    | -   |
+| Custom resources view              | +       | +                    | +    | +   |
+| Custom resources generation        | +       | -                    | -    | -   |
+| Network view (services/endpoints)  | +       | +                    | +    | +   |
+| Network policies vizualisation     | +       | -                    | -    | -   |
+| Storage view                       | +       | +                    | +    | +   |
+| Configs view (including secrets)   | +       | +                    | +    | +   |
+| Logs viewer (basic)                | +       | +                    | +    | +   |
+| Logs viewer (highliting)           | +       | -                    | -    | -   |
+| Pod interactive sessions (exec)    | +       | +                    | -    | -   |
+| Resource usage view (metrics)      | +       | +                    | +    | +   |
+| Scaling  (vpa/hpa) config/view     | +       | +                    | +    | -   |
+| Cluster events view                | +       | +                    | +    | +   |
+
 ## Scope:
 - Application releases
 - Website src
