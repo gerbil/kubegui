@@ -7,13 +7,14 @@ Comparison table:
 |------------------------------------|---------|----------------------|------|-----|
 | Desktop version                    | +       | -                    | +    | -   |
 | Multi cluster support              | +       | -                    | +    | -   |
+| Official Kubernetes client usage   | +       | -                    | -    | +   |
 | Large cluster views support        | +       | -                    | -    | +   |
-| No 3rd party dependecies           | +       | -                    | -    | -   |
+| Non 3rd party software dependecies | +       | -                    | -    | -   |
 | Workload views                     | +       | +                    | +    | +   |
 | Workload yaml error check (linter) | +       | -                    | -    | -   |
 | Resource creation templates        | +       | -                    | -    | -   |
 | Custom resources view              | +       | +                    | +    | +   |
-| Custom resources generation        | +       | -                    | -    | -   |
+| Custom resources generator         | +       | -                    | -    | -   |
 | Network view (services/endpoints)  | +       | +                    | +    | +   |
 | Network policies vizualisation     | +       | -                    | -    | -   |
 | Storage view                       | +       | +                    | +    | +   |
