@@ -26,6 +26,7 @@ Comparison table:
 | Scaling  (vpa/hpa) config/view     | +       | +                    | +    | -   |
 | Cluster events view                | +       | +                    | +    | +   |
 | Port forwarding                    | +       | -                    | +    | +   |
+| Auto update for application        | +       | -                    | -    | -   |
 
 ## Scope:
 - Application releases
