@@ -5,6 +5,7 @@ Official website - https://kubegui.io
 Comparison table: 
 | Feature                            | KubeGUI | Kubernetes dashboard | LENS | k9s |
 |------------------------------------|---------|----------------------|------|-----|
+| Price *                            | $50     | Free                 | $300 | Free|
 | Desktop version                    | +       | -                    | +    | -   |
 | Multi cluster support              | +       | -                    | +    | -   |
 | Official Kubernetes client usage   | +       | -                    | -    | +   |
@@ -27,6 +28,8 @@ Comparison table:
 | Cluster events view                | +       | +                    | +    | +   |
 | Port forwarding                    | +       | -                    | +    | +   |
 | Auto update for application        | +       | -                    | -    | -   |
+
+* Price for 1 user per year (commercial, but not EE version)
 
 ## Scope:
 - Application releases
