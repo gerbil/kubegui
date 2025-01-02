@@ -25,6 +25,7 @@ Comparison table:
 | Resource usage view (metrics)      | +       | +                    | +    | +   |
 | Scaling  (vpa/hpa) config/view     | +       | +                    | +    | -   |
 | Cluster events view                | +       | +                    | +    | +   |
+| Port forwarding                    | +       | -                    | +    | +   |
 
 ## Scope:
 - Application releases
