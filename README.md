@@ -27,9 +27,10 @@ Comparison table:
 | Scaling  (vpa/hpa) config/view     | +       | +                    | +    | -   |
 | Cluster events view                | +       | +                    | +    | +   |
 | Port forwarding                    | +       | -                    | +    | +   |
-| Auto update for application        | +       | -                    | -    | -   |
+| Auto update for application **     | +       | -                    | -    | -   |
 
-* Price for 1 user per year (commercial, but not EE version)
+\* Price for 1 user per year (commercial, but not EE version)  
+\** Github.com connection required
 
 ## Scope:
 - Application releases
