@@ -17,7 +17,7 @@ Comparison table:
 | Custom resources view              | +       | +                    | +    | +   |
 | Custom resources generator         | +       | -                    | -    | -   |
 | Network view (services/endpoints)  | +       | +                    | +    | +   |
-| Network policies vizualisation     | +       | -                    | -    | -   |
+| Network policies visualization     | +       | -                    | -    | -   |
 | Storage view                       | +       | +                    | +    | +   |
 | Configs view (including secrets)   | +       | +                    | +    | +   |
 | Logs viewer (basic)                | +       | +                    | +    | +   |

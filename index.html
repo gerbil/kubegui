@@ -18,6 +18,7 @@
         <link rel="shortcut icon" href="assets/images/favicon.ico">
         <link rel="stylesheet" href="assets/css/tailwind.css">
         <link rel="stylesheet" href="assets/css/style.css" />
+         <link rel="stylesheet" href="assets/css/table.css" />
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -78,12 +79,152 @@
                     <h6 class="font-medium text-gray-600 text-lg md:text-2xl uppercase mb-8">Free for personal use.<br/>Commercial usage requires a license.</h6>
                     <h1 class="font-normal text-gray-900 text-4xl md:text-7xl leading-none mb-8">Now with multi cluster support!</h1>
                     <p class="font-normal text-gray-600 text-md md:text-xl mb-16">Batteries included. No external dependencies! KubeGUI can work even in `air gapped` environments.</p>
-                    <a href="#" class="px-7 py-3 md:px-9 md:py-4 font-medium md:font-semibold bg-gray-700 text-gray-50 text-sm rounded-md hover:bg-gray-50 hover:text-gray-700 transition ease-linear duration-500" onclick="window.open('https://buy.stripe.com/cN2cNAfJs5It8CY8ww', '_blank');">Buy</a>
-                    <p class="font-light text-xs mt-4">Invoice available on demand.</p>
+                    <a href="#" class="px-7 py-3 md:px-9 md:py-4 font-medium md:font-semibold bg-gray-700 text-gray-50 text-sm rounded-md hover:bg-gray-50 hover:text-gray-700 transition ease-linear duration-500" onclick="window.open('https://buy.stripe.com/cN2cNAfJs5It8CY8ww', '_blank');">Order Kubegui via stripe.com</a>
+                    <p class="font-light text-s mt-4">Invoice available on demand.</p>
                 </div>
 
+                <div class="table-responsive custom-table-responsive">
+                  <table class="table custom-table">
+                    <thead>
+                      <tr>
+                        <th scope="col">Feature</th>
+                        <th scope="col">Kubegui</th>
+                        <th scope="col">LENS</th>
+                        <th scope="col">Kubernetes dashboard</th>
+                        <th scope="col">k9s</th>
+                        <th scope="col">Portainer</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr scope="row">
+                        <td>Price</td>
+                        <td>$50</td>
+                        <td>$300</td>
+                        <td>Free</td>
+                        <td>Free</td>
+                        <td>$1200</td>
+                      </tr>
+                      <tr class="spacer"><td colspan="100"></td></tr>
+                      <tr>
+                        <td>Desktop version</td>
+                        <td><img src="assets/images/supported.png" /></td>
+                        <td><img src="assets/images/supported.png" /></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/supported.png"/></td>
+                      </tr>
+                      <tr class="spacer"><td colspan="100"></td></tr>
+                      <tr>
+                        <td>Multi cluster support</td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/supported.png"/></td>
+                      </tr>
+                      <tr class="spacer"><td colspan="100"></td></tr>
+                      <tr>
+                        <td>AI support for fix suggestions</td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                      </tr>
+                      <tr class="spacer"><td colspan="100"></td></tr>
+                      <tr>
+                        <td>Common resource controls</td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/supported.png"/></td>
+                      </tr>
+                      <tr class="spacer"><td colspan="100"></td></tr>
+                      <tr>
+                        <td>Custom resource controls</td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/supported.png"/></td>
+                      </tr>
+                      <tr class="spacer"><td colspan="100"></td></tr>
+                      <tr>
+                        <td>Advanced resource editor</td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                      </tr>
+                      <tr class="spacer"><td colspan="100"></td></tr>
+                      <tr>
+                        <td>Custom resource generator</td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                      </tr>
+                      <tr class="spacer"><td colspan="100"></td></tr>
+                      <tr>
+                        <td>Network policies visualization</td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                      </tr>
+                      <tr class="spacer"><td colspan="100"></td></tr>
+                      <tr>
+                        <td>Official Kubernetes libs usage</td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                      </tr>
+                      <tr class="spacer"><td colspan="100"></td></tr>
+                      <tr>
+                        <td>No external dependecies</td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                      </tr>
+                      <tr class="spacer"><td colspan="100"></td></tr>
+                      <tr>
+                        <td>Advanced logs viewer</td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                      </tr>
+                      <tr class="spacer"><td colspan="100"></td></tr>
+                      <tr>
+                        <td>Pods shell direct access</td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                      </tr>
+                      <tr class="spacer"><td colspan="100"></td></tr>
+                      <tr>
+                        <td>Pod port forwarding</td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                        <td><img src="assets/images/supported.png"/></td>
+                        <td><img src="assets/images/notsupported.png"/></td>
+                      </tr>                     
+                    </tbody>
+                  </table>
+                </div>
             </div>
-
         </section>
 
         <section class="py-10 md:py-16">
