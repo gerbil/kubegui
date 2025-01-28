@@ -16,7 +16,7 @@
         <meta property="og:locale" content="en_US" />
         
         <link rel="shortcut icon" href="assets/images/favicon.ico">
-        <link rel="stylesheet" href="assets/css/tailwind.css">
+        <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
         <link rel="stylesheet" href="assets/css/style.css" />
          <link rel="stylesheet" href="assets/css/table.css" />
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -83,7 +83,7 @@
                     <p class="font-light text-s mt-4">Invoice available on demand.</p>
                 </div>
 
-                <div class="table-responsive custom-table-responsive">
+                <div class="table-responsive custom-table-responsive max-[400px]:text-xs">
                   <table class="table custom-table">
                     <thead>
                       <tr>
@@ -96,6 +96,7 @@
                       </tr>
                     </thead>
                     <tbody>
+                      <tr class="spacer"><td colspan="100"></td></tr>
                       <tr scope="row">
                         <td>Price</td>
                         <td>$50</td>
