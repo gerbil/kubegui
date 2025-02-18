@@ -1,456 +1,427 @@
 <!DOCTYPE html>
 <html lang="en">
+<head>
+  <title>KubeGUI - Kubernetes admin desktop application</title>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="Kubernetes UI / admin desktop application for Devops, SRE and platform engineers.">
+  <meta name="og:title" content="KubeGUI - Kubernetes admin desktop application">
+  <meta name="og:description" content="Kubernetes UI / admin desktop application for Devops, SRE and platform engineers.">
+  <meta name="og:image" content="https://kubeui.app/assets/images/big.png">
+  <meta name="og:type" content="website">
+  <meta name="og:site_name" content="KubeGUI">
+  <meta property="og:locale" content="en_US" />
+  <link rel="shortcut icon" href="assets/images/favicon.ico">
+  <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
+  <link rel="stylesheet" href="assets/css/style.css" />
+  <link rel="stylesheet" href="assets/css/table.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js" integrity="sha512-7x3zila4t2qNycrtZ31HO0NnJr8kg2VI67YLoRSyi9hGhRN66FHYWr7Axa9Y1J9tGYHVBPqIjSE1ogHrJTz51g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <link href="assets/css/lightbox.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@simondmc/popup-js@1.4.2/popup.min.js"></script>
+  <script src="assets/js/lightbox.js"></script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "KubeUI",
+      "operatingSystem": "Windows",
+      "applicationCategory": "DeveloperApplication",
+      "aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": 5,
+        "ratingCount": 1
+      },
+      "offers": {
+        "@type": "Offer",
+        "price": 50.00,
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Jurijs Kobecs"
+      }
+    }
+  </script>
+</head>
 
-    <head>
-        <title>KubeGUI - Kubernetes admin desktop application</title>
-
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="initial-scale=1, maximum-scale=1.0, user-scalable=no" />
-        <meta name="description" content="Kubernetes UI / admin desktop application for Devops, SRE and platform engineers.">
-        <meta name="og:title" content="KubeGUI - Kubernetes admin desktop application">
-        <meta name="og:description" content="Kubernetes UI / admin desktop application for Devops, SRE and platform engineers.">
-        <meta name="og:image" content="https://kubeui.app/assets/images/big.png">
-        <meta name="og:type" content="website">
-        <meta name="og:site_name" content="KubeGUI">
-        <meta property="og:locale" content="en_US" />
-        
-        <link rel="shortcut icon" href="assets/images/favicon.ico">
-        <script src="https://unpkg.com/@tailwindcss/browser@4"></script>
-        <link rel="stylesheet" href="assets/css/style.css" />
-         <link rel="stylesheet" href="assets/css/table.css" />
-        <link rel="preconnect" href="https://fonts.googleapis.com">
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/feather-icons/4.28.0/feather.min.js" integrity="sha512-7x3zila4t2qNycrtZ31HO0NnJr8kg2VI67YLoRSyi9hGhRN66FHYWr7Axa9Y1J9tGYHVBPqIjSE1ogHrJTz51g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-        <link href="assets/css/lightbox.css" rel="stylesheet" />
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@simondmc/popup-js@1.4.2/popup.min.js"></script>
-        <script src="assets/js/lightbox.js"></script>
-        
-        <script type="application/ld+json">
-          {
-            "@context": "https://schema.org",
-            "@type": "SoftwareApplication",
-            "name": "KubeUI",
-            "operatingSystem": "Windows",
-            "applicationCategory": "DeveloperApplication",
-            "aggregateRating": {
-              "@type": "AggregateRating",
-              "ratingValue": 5,
-              "ratingCount": 1
-            },
-            "offers": {
-              "@type": "Offer",
-              "price": 50.00,
-              "priceCurrency": "USD"
-            },
-            "author": {
-              "@type": "Person",
-              "name": "Jurijs Kobecs"
-            }
-          }
-          </script>
-    </head>
-
-    <body class="bg-gray-100">
-        
-        <section class="py-10 md:py-16">
-            <div class="container max-w-screen-xl mx-auto px-4">
-                <nav class="flex items-center justify-between mb-20">
-                  <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-1">
-                    <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-5 title">KubeGUI</h1>
-                    <span class="font-light text-gray-700 text-small md:text-smaller description mr-4">Kubernetes UI / admin desktop application for Devops, SRE and platform engineers.</span>
-                  </div>
-
-                   <section class="py-2 md:py-2">
-                    <div class="container max-w-screen-xl mx-auto px-2">
-                        <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-1">
-                          <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500" onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-windows-x86_64.zip', '_blank');" title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">Windows<br/><span class="text-xs">free download</span></button>
-                          <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500" onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-linux_amd64.zip', '_blank');" title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">Linux<br/><span class="text-xs">free download</span></button>
-                          <!--<button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500" onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-macos.zip', '_blank');" title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">Macos<br/><span class="text-xs">free download</span></button>-->
-                        </div>
-                        <div onclick="popup.show();" style="cursor: pointer; position: relative; top: 5px; text-decoration:underline; text-decoration-style: dotted; color: grey; margin-left: auto; margin-right: auto; width: 150px !important; xs:text-small;">Terms & Conditions<div>
-                    </div>  
-                  </section> 
-                </nav>
-
-                <div class="text-center">
-                    <div class="flex justify-center mb-16">
-                         <a href="assets/images/big.png" data-lightbox="main"><img src="assets/images/big.png" class="bg-gray-100 rounded-md p-1" /></a>
-                    </div>
-                    <h6 class="font-medium text-gray-600 text-lg md:text-2xl uppercase mb-8">Free for personal use.<br/>Commercial usage requires a license.</h6>
-                    <h1 class="font-normal text-gray-900 text-4xl md:text-7xl leading-none mb-8">Now with AI suggestions!</h1>
-                    <p class="font-normal text-gray-600 text-md md:text-xl mb-16">No external dependencies! KubeGUI can work even in `air gapped` environments.</p>
-                    <a href="#" class="px-7 py-3 md:px-9 md:py-4 font-medium md:font-semibold bg-gray-700 text-gray-50 text-sm rounded-md hover:bg-gray-50 hover:text-gray-700 transition ease-linear duration-500" onclick="window.open('https://buy.stripe.com/cN2cNAfJs5It8CY8ww', '_blank');">Order Kubegui via stripe.com</a>
-                    <p class="font-light text-s mt-4">Invoice available on demand.</p>
-                </div>
-
-                <div class="table-responsive custom-table-responsive max-[400px]:text-xs">
-                  <table class="table custom-table">
-                    <thead>
-                      <tr>
-                        <th scope="col">Feature</th>
-                        <th scope="col">Kubegui</th>
-                        <th scope="col">LENS</th>
-                        <th scope="col">Kubernetes dashboard</th>
-                        <th scope="col">k9s</th>
-                        <th scope="col">Portainer</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr class="spacer"><td colspan="100"></td></tr>
-                      <tr scope="row">
-                        <td>Price</td>
-                        <td>$50</td>
-                        <td>$300</td>
-                        <td>Free</td>
-                        <td>Free</td>
-                        <td>$1200</td>
-                      </tr>
-                      <tr class="spacer"><td colspan="100"></td></tr>
-                      <tr>
-                        <td>Desktop version</td>
-                        <td><img src="assets/images/supported.png" /></td>
-                        <td><img src="assets/images/supported.png" /></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/supported.png"/></td>
-                      </tr>
-                      <tr class="spacer"><td colspan="100"></td></tr>
-                      <tr>
-                        <td>Multi cluster support</td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/supported.png"/></td>
-                      </tr>
-                      <tr class="spacer"><td colspan="100"></td></tr>
-                      <tr>
-                        <td>AI support for fix suggestions</td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                      </tr>
-                      <tr class="spacer"><td colspan="100"></td></tr>
-                      <tr>
-                        <td>Common resource controls</td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/supported.png"/></td>
-                      </tr>
-                      <tr class="spacer"><td colspan="100"></td></tr>
-                      <tr>
-                        <td>Custom resource controls</td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/supported.png"/></td>
-                      </tr>
-                      <tr class="spacer"><td colspan="100"></td></tr>
-                      <tr>
-                        <td>Advanced resource editor</td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                      </tr>
-                      <tr class="spacer"><td colspan="100"></td></tr>
-                      <tr>
-                        <td>Custom resource generator</td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                      </tr>
-                      <tr class="spacer"><td colspan="100"></td></tr>
-                      <tr>
-                        <td>Network policies visualization</td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                      </tr>
-                      <tr class="spacer"><td colspan="100"></td></tr>
-                      <tr>
-                        <td>Official Kubernetes libs usage</td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                      </tr>
-                      <tr class="spacer"><td colspan="100"></td></tr>
-                      <tr>
-                        <td>No external dependecies</td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                      </tr>
-                      <tr class="spacer"><td colspan="100"></td></tr>
-                      <tr>
-                        <td>Advanced logs viewer</td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                      </tr>
-                      <tr class="spacer"><td colspan="100"></td></tr>
-                      <tr>
-                        <td>Pods shell direct access</td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                      </tr>
-                      <tr class="spacer"><td colspan="100"></td></tr>
-                      <tr>
-                        <td>Pod port forwarding</td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                        <td><img src="assets/images/supported.png"/></td>
-                        <td><img src="assets/images/notsupported.png"/></td>
-                      </tr>                     
-                    </tbody>
-                  </table>
-                </div>
+<body class="bg-gray-100">
+<section class="py-10 md:py-16">
+  <div class="container max-w-screen-xl mx-auto px-4">
+    <nav class="flex items-center justify-between mb-20">
+      <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-1">
+        <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-5 title">KubeGUI</h1>
+        <span class="font-light text-gray-700 text-small md:text-smaller description mr-4">Kubernetes UI / admin desktop application for Devops, SRE and platform engineers.</span>
+      </div>
+      <section class="py-2 md:py-2">
+        <div class="container max-w-screen-xl mx-auto px-2">
+          <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-1">
+            <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500" onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-windows-x86_64.zip', '_blank');" title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">Windows<br/><span class="text-xs">free download</span></button>
+            <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500" onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-linux_amd64.zip', '_blank');" title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">Linux<br/><span class="text-xs">free download</span></button>
+            <!--<button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500" onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-macos.zip', '_blank');" title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">Macos<br/><span class="text-xs">free download</span></button>-->
+          </div>
+          <div onclick="popup.show();" style="cursor: pointer; position: relative; top: 5px; text-decoration:underline; text-decoration-style: dotted; color: grey; margin-left: auto; margin-right: auto; width: 150px !important; xs:text-small;">
+            Terms & Conditions
+            <div>
             </div>
-        </section>
-
-        <section class="py-10 md:py-16">
-            <div class="container max-w-screen-xl mx-auto px-4">
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="bg-gray-50 px-8 py-10 rounded-md">
-                        <nav class="flex items-center justify-between">
-                          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
-                            <i data-feather="layout"></i>
-                          </div>
-                          <div class="w-20 flex justify-center rounded-md mb-4">                            
-                            <a href="assets/images/details.png" data-lightbox="logs"><img src="assets/images/details.png" class="bg-gray-100 rounded-md p-1" /></a>
-                          </div>
-                        </nav>
-                        <h4 class="font-medium text-gray-700 text-lg mb-4">Effective UI/UX design</h4>
-                        <p class="font-normal text-gray-500 text-md">Connect to your clusters to see real time state and resources using simple UI with auto-refresh enabled.</p>
-                    </div>
-                    
-                    <div class="bg-gray-50 px-8 py-10 rounded-md">
-                       <nav class="flex items-center justify-between">
-                          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
-                            <i data-feather="file-text"></i>
-                          </div>
-                          <div class="w-20 flex justify-center rounded-md mb-4">                            
-                            <a href="assets/images/logs.png" data-lightbox="logs"><img src="assets/images/logs.png" class="bg-gray-100 rounded-md p-1" /></a>
-                          </div>
-                        </nav>
-                        <h4 class="font-medium text-gray-700 text-lg mb-4">Logs with syntax highlighting</h4>
-                        <p class="font-normal text-gray-500 text-md">Logs highlighting helps to view a log (of any type) with an error/warning syntax, color scheme & extensible severity levels.</p>
-                    </div>
-                    
-                    <div class="bg-gray-50 px-8 py-10 rounded-md">
-                        <nav class="flex items-center justify-between">
-                          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
-                            <i data-feather="command"></i>
-                          </div>
-                          <div class="w-20 flex justify-center rounded-md mb-4">                            
-                            <a href="assets/images/exec.png" data-lightbox="logs"><img src="assets/images/exec.png" class="bg-gray-100 rounded-md p-1" /></a>
-                          </div>
-                        </nav>
-                        <h4 class="font-medium text-gray-700 text-lg mb-4">One click Pod shell access</h4>
-                        <p class="font-normal text-gray-500 text-md">No more unnecessary connections, only direct client to pod communication.</p>
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-                    <div class="bg-gray-50 px-8 py-10 rounded-md">
-                        <nav class="flex items-center justify-between">
-                          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
-                            <i data-feather="activity"></i>
-                          </div>
-                          <div class="w-20 flex justify-center rounded-md mb-4">                            
-                            <a href="assets/images/metrics.png" data-lightbox="logs"><img src="assets/images/metrics.png" class="bg-gray-100 rounded-md p-1" /></a>
-                          </div>
-                        </nav>
-                        <h4 class="font-medium text-gray-700 text-lg mb-4">Performance metrics</h4>
-                        <p class="font-normal text-gray-500 text-md">Integrated Nodes and Pods metrics (metrics-server required).</p>
-                    </div>
-                    
-                    <div class="bg-gray-50 px-8 py-10 rounded-md">
-                       <nav class="flex items-center justify-between">
-                          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
-                            <i data-feather="wind"></i>
-                          </div>
-                          <div class="w-20 flex justify-center rounded-md mb-4">                            
-                            <a href="assets/images/events.png" data-lightbox="logs"><img src="assets/images/events.png" class="bg-gray-100 rounded-md p-1" /></a>
-                          </div>
-                        </nav>
-                        <h4 class="font-medium text-gray-700 text-lg mb-4">Events aggregation</h4>
-                        <p class="font-normal text-gray-500 text-md">Deployments centric events viewer.</p>
-                    </div>
-                    
-                    <div class="bg-gray-50 px-8 py-10 rounded-md">
-                        <nav class="flex items-center justify-between">
-                          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
-                            <i data-feather="edit"></i>
-                          </div>
-                          <div class="w-20 flex justify-center rounded-md mb-4">                            
-                            <a href="assets/images/edit.png" data-lightbox="logs"><img src="assets/images/edit.png" class="bg-gray-100 rounded-md p-1" /></a>
-                          </div>
-                        </nav>
-                        <h4 class="font-medium text-gray-700 text-lg mb-4">Resource editor with YAML validation</h4>
-                        <p class="font-normal text-gray-500 text-md">Simple and effective yaml editor with solarized theme support and included linters.</p>
-                    </div>
-                </div>
-
-            </div>
-
-        </section>
-
-        <section class="py-10 md:py-16">
-            <div class="container max-w-screen-xl mx-auto px-4">
-                <div class="flex flex-col lg:flex-row justify-between">
-                    <div class="mb-10 lg:mb-0" style="min-width: 300px; margin-right: 250px;">
-                        <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-5">Unique features</h1>
-                        <p class="font-normal text-gray-500 text-xs md:text-base">KubeUI specifics provided out-of-the box.</p>
-                    </div>
-
-                    <div class="space-y-24">
-                        <div class="flex space-x-6">
-                            <h1 class="font-normal text-gray-700 text-3xl md:text-4xl">01</h1>
-                            <span class="w-28 h-0.5 bg-gray-300 mt-5"></span>
-                            <div>
-                                <h1 class="font-normal text-gray-700 text-3xl md:text-4xl mb-5">Custom Resource creation</h1>
-                                <p class="font-normal text-gray-500 text-sm md:text-base">Custom Resouce generation from existing definition manifests.<br/>Any available CRD provides a schema used within KubeGUI to automagically generate Custom Resource example.<br/>Just click on 'Add resource' button on top to try it out!</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex space-x-6">
-                            <h1 class="font-normal text-gray-700 text-3xl md:text-4xl">02</h1>
-                            <span class="w-28 h-0.5 bg-gray-300 mt-5"></span>
-                            <div>
-                                <h1 class="font-normal text-gray-700 text-3xl md:text-4xl mb-5">Wails and official Go client usage</h1>
-                                <p class="font-normal text-gray-500 text-sm md:text-base">Lightweight desktop application written in GO (Wails).<br/>Official Kubernetes client provides compatibility with latest K8S versions. Kubeconfig is the only thing required!</p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex space-x-6">
-                            <h1 class="font-normal text-gray-700 text-3xl md:text-4xl">03</h1>
-                            <span class="w-28 h-0.5 bg-gray-300 mt-5"></span>
-                            <div>
-                                <h1 class="font-normal text-gray-700 text-3xl md:text-4xl mb-5">Deployment restart and scale in one click</h1>
-                                <p class="font-normal text-gray-500 text-sm md:text-base">Deployment scaling and simple restart available via list view.</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <section class="py-10 md:py-16">
-            <div class="container max-w-screen-xl mx-auto px-4">
-                <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-5">Roadmap</h1>
-                <p class="font-normal text-gray-500 text-xs md:text-base mb-20">Below is an official product roadmap.</p>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <div class="bg-gray-50 px-8 py-10 rounded-md">
-                        <h4 class="font-medium text-gray-700 text-lg mb-4">2025'Q1 - 2025'Q2</h4>
-                        <p class="font-normal text-gray-500 text-md mb-4">Macos version.</p>
-                        <div class="relative">
-                            <h6 class="font-semibold text-gray-500 text-md relative z-10"><a href="https://github.com/gerbil/kubeui-public/discussions">Github discussion</a></h6>
-                            <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-50 px-8 py-10 rounded-md">
-                        <h4 class="font-medium text-gray-700 text-lg mb-4">2025'Q2 - 2025'Q3</h4>
-                        <p class="font-normal text-gray-500 text-md mb-4">Advanced RBAC viewer.</p>
-                        <div class="relative">
-                            <h6 class="font-semibold text-gray-500 text-md relative z-10"><a href="https://github.com/gerbil/kubeui-public/discussions">Github discussion</a></h6>
-                            <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-50 px-8 py-10 rounded-md">
-                        <h4 class="font-medium text-gray-700 text-lg mb-4">2025'Q3 - 2025'Q4</h4>
-                        <p class="font-normal text-gray-500 text-md mb-4">Advanced events viewer.</p>
-                        <div class="relative">
-                            <h6 class="font-semibold text-gray-500 text-md relative z-10"><a href="https://github.com/gerbil/kubeui-public/discussions">Github discussion</a></h6>
-                            <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
-                        </div>
-                    </div>
-                    
-              </div>
-            </div>
-
-        </section>              
-
-        <footer class="py-10 md:py-16 mb-20 md:mb-40 lg::mb-52">
-            <div class="container max-w-screen-xl mx-auto px-4">
-                <div class="text-center">
-                    <h1 class="font-medium text-gray-700 text-4xl md:text-5xl mb-5">Contacts</h1>
-                    <p class="font-normal text-gray-400 text-md md:text-lg mb-20">Feel free to contact me anywhere. Community channels available in discord and slack.</p>
-                    <div class="flex items-center justify-center space-x-8">
-                        <a href="https://join.slack.com/t/kubegui/shared_invite/zt-300hiz9b6-xWdKKqhXNy4gS1WSIb182Q" class="w-16 h-16 flex items-center justify-center rounded-full hover:bg-gray-200 transition ease-in-out duration-500">
-                            <i data-feather="slack" class="text-gray-500 hover:text-gray-800 transition ease-in-out duration-500"></i>
-                        </a>
-                        <a href="https://www.facebook.com/groups/1093760135670105" class="w-16 h-16 flex items-center justify-center rounded-full hover:bg-gray-200 transition ease-in-out duration-500">
-                            <i data-feather="facebook" class="text-gray-500 hover:text-gray-700 transition ease-in-out duration-500"></i>
-                        </a>
-                        <a href="https://www.linkedin.com/groups/10015265/" class="w-16 h-16 flex items-center justify-center rounded-full hover:bg-gray-200 transition ease-in-out duration-500">
-                            <i data-feather="linkedin" class="text-gray-500 hover:text-gray-700 transition ease-in-out duration-500"></i>
-                        </a>
-                        <a href="https://discord.gg/Kqd6zHeZ" class="w-16 h-16 flex items-center justify-center rounded-full hover:bg-gray-200 transition ease-in-out duration-500">
-                            <i class="text-gray-500 hover:text-gray-700 transition ease-in-out feather"><img src="assets/images/discord.svg" style="width: 24px" /></i>
-                        </a>
-                    </div>
-                </div>
-
-            </div>
-
-        </footer>
-
-        <script>
-            feather.replace()
-
-            const popup = new Popup({
-              id: "disclaimer",
-              title: "",
-              content:
-                  "Copyright (c) 2024, Jurijs Kobecs. All rights reserved. Redistribution and use in source and binary forms, with or without modification, are not permitted. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JURIJS KOBECS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.",
-              sideMargin: "2.9vw",
-              titleColor: "#fff",
-              textColor: "#fff",
-              backgroundColor: "#6b7280",
-              closeColor: "#fff",
-              fontSizeMultiplier: 0.6,
-              linkColor: "#888",
-              font: "Poppins",
-              css: `
-              .popup {
-                background-color: transparent !important;
-              }
-              .popup-title {
-                background-color: font-weight: 200 !important;
-                font-size: min(35px, 11vw);
-                margin-top: 1vh !important;
-              }
-              .popup.disclaimer .popup-header {
-                margin-bottom: 0% !important;
-              }`
-          });
-        </script>
-
-    </body>
+      </section>
+    </nav>
+    <div class="text-center">
+      <div class="flex justify-center mb-16">
+        <a href="assets/images/big.png" data-lightbox="main"><img src="assets/images/big.png" class="bg-gray-100 rounded-md p-1" /></a>
+      </div>
+      <h6 class="font-medium text-gray-600 text-lg md:text-2xl uppercase mb-8">Free for personal use.<br/>Commercial usage requires a license.</h6>
+      <h1 class="font-normal text-gray-900 text-4xl md:text-7xl leading-none mb-8">Now with AI suggestions!</h1>
+      <p class="font-normal text-gray-600 text-md md:text-xl mb-16">No external dependencies! KubeGUI can work even in `air gapped` environments.</p>
+      <a href="#" class="px-7 py-3 md:px-9 md:py-4 font-medium md:font-semibold bg-gray-700 text-gray-50 text-sm rounded-md hover:bg-gray-50 hover:text-gray-700 transition ease-linear duration-500" onclick="window.open('https://buy.stripe.com/cN2cNAfJs5It8CY8ww', '_blank');">Order Kubegui via stripe.com</a>
+      <p class="font-light text-s mt-4">Invoice available on demand.</p>
+    </div>
+    <div class="table-responsive custom-table-responsive max-[400px]:text-xs">
+      <table class="table custom-table">
+        <thead>
+        <tr>
+          <th scope="col">Feature</th>
+          <th scope="col">Kubegui</th>
+          <th scope="col">LENS</th>
+          <th scope="col">Kubernetes dashboard</th>
+          <th scope="col">k9s</th>
+          <th scope="col">Portainer</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="spacer"><td colspan="100"></td></tr>
+        <tr scope="row">
+          <td>Price</td>
+          <td>$50</td>
+          <td>$300</td>
+          <td>Free</td>
+          <td>Free</td>
+          <td>$1200</td>
+        </tr>
+        <tr class="spacer"><td colspan="100"></td></tr>
+        <tr>
+          <td>Desktop version</td>
+          <td><img src="assets/images/supported.png" /></td>
+          <td><img src="assets/images/supported.png" /></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/supported.png"/></td>
+        </tr>
+        <tr class="spacer"><td colspan="100"></td></tr>
+        <tr>
+          <td>Multi cluster support</td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/supported.png"/></td>
+        </tr>
+        <tr class="spacer"><td colspan="100"></td></tr>
+        <tr>
+          <td>AI support for fix suggestions</td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+        </tr>
+        <tr class="spacer"><td colspan="100"></td></tr>
+        <tr>
+          <td>Common resource controls</td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/supported.png"/></td>
+        </tr>
+        <tr class="spacer"><td colspan="100"></td></tr>
+        <tr>
+          <td>Custom resource controls</td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/supported.png"/></td>
+        </tr>
+        <tr class="spacer"><td colspan="100"></td></tr>
+        <tr>
+          <td>Advanced resource editor</td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+        </tr>
+        <tr class="spacer"><td colspan="100"></td></tr>
+        <tr>
+          <td>Custom resource generator</td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+        </tr>
+        <tr class="spacer"><td colspan="100"></td></tr>
+        <tr>
+          <td>Network policies visualization</td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+        </tr>
+        <tr class="spacer"><td colspan="100"></td></tr>
+        <tr>
+          <td>Official Kubernetes libs usage</td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+        </tr>
+        <tr class="spacer"><td colspan="100"></td></tr>
+        <tr>
+          <td>No external dependecies</td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+        </tr>
+        <tr class="spacer"><td colspan="100"></td></tr>
+        <tr>
+          <td>Advanced logs viewer</td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+        </tr>
+        <tr class="spacer"><td colspan="100"></td></tr>
+        <tr>
+          <td>Pods shell direct access</td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+        </tr>
+        <tr class="spacer"><td colspan="100"></td></tr>
+        <tr>
+          <td>Pod port forwarding</td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+          <td><img src="assets/images/supported.png"/></td>
+          <td><img src="assets/images/notsupported.png"/></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+<section class="py-10 md:py-16">
+  <div class="container max-w-screen-xl mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="bg-gray-50 px-8 py-10 rounded-md">
+        <nav class="flex items-center justify-between">
+          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+            <i data-feather="layout"></i>
+          </div>
+          <div class="w-20 flex justify-center rounded-md mb-4">
+            <a href="assets/images/details.png" data-lightbox="logs"><img src="assets/images/details.png" class="bg-gray-100 rounded-md p-1" /></a>
+          </div>
+        </nav>
+        <h4 class="font-medium text-gray-700 text-lg mb-4">Effective UI/UX design</h4>
+        <p class="font-normal text-gray-500 text-md">Connect to your clusters to see real time state and resources using simple UI with auto-refresh enabled.</p>
+      </div>
+      <div class="bg-gray-50 px-8 py-10 rounded-md">
+        <nav class="flex items-center justify-between">
+          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+            <i data-feather="file-text"></i>
+          </div>
+          <div class="w-20 flex justify-center rounded-md mb-4">
+            <a href="assets/images/logs.png" data-lightbox="logs"><img src="assets/images/logs.png" class="bg-gray-100 rounded-md p-1" /></a>
+          </div>
+        </nav>
+        <h4 class="font-medium text-gray-700 text-lg mb-4">Logs with syntax highlighting</h4>
+        <p class="font-normal text-gray-500 text-md">Logs highlighting helps to view a log (of any type) with an error/warning syntax, color scheme & extensible severity levels.</p>
+      </div>
+      <div class="bg-gray-50 px-8 py-10 rounded-md">
+        <nav class="flex items-center justify-between">
+          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+            <i data-feather="command"></i>
+          </div>
+          <div class="w-20 flex justify-center rounded-md mb-4">
+            <a href="assets/images/exec.png" data-lightbox="logs"><img src="assets/images/exec.png" class="bg-gray-100 rounded-md p-1" /></a>
+          </div>
+        </nav>
+        <h4 class="font-medium text-gray-700 text-lg mb-4">One click Pod shell access</h4>
+        <p class="font-normal text-gray-500 text-md">No more unnecessary connections, only direct client to pod communication.</p>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+      <div class="bg-gray-50 px-8 py-10 rounded-md">
+        <nav class="flex items-center justify-between">
+          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+            <i data-feather="activity"></i>
+          </div>
+          <div class="w-20 flex justify-center rounded-md mb-4">
+            <a href="assets/images/metrics.png" data-lightbox="logs"><img src="assets/images/metrics.png" class="bg-gray-100 rounded-md p-1" /></a>
+          </div>
+        </nav>
+        <h4 class="font-medium text-gray-700 text-lg mb-4">Performance metrics</h4>
+        <p class="font-normal text-gray-500 text-md">Integrated Nodes and Pods metrics (metrics-server required).</p>
+      </div>
+      <div class="bg-gray-50 px-8 py-10 rounded-md">
+        <nav class="flex items-center justify-between">
+          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+            <i data-feather="wind"></i>
+          </div>
+          <div class="w-20 flex justify-center rounded-md mb-4">
+            <a href="assets/images/events.png" data-lightbox="logs"><img src="assets/images/events.png" class="bg-gray-100 rounded-md p-1" /></a>
+          </div>
+        </nav>
+        <h4 class="font-medium text-gray-700 text-lg mb-4">Events aggregation</h4>
+        <p class="font-normal text-gray-500 text-md">Deployments centric events viewer.</p>
+      </div>
+      <div class="bg-gray-50 px-8 py-10 rounded-md">
+        <nav class="flex items-center justify-between">
+          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+            <i data-feather="edit"></i>
+          </div>
+          <div class="w-20 flex justify-center rounded-md mb-4">
+            <a href="assets/images/edit.png" data-lightbox="logs"><img src="assets/images/edit.png" class="bg-gray-100 rounded-md p-1" /></a>
+          </div>
+        </nav>
+        <h4 class="font-medium text-gray-700 text-lg mb-4">Resource editor with YAML validation</h4>
+        <p class="font-normal text-gray-500 text-md">Simple and effective yaml editor with solarized theme support and included linters.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="py-10 md:py-16">
+  <div class="container max-w-screen-xl mx-auto px-4">
+    <div class="flex flex-col lg:flex-row justify-between">
+      <div class="mb-10 lg:mb-0" style="min-width: 300px; margin-right: 250px;">
+        <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-5">Unique features</h1>
+        <p class="font-normal text-gray-500 text-xs md:text-base">KubeUI specifics provided out-of-the box.</p>
+      </div>
+      <div class="space-y-24">
+        <div class="flex space-x-6">
+          <h1 class="font-normal text-gray-700 text-3xl md:text-4xl">01</h1>
+          <span class="w-28 h-0.5 bg-gray-300 mt-5"></span>
+          <div>
+            <h1 class="font-normal text-gray-700 text-3xl md:text-4xl mb-5">Custom Resource creation</h1>
+            <p class="font-normal text-gray-500 text-sm md:text-base">Custom Resouce generation from existing definition manifests.<br/>Any available CRD provides a schema used within KubeGUI to automagically generate Custom Resource example.<br/>Just click on 'Add resource' button on top to try it out!</p>
+          </div>
+        </div>
+        <div class="flex space-x-6">
+          <h1 class="font-normal text-gray-700 text-3xl md:text-4xl">02</h1>
+          <span class="w-28 h-0.5 bg-gray-300 mt-5"></span>
+          <div>
+            <h1 class="font-normal text-gray-700 text-3xl md:text-4xl mb-5">Wails and official Go client usage</h1>
+            <p class="font-normal text-gray-500 text-sm md:text-base">Lightweight desktop application written in GO (Wails).<br/>Official Kubernetes client provides compatibility with latest K8S versions. Kubeconfig is the only thing required!</p>
+          </div>
+        </div>
+        <div class="flex space-x-6">
+          <h1 class="font-normal text-gray-700 text-3xl md:text-4xl">03</h1>
+          <span class="w-28 h-0.5 bg-gray-300 mt-5"></span>
+          <div>
+            <h1 class="font-normal text-gray-700 text-3xl md:text-4xl mb-5">Deployment restart and scale in one click</h1>
+            <p class="font-normal text-gray-500 text-sm md:text-base">Deployment scaling and simple restart available via list view.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="py-10 md:py-16">
+  <div class="container max-w-screen-xl mx-auto px-4">
+    <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-5">Roadmap</h1>
+    <p class="font-normal text-gray-500 text-xs md:text-base mb-20">Below is an official product roadmap.</p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="bg-gray-50 px-8 py-10 rounded-md">
+        <h4 class="font-medium text-gray-700 text-lg mb-4">2025'Q1 - 2025'Q2</h4>
+        <p class="font-normal text-gray-500 text-md mb-4">Macos version.</p>
+        <div class="relative">
+          <h6 class="font-semibold text-gray-500 text-md relative z-10"><a href="https://github.com/gerbil/kubeui-public/discussions">Github discussion</a></h6>
+          <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-8 py-10 rounded-md">
+        <h4 class="font-medium text-gray-700 text-lg mb-4">2025'Q2 - 2025'Q3</h4>
+        <p class="font-normal text-gray-500 text-md mb-4">Advanced RBAC viewer.</p>
+        <div class="relative">
+          <h6 class="font-semibold text-gray-500 text-md relative z-10"><a href="https://github.com/gerbil/kubeui-public/discussions">Github discussion</a></h6>
+          <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-8 py-10 rounded-md">
+        <h4 class="font-medium text-gray-700 text-lg mb-4">2025'Q3 - 2025'Q4</h4>
+        <p class="font-normal text-gray-500 text-md mb-4">Advanced events viewer.</p>
+        <div class="relative">
+          <h6 class="font-semibold text-gray-500 text-md relative z-10"><a href="https://github.com/gerbil/kubeui-public/discussions">Github discussion</a></h6>
+          <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<footer class="py-10 md:py-16 mb-20 md:mb-40 lg::mb-52">
+  <div class="container max-w-screen-xl mx-auto px-4">
+    <div class="text-center">
+      <h1 class="font-medium text-gray-700 text-4xl md:text-5xl mb-5">Contacts</h1>
+      <p class="font-normal text-gray-400 text-md md:text-lg mb-20">Feel free to contact me anywhere. Community channels available in discord and slack.</p>
+      <div class="flex items-center justify-center space-x-8">
+        <a href="https://join.slack.com/t/kubegui/shared_invite/zt-300hiz9b6-xWdKKqhXNy4gS1WSIb182Q" class="w-16 h-16 flex items-center justify-center rounded-full hover:bg-gray-200 transition ease-in-out duration-500">
+          <i data-feather="slack" class="text-gray-500 hover:text-gray-800 transition ease-in-out duration-500"></i>
+        </a>
+        <a href="https://www.facebook.com/groups/1093760135670105" class="w-16 h-16 flex items-center justify-center rounded-full hover:bg-gray-200 transition ease-in-out duration-500">
+          <i data-feather="facebook" class="text-gray-500 hover:text-gray-700 transition ease-in-out duration-500"></i>
+        </a>
+        <a href="https://www.linkedin.com/groups/10015265/" class="w-16 h-16 flex items-center justify-center rounded-full hover:bg-gray-200 transition ease-in-out duration-500">
+          <i data-feather="linkedin" class="text-gray-500 hover:text-gray-700 transition ease-in-out duration-500"></i>
+        </a>
+        <a href="https://discord.gg/Kqd6zHeZ" class="w-16 h-16 flex items-center justify-center rounded-full hover:bg-gray-200 transition ease-in-out duration-500">
+          <i class="text-gray-500 hover:text-gray-700 transition ease-in-out feather"><img src="assets/images/discord.svg" style="width: 24px" /></i>
+        </a>
+      </div>
+    </div>
+  </div>
+</footer>
+<script>
+  feather.replace()
+  const popup = new Popup({
+    id: "disclaimer",
+    title: "",
+    content:
+      "Copyright (c) 2024, Jurijs Kobecs. All rights reserved. Redistribution and use in source and binary forms, with or without modification, are not permitted. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JURIJS KOBECS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.",
+    sideMargin: "2.9vw",
+    titleColor: "#fff",
+    textColor: "#fff",
+    backgroundColor: "#6b7280",
+    closeColor: "#fff",
+    fontSizeMultiplier: 0.6,
+    linkColor: "#888",
+    font: "Poppins",
+    css: `
+      .popup {
+      background-color: transparent !important;
+      }
+      .popup-title {
+      background-color: font-weight: 200 !important;
+      font-size: min(35px, 11vw);
+      margin-top: 1vh !important;
+      }
+      .popup.disclaimer .popup-header {
+      margin-bottom: 0% !important;
+      }`
+  });
+</script>
+</body>
 </html>
