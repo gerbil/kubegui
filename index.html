@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -53,21 +55,39 @@
 <section class="py-10 md:py-16">
   <div class="container max-w-screen-xl mx-auto px-4">
     <nav class="flex items-center justify-between mb-20">
-      <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-1 gap-1">
-        <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-5 title">KubeGUI</h1>
-        <span class="font-light text-gray-700 text-small md:text-smaller description mr-4">Kubernetes UI / admin desktop application for Devops, SRE and platform engineers.</span>
+      <div>
+        <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-2 title">KubeGUI</h1>
+        <span class="font-light text-gray-700 text-small md:text-smaller description">
+      Kubernetes UI / admin desktop application for DevOps, SRE and platform engineers.
+    </span>
       </div>
+
       <section class="py-2 md:py-2">
         <div class="container max-w-screen-xl mx-auto px-2">
-          <div class="grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 gap-1">
-            <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500" onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-windows-x86_64.zip', '_blank');" title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">Windows<br/><span class="text-xs">free download</span></button>
-            <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500" onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-linux_amd64.zip', '_blank');" title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">Linux<br/><span class="text-xs">free download</span></button>
-            <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500" onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-macos.zip', '_blank');" title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">Macos<br/><span class="text-xs">free download</span></button>
+          <div class="flex justify-end space-x-3">
+            <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
+                    onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-windows-x86_64.zip', '_blank');"
+                    title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">
+              Windows<br><span class="text-xs">free download</span>
+            </button>
+
+            <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
+                    onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-linux_amd64.zip', '_blank');"
+                    title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">
+              Linux<br><span class="text-xs">free download</span>
+            </button>
+
+            <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
+                    onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-macos.zip', '_blank');"
+                    title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">
+              MacOS<br><span class="text-xs">free download</span>
+            </button>
           </div>
-          <div onclick="popup.show();" style="cursor: pointer; position: relative; top: 5px; text-decoration:underline; text-decoration-style: dotted; color: grey; margin-left: auto; margin-right: auto; width: 150px !important; xs:text-small;">
-            Terms & Conditions
-            <div>
-            </div>
+
+          <div onclick="popup.show();" class="text-center mt-2" style="cursor: pointer; text-decoration:underline; text-decoration-style: dotted; color: grey;">
+            Terms &amp; Conditions
+          </div>
+        </div>
       </section>
     </nav>
     <div class="text-center">
@@ -346,15 +366,15 @@
     <p class="font-normal text-gray-500 text-xs md:text-base mb-20">Below is an official product roadmap.</p>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div class="bg-gray-50 px-8 py-10 rounded-md">
-        <h4 class="font-medium text-gray-700 text-lg mb-4">2025'Q3 - 2025'Q4</h4>
-        <p class="font-normal text-gray-500 text-md mb-4">Huge cluster support.</p>
+        <h4 class="font-medium text-gray-700 text-lg mb-4">2025'Q1 - 2025'Q2</h4>
+        <p class="font-normal text-gray-500 text-md mb-4">Macos version.</p>
         <div class="relative">
           <h6 class="font-semibold text-gray-500 text-md relative z-10"><a href="https://github.com/gerbil/kubeui-public/discussions">Github discussion</a></h6>
           <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
         </div>
       </div>
       <div class="bg-gray-50 px-8 py-10 rounded-md">
-        <h4 class="font-medium text-gray-700 text-lg mb-4">2025'Q3 - 2025'Q4</h4>
+        <h4 class="font-medium text-gray-700 text-lg mb-4">2025'Q2 - 2025'Q3</h4>
         <p class="font-normal text-gray-500 text-md mb-4">Advanced RBAC viewer.</p>
         <div class="relative">
           <h6 class="font-semibold text-gray-500 text-md relative z-10"><a href="https://github.com/gerbil/kubeui-public/discussions">Github discussion</a></h6>
