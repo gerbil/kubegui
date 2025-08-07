@@ -26,6 +26,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@simondmc/popup-js@1.4.2/popup.min.js"></script>
   <script src="assets/js/lightbox.js"></script>
+   <script src="assets/js/release.js"></script>
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -68,19 +69,19 @@
             <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
                     onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-windows-x86_64.zip', '_blank');"
                     title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">
-              Windows<br><span class="text-xs">free download</span>
+              Windows<br><span class="text-xs release-version">()</span>
             </button>
 
             <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
                     onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-linux_amd64.zip', '_blank');"
                     title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">
-              Linux<br><span class="text-xs">free download</span>
+              Linux<br><span class="text-xs release-version">()</span>
             </button>
 
             <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
                     onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-macos.zip', '_blank');"
                     title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">
-              MacOS<br><span class="text-xs">free download</span>
+              MacOS<br><span class="text-xs release-version">()</span>
             </button>
           </div>
 
@@ -444,4 +445,12 @@
   });
 </script>
 </body>
+
+<script>
+const owner = 'gerbil';
+const repo = 'kubegui';
+// Fetch and display latest release
+getLatestReleaseVersion(owner, repo);
+</script>
+
 </html>
