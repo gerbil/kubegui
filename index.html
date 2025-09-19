@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,13 +24,12 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@simondmc/popup-js@1.4.2/popup.min.js"></script>
   <script src="assets/js/lightbox.js"></script>
-   <script src="assets/js/release.js"></script>
   <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
       "name": "KubeUI",
-      "operatingSystem": "Windows",
+      "operatingSystem": "Windows,Macos",
       "applicationCategory": "DeveloperApplication",
       "aggregateRating": {
         "@type": "AggregateRating",
@@ -41,7 +38,7 @@
       },
       "offers": {
         "@type": "Offer",
-        "price": 50.00,
+        "price": 5.00,
         "priceCurrency": "USD"
       },
       "author": {
@@ -50,6 +47,7 @@
       }
     }
   </script>
+  <script src="assets/js/release.js"></script>
 </head>
 
 <body class="bg-gray-100">
@@ -57,10 +55,15 @@
   <div class="container max-w-screen-xl mx-auto px-4">
     <nav class="flex items-center justify-between mb-20">
       <div>
-        <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-2 title">KubeGUI</h1>
+        <h1 class="font-medium text-gray-700 text-5xl md:text-5xl mb-2 title">KubeGUI</h1>
         <span class="font-light text-gray-700 text-small md:text-smaller description">
-      Kubernetes UI / admin desktop application for DevOps, SRE and platform engineers.
-    </span>
+        Free Kubernetes desktop application for DevOps, SRE and platform engineers.<br/>
+        Simple, secure, modern GUI with <a href="assets/video/clusters.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="multicluster">multi-cluster support</a>,
+          <a href="assets/video/live.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="live">resource browser with live updates</a>,<br/>
+        <a href="assets/video/editor.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="editor">advanced YAML editor</a>,
+          <a href="assets/video/logs.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="logs">context aware log highlighting</a>,
+          CRD support and example generation, <a href="assets/video/exec.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="exec">pod shell access</a> and much more.
+        </span>
       </div>
 
       <section class="py-2 md:py-2">
@@ -69,19 +72,19 @@
             <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
                     onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-windows-x86_64.zip', '_blank');"
                     title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">
-              Windows<br><span class="text-xs release-version">()</span>
+              Windows<br/><span class="text-xs release-version">()</span>
             </button>
 
-            <!-- <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
-                    onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-linux_amd64.zip', '_blank');"
-                    title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">
-              Linux<br><span class="text-xs release-version">()</span>
-            </button> -->
+<!--            <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"-->
+<!--                    onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-linux_amd64.zip', '_blank');"-->
+<!--                    title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">-->
+<!--              Linux<br><span class="text-xs">free download</span>-->
+<!--            </button>-->
 
             <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
                     onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-macos.zip', '_blank');"
                     title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">
-              MacOS<br><span class="text-xs release-version">()</span>
+              MacOS<br/><span class="text-xs release-version">()</span>
             </button>
           </div>
 
@@ -91,15 +94,14 @@
         </div>
       </section>
     </nav>
-    <div class="text-center">
+    <div class="text-center mb-20">
       <div class="flex justify-center mb-16">
-        <a href="assets/images/big.png" data-lightbox="main"><img src="assets/images/big.png" class="bg-gray-100 rounded-md p-1" /></a>
+        <a href="assets/images/big.png" data-lightbox="main"><img src="assets/video/ns.gif" class="bg-gray-100 rounded-md p-1" /></a>
       </div>
-      <h6 class="font-medium text-gray-600 text-lg md:text-2xl uppercase mb-8">Free for personal use.<br/>Commercial usage requires a license.</h6>
-      <h1 class="font-normal text-gray-900 text-4xl md:text-7xl leading-none mb-8">Now with AI suggestions!</h1>
+      <h6 class="font-medium text-gray-600 text-lg md:text-2xl uppercase mb-8">Free for personal and commercial usage.</h6>
+      <h1 class="font-normal text-gray-900 text-4xl md:text-5xl leading-none mb-8">Now with AI fix suggestions!</h1>
       <p class="font-normal text-gray-600 text-md md:text-xl mb-16">No external dependencies! KubeGUI can work even in `air gapped` environments.</p>
-      <a href="#" class="px-7 py-3 md:px-9 md:py-4 font-medium md:font-semibold bg-gray-700 text-gray-50 text-sm rounded-md hover:bg-gray-50 hover:text-gray-700 transition ease-linear duration-500" onclick="window.open('https://buy.stripe.com/cN2cNAfJs5It8CY8ww', '_blank');">Order Kubegui via stripe.com</a>
-      <p class="font-light text-s mt-4">Invoice available on demand.</p>
+      <a href="#" class="px-7 py-3 md:px-9 md:py-4 font-medium md:font-semibold bg-gray-700 text-gray-50 text-sm rounded-md hover:bg-gray-50 hover:text-gray-700 transition ease-linear duration-500" onclick="window.open('https://ko-fi.com/kubegui#checkoutModal', '_blank');">Support Kubegui</a>
     </div>
     <div class="table-responsive custom-table-responsive max-[400px]:text-xs">
       <table class="table custom-table">
@@ -117,7 +119,7 @@
         <tr class="spacer"><td colspan="100"></td></tr>
         <tr scope="row">
           <td>Price</td>
-          <td>$50</td>
+          <td>Free</td>
           <td>$300</td>
           <td>Free</td>
           <td>Free</td>
@@ -254,10 +256,10 @@
             <i data-feather="layout"></i>
           </div>
           <div class="w-20 flex justify-center rounded-md mb-4">
-            <a href="assets/images/details.png" data-lightbox="logs"><img src="assets/images/details.png" class="bg-gray-100 rounded-md p-1" /></a>
+            <a href="assets/images/details.png" data-lightbox="details"><img src="assets/images/details.png" class="bg-gray-100 rounded-md p-1" /></a>
           </div>
         </nav>
-        <h4 class="font-medium text-gray-700 text-lg mb-4">Effective UI/UX design</h4>
+        <h4 class="font-medium text-gray-700 text-lg mb-4">Effective UI</h4>
         <p class="font-normal text-gray-500 text-md">Connect to your clusters to see real time state and resources using simple UI with auto-refresh enabled.</p>
       </div>
       <div class="bg-gray-50 px-8 py-10 rounded-md">
@@ -278,7 +280,7 @@
             <i data-feather="command"></i>
           </div>
           <div class="w-20 flex justify-center rounded-md mb-4">
-            <a href="assets/images/exec.png" data-lightbox="logs"><img src="assets/images/exec.png" class="bg-gray-100 rounded-md p-1" /></a>
+            <a href="assets/images/exec.png" data-lightbox="exec"><img src="assets/images/exec.png" class="bg-gray-100 rounded-md p-1" /></a>
           </div>
         </nav>
         <h4 class="font-medium text-gray-700 text-lg mb-4">One click Pod shell access</h4>
@@ -292,7 +294,7 @@
             <i data-feather="activity"></i>
           </div>
           <div class="w-20 flex justify-center rounded-md mb-4">
-            <a href="assets/images/metrics.png" data-lightbox="logs"><img src="assets/images/metrics.png" class="bg-gray-100 rounded-md p-1" /></a>
+            <a href="assets/images/metrics.png" data-lightbox="metrics"><img src="assets/images/metrics.png" class="bg-gray-100 rounded-md p-1" /></a>
           </div>
         </nav>
         <h4 class="font-medium text-gray-700 text-lg mb-4">Performance metrics</h4>
@@ -304,7 +306,7 @@
             <i data-feather="wind"></i>
           </div>
           <div class="w-20 flex justify-center rounded-md mb-4">
-            <a href="assets/images/events.png" data-lightbox="logs"><img src="assets/images/events.png" class="bg-gray-100 rounded-md p-1" /></a>
+            <a href="assets/images/events.png" data-lightbox="events"><img src="assets/images/events.png" class="bg-gray-100 rounded-md p-1" /></a>
           </div>
         </nav>
         <h4 class="font-medium text-gray-700 text-lg mb-4">Events aggregation</h4>
@@ -316,7 +318,7 @@
             <i data-feather="edit"></i>
           </div>
           <div class="w-20 flex justify-center rounded-md mb-4">
-            <a href="assets/images/edit.png" data-lightbox="logs"><img src="assets/images/edit.png" class="bg-gray-100 rounded-md p-1" /></a>
+            <a href="assets/images/edit.png" data-lightbox="edit"><img src="assets/images/edit.png" class="bg-gray-100 rounded-md p-1" /></a>
           </div>
         </nav>
         <h4 class="font-medium text-gray-700 text-lg mb-4">Resource editor with YAML validation</h4>
@@ -328,9 +330,9 @@
 <section class="py-10 md:py-16">
   <div class="container max-w-screen-xl mx-auto px-4">
     <div class="flex flex-col lg:flex-row justify-between">
-      <div class="mb-10 lg:mb-0" style="min-width: 300px; margin-right: 250px;">
+      <div class="mb-10 lg:mb-0" style="min-width: 400px; margin-right: 250px;">
         <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-5">Unique features</h1>
-        <p class="font-normal text-gray-500 text-xs md:text-base">KubeUI specifics provided out-of-the box.</p>
+        <p class="font-normal text-gray-500 text-xs md:text-base">KubeGUI super powers provided out-of-the box.</p>
       </div>
       <div class="space-y-24">
         <div class="flex space-x-6">
@@ -338,7 +340,7 @@
           <span class="w-28 h-0.5 bg-gray-300 mt-5"></span>
           <div>
             <h1 class="font-normal text-gray-700 text-3xl md:text-4xl mb-5">Custom Resource creation</h1>
-            <p class="font-normal text-gray-500 text-sm md:text-base">Custom Resouce generation from existing definition manifests.<br/>Any available CRD provides a schema used within KubeGUI to automagically generate Custom Resource example.<br/>Just click on 'Add resource' button on top to try it out!</p>
+            <p class="font-normal text-gray-500 text-sm md:text-base">Custom Resource generation from existing definition manifests.<br/>Any available CRD provides a schema used within KubeGUI to automagically generate Custom Resource example.<br/>Just click on 'Add resource' button on top to try it out!</p>
           </div>
         </div>
         <div class="flex space-x-6">
@@ -349,12 +351,12 @@
             <p class="font-normal text-gray-500 text-sm md:text-base">Lightweight desktop application written in GO (Wails).<br/>Official Kubernetes client provides compatibility with latest K8S versions. Kubeconfig is the only thing required!</p>
           </div>
         </div>
-        <div class="flex space-x-6">
+        <div class="flex space-x-5">
           <h1 class="font-normal text-gray-700 text-3xl md:text-4xl">03</h1>
-          <span class="w-28 h-0.5 bg-gray-300 mt-5"></span>
+          <span class="w-22 h-0.5 bg-gray-300 mt-5"></span>
           <div>
-            <h1 class="font-normal text-gray-700 text-3xl md:text-4xl mb-5">Deployment restart and scale in one click</h1>
-            <p class="font-normal text-gray-500 text-sm md:text-base">Deployment scaling and simple restart available via list view.</p>
+            <h1 class="font-normal text-gray-700 text-3xl md:text-4xl mb-5">Deployments one click restart or scale</h1>
+            <p class="font-normal text-gray-500 text-sm md:text-base">Deployments scaling and simple restart available from list view.</p>
           </div>
         </div>
       </div>
@@ -367,15 +369,7 @@
     <p class="font-normal text-gray-500 text-xs md:text-base mb-20">Below is an official product roadmap.</p>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div class="bg-gray-50 px-8 py-10 rounded-md">
-        <h4 class="font-medium text-gray-700 text-lg mb-4">2025'Q1 - 2025'Q2</h4>
-        <p class="font-normal text-gray-500 text-md mb-4">Macos version.</p>
-        <div class="relative">
-          <h6 class="font-semibold text-gray-500 text-md relative z-10"><a href="https://github.com/gerbil/kubeui-public/discussions">Github discussion</a></h6>
-          <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
-        </div>
-      </div>
-      <div class="bg-gray-50 px-8 py-10 rounded-md">
-        <h4 class="font-medium text-gray-700 text-lg mb-4">2025'Q2 - 2025'Q3</h4>
+        <h4 class="font-medium text-gray-700 text-lg mb-4">2025'Q3 - 2025'Q4</h4>
         <p class="font-normal text-gray-500 text-md mb-4">Advanced RBAC viewer.</p>
         <div class="relative">
           <h6 class="font-semibold text-gray-500 text-md relative z-10"><a href="https://github.com/gerbil/kubeui-public/discussions">Github discussion</a></h6>
@@ -383,8 +377,16 @@
         </div>
       </div>
       <div class="bg-gray-50 px-8 py-10 rounded-md">
-        <h4 class="font-medium text-gray-700 text-lg mb-4">2025'Q3 - 2025'Q4</h4>
-        <p class="font-normal text-gray-500 text-md mb-4">Advanced events viewer.</p>
+        <h4 class="font-medium text-gray-700 text-lg mb-4">2026'Q1 - 2026'Q2</h4>
+        <p class="font-normal text-gray-500 text-md mb-4">Advanced events aggregation / viewer.</p>
+        <div class="relative">
+          <h6 class="font-semibold text-gray-500 text-md relative z-10"><a href="https://github.com/gerbil/kubeui-public/discussions">Github discussion</a></h6>
+          <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
+        </div>
+      </div>
+      <div class="bg-gray-50 px-8 py-10 rounded-md">
+        <h4 class="font-medium text-gray-700 text-lg mb-4">2026'Q3 - 2026'Q4</h4>
+        <p class="font-normal text-gray-500 text-md mb-4">Custom events notifications / alert system.</p>
         <div class="relative">
           <h6 class="font-semibold text-gray-500 text-md relative z-10"><a href="https://github.com/gerbil/kubeui-public/discussions">Github discussion</a></h6>
           <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
@@ -443,14 +445,11 @@
       margin-bottom: 0% !important;
       }`
   });
+
+    const owner = 'gerbil';
+    const repo = 'kubegui';
+    // Fetch and display latest release
+    getLatestReleaseVersion(owner, repo);
 </script>
 </body>
-
-<script>
-const owner = 'gerbil';
-const repo = 'kubegui';
-// Fetch and display latest release
-getLatestReleaseVersion(owner, repo);
-</script>
-
 </html>
