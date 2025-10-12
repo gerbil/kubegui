@@ -2,10 +2,13 @@
 
 Official website - https://kubegui.io
 
+## AI suggestions included (configurable)
+![kubegui](./assets/video/ai-suggestion.mp4)
+
 Comparison table: 
 | Feature                            | KubeGUI | Kubernetes dashboard | LENS | k9s |
 |------------------------------------|---------|----------------------|------|-----|
-| Price *                            | $50     | Free                 | $300 | Free|
+| Price *                            | Free    | Free                 | $300 | Free|
 | Desktop version                    | +       | -                    | +    | -   |
 | Multi cluster support              | +       | -                    | +    | -   |
 | Official Kubernetes client usage   | +       | -                    | -    | +   |
