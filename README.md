@@ -41,3 +41,4 @@ Comparison table:
 - Issues/Bugs/Discussions hub
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
