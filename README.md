@@ -3,7 +3,7 @@
 Official website - https://kubegui.io
 
 ## AI suggestions included (configurable)
-![kubegui](./assets/video/ai-suggestion.mp4)
+![kubegui](./assets/images/big.png)
 
 Comparison table: 
 | Feature                            | KubeGUI | Kubernetes dashboard | LENS | k9s |
@@ -41,4 +41,5 @@ Comparison table:
 - Issues/Bugs/Discussions hub
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
 
