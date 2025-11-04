@@ -30,7 +30,7 @@
       "@type": "SoftwareApplication",
       "name": "KubeGUI",
       "operatingSystem": "Windows,Macos,Linux",
-      "applicationCategory": "DeveloperApplication",      
+      "applicationCategory": "DeveloperApplication",
       "author": {
         "@type": "Person",
         "name": "Jurijs Kobecs"
@@ -44,34 +44,35 @@
 <section class="py-10 md:py-16">
   <div class="container max-w-screen-xl mx-auto px-4">
     <nav class="flex items-center justify-between mb-20">
-      <div>
+      <div class="ml-1 w-85">
         <h1 class="font-medium text-gray-700 text-5xl md:text-5xl mb-2 title">KubeGUI</h1>
         <span class="font-light text-gray-700 text-small md:text-smaller description">
-        Free Kubernetes Desktop application for DevOps, SRE and Platform Engineers.<br/>
-        Simple, secure, modern GUI with <a href="assets/video/clusters.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="multicluster">multi-cluster support</a>,
-          <a href="assets/video/live.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="live">resource browser with live updates</a>,<br/>
-        <a href="assets/video/editor.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="editor">advanced YAML editor</a>,
+        Free Kubernetes Desktop application.<br/>
+        Simple, secure, modern GUI with solid feature list:<br/>
+          <a href="assets/video/clusters.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="multicluster">multi-cluster support</a>,
+          <a href="assets/video/live.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="live">live updates</a>,
+          <a href="assets/video/editor.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="editor">advanced YAML editor</a>,
           <a href="assets/video/logs.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="logs">context aware log highlighting</a>,
-          CRD support and example generation, <a href="assets/video/exec.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="exec">pod shell access</a> and much more.
+          <a href="assets/video/exec.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="exec">pod shell access</a>,
+          CRD generator,
+          and much more.
         </span>
       </div>
 
-      <section class="py-2 md:py-2">
+      <section class="py-2 md:py-2 ml-15">
         <div class="container max-w-screen-xl mx-auto px-2">
-          <div class="flex justify-end space-x-3">
-            <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
+          <div class="space-x-2">
+            <button class="mb-1 px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
                     onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-windows-x86_64.zip', '_blank');"
                     title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">
               Windows<br/><span class="text-xs release-version">()</span>
             </button>
-
-            <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
+            <button class="w-23 text-center mb-1 px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
                     onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-linux_amd64.zip', '_blank');"
                     title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">
               Linux<br/><span class="text-xs release-version">()</span>
             </button>
-
-            <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
+            <button class="w-23 text-center mb-1 px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
                     onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-macos.zip', '_blank');"
                     title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">
               MacOS<br/><span class="text-xs release-version">()</span>
@@ -436,14 +437,11 @@
       }`
   });
 
-    const owner = 'gerbil';
-    const repo = 'kubegui';
-    // Fetch and display latest release
-    getLatestReleaseVersion(owner, repo);
+  const owner = 'gerbil';
+  const repo = 'kubegui';
+  // Fetch and display latest release
+  getLatestReleaseVersion(owner, repo);
 </script>
 </body>
 
 </html>
-
-
-
