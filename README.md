@@ -5,8 +5,6 @@ Official website - https://kubegui.io
 ## AI suggestions included (configurable)
 ![kubegui](./assets/images/big.png)
 
-<iframe src="https://github.com/sponsors/gerbil/card" title="Sponsor gerbil" height="225" width="600" style="border: 0;"></iframe>
-
 Comparison table: 
 | Feature                            | KubeGUI | Kubernetes dashboard | LENS | k9s |
 |------------------------------------|---------|----------------------|------|-----|
@@ -43,6 +41,7 @@ Comparison table:
 - Issues/Bugs/Discussions hub
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
 
 
 
