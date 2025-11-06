@@ -2,38 +2,23 @@
 
 Official website - https://kubegui.io
 
-## AI suggestions included (configurable)
-![kubegui](./assets/images/big.png)
+![kubegui](./assets/images/big.png)  
+  
+  
+🚀 **Features**       
 
-Comparison table: 
-| Feature                            | KubeGUI | Kubernetes dashboard | LENS | k9s |
-|------------------------------------|---------|----------------------|------|-----|
-| Price *                            | Free    | Free                 | $300 | Free|
-| Desktop version                    | +       | -                    | +    | -   |
-| Multi cluster support              | +       | -                    | +    | -   |
-| Official Kubernetes client usage   | +       | -                    | -    | +   |
-| Large cluster views support        | +       | -                    | -    | +   |
-| Non 3rd party software dependecies | +       | -                    | -    | -   |
-| Workload views                     | +       | +                    | +    | +   |
-| Workload yaml error check (linter) | +       | -                    | -    | -   |
-| Resource creation templates        | +       | -                    | -    | -   |
-| Custom resources view              | +       | +                    | +    | +   |
-| Custom resources generator         | +       | -                    | -    | -   |
-| Network view (services/endpoints)  | +       | +                    | +    | +   |
-| Network policies visualization     | +       | -                    | -    | -   |
-| Storage view                       | +       | +                    | +    | +   |
-| Configs view (including secrets)   | +       | +                    | +    | +   |
-| Logs viewer (basic)                | +       | +                    | +    | +   |
-| Logs viewer (highliting)           | +       | -                    | -    | -   |
-| Pod interactive sessions (exec)    | +       | +                    | -    | -   |
-| Resource usage view (metrics)      | +       | +                    | +    | +   |
-| Scaling  (vpa/hpa) config/view     | +       | +                    | +    | -   |
-| Cluster events view                | +       | +                    | +    | +   |
-| Port forwarding                    | +       | -                    | +    | +   |
-| Auto update for application **     | +       | -                    | -    | -   |
-
-\* Price for 1 user per year (commercial, but not EE version)  
-\** Github.com connection required
+📋 **Resources list and controls**  
+🔄 **Live updates**  
+🧩 **CRD support**   
+🌐 **Multi-cluster support**  
+🤖 **AI suggestions (optional)**  
+🧠 **Advanced resource editor** (yaml validation included)  
+🕸️ **Network policies visualizer**  
+🧱 **Zero external dependencies** (no kubectl needed)  
+🛠️ **Deployments and Pods logs** (with syntax highlighter)  
+💻 **Direct shell access**  
+🔀 **Simple port forwarding**  
+⚙️ **Application auto-updater**  
 
 ## Scope:
 - Application releases
@@ -41,6 +26,7 @@ Comparison table:
 - Issues/Bugs/Discussions hub
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
 
 
 
