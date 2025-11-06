@@ -11,7 +11,7 @@ Official website - https://kubegui.io
 🔄 **Live updates**  
 🧩 **CRD support**   
 🌐 **Multi-cluster support**  
-🤖 **AI suggestions (optional)**  
+🤖 **AI suggestions** (optional)  
 🧠 **Advanced resource editor** (yaml validation included)  
 🕸️ **Network policies visualizer**  
 🧱 **Zero external dependencies** (no kubectl needed)  
@@ -26,6 +26,7 @@ Official website - https://kubegui.io
 - Issues/Bugs/Discussions hub
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
 
 
 
