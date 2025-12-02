@@ -25,10 +25,9 @@ Official website - https://kubegui.io
 - Website src
 - Issues/Bugs/Discussions hub
 
+### Roadmap (Q1'2026)
+- Cilium network policy visualizer
+
+  
+
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
-
-
-
-
-
-
