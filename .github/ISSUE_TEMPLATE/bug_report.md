@@ -30,4 +30,4 @@ If applicable, add screenshots to help explain your problem.
 
 **Log output**
 - Windows -> C:\Users\%USERNAME%\AppData\Roaming\kubegui\kubegui.log
-- Macos -> /Users/$USER/Library/Application Support/kubegui/kubegui.log
+- Macos -> /Users/$USER/Library/"Application Support"/kubegui/kubegui.log
