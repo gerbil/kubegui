@@ -27,7 +27,9 @@ Official website - https://kubegui.io
 
 ### Roadmap (Q1'2026)
 - Cilium network policy visualizer
+- Node shell exec (via privileged pod with hostNetwork/hostpid)
 
   
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
