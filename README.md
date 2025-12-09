@@ -29,9 +29,11 @@ Official website - https://kubegui.io
 - Cilium network policy visualizer
 - Node shell exec (via privileged pod with hostNetwork/hostpid)
 - Nodes metrics graph perfomance improvements
+- Pod removal bugfix
 
   
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
 
 
