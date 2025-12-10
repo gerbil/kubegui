@@ -31,5 +31,7 @@ Official website - https://kubegui.io
 - Nodes metrics graph perfomance improvements
 - Pod removal bugfix
 - Can I? (auth check) view for any namespace / core resource
+- Connection/config refresh feature (right click -> `refresh` on cluster name in a sidebar); useful for kubelogin/PIM
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
