@@ -25,7 +25,7 @@ Official website - https://kubegui.io
 - Website src
 - Issues/Bugs/Discussions hub
 
-### Roadmap (Q1'2026) -> 1.98.1
+### Roadmap (Q1'2026) -> v1.98.1
 - Cilium network policy visualizer
 - Node shell exec (via privileged pod with hostNetwork/hostpid)
 - Nodes metrics graph perfomance improvements
@@ -35,6 +35,7 @@ Official website - https://kubegui.io
 - File download via `/download %filename%`command inside pod shell
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
 
 
 
