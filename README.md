@@ -35,8 +35,10 @@ Official website - https://kubegui.io
 - File download via `/download %filename%`command inside pod shell
 - Workload allocation on nodes graph/visualization (icon inside Nodes view)
 - CRDs - All namespaces view fix
+- Resource count add/remove bug fix
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
 
 
 
