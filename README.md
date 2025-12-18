@@ -36,8 +36,10 @@ Official website - https://kubegui.io
 - Workload allocation on nodes graph/visualization (icon inside Nodes view)
 - CRDs - All namespaces view fix
 - Resource count add/remove bug fix
+- Node view fix (fetch speed and metrics allocation)
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
 
 
 
