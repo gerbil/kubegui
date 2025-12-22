@@ -34,11 +34,12 @@ Official website - https://kubegui.io
 - Connection/config refresh feature (right click -> `refresh` on cluster name in a sidebar); useful for kubelogin/PIM
 - File download via `/download %filename%`command inside pod shell
 - Workload allocation on nodes graph/visualization (icon inside Nodes view)
-- CRDs - All namespaces view fix
+- CRDs - All namespaces view fix / Namespace controller fix
 - Resource count add/remove bug fix
 - Node view fix (fetch speed and metrics allocation)
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
 
 
 
