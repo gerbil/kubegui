@@ -37,8 +37,10 @@ Official website - https://kubegui.io
 - CRDs - All namespaces view fix / Namespace controller fix
 - Resource count add/remove bug fix
 - Node view fix (fetch speed and metrics allocation)
+- Endpoint slices added to a resource viewer
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
 
 
 
