@@ -38,8 +38,10 @@ Official website - https://kubegui.io
 - Resource count add/remove bug fix
 - Node view fix (fetch speed and metrics allocation)
 - Endpoint slices added to a resource viewer
+- Resource hierarchy tree (subresourced created by root resource, like deployment->pod) included in details view both for standard resources and CRDs
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
 
 
 
