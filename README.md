@@ -3,9 +3,8 @@
 Official website - https://kubegui.io
 
 ![kubegui](./assets/images/big.png)  
-  
-  
-🚀 **Features**       
+
+## **Features**       
 
 📋 **Resources list and controls**  
 🔄 **Live updates**  
@@ -20,12 +19,7 @@ Official website - https://kubegui.io
 🔀 **Simple port forwarding**  
 ⚙️ **Application auto-updater**  
 
-## Scope:
-- Application releases
-- Website src
-- Issues/Bugs/Discussions hub
-
-### Roadmap (Q1'2026) -> v1.98.1
+## Roadmap (Q1'2026) -> v1.98.1
 - Cilium network policy visualizer
 - Node shell exec (via privileged pod with hostNetwork/hostpid)
 - Nodes metrics graph perfomance improvements
@@ -40,7 +34,15 @@ Official website - https://kubegui.io
 - Endpoint slices added to a resource viewer
 - Resource hierarchy tree (subresourced created by root resource, like deployment->pod) included in details view both for standard resources and CRDs
 
+## Scope:
+- Application releases
+- Website src
+- Issues/Bugs/Discussions hub
+
+
+
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
 
 
 
