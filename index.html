@@ -28,19 +28,9 @@
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
-      "name": "KubeUI",
-      "operatingSystem": "Windows,Macos",
+      "name": "KubeGUI",
+      "operatingSystem": "Windows,Macos,Linux",
       "applicationCategory": "DeveloperApplication",
-      "aggregateRating": {
-        "@type": "AggregateRating",
-        "ratingValue": 5,
-        "ratingCount": 1
-      },
-      "offers": {
-        "@type": "Offer",
-        "price": 5.00,
-        "priceCurrency": "USD"
-      },
       "author": {
         "@type": "Person",
         "name": "Jurijs Kobecs"
@@ -54,34 +44,34 @@
 <section class="py-10 md:py-16">
   <div class="container max-w-screen-xl mx-auto px-4">
     <nav class="flex items-center justify-between mb-20">
-      <div>
+      <div class="ml-1 w-85">
         <h1 class="font-medium text-gray-700 text-5xl md:text-5xl mb-2 title">KubeGUI</h1>
         <span class="font-light text-gray-700 text-small md:text-smaller description">
-        Free Kubernetes desktop application for DevOps, SRE and platform engineers.<br/>
-        Simple, secure, modern GUI with <a href="assets/video/clusters.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="multicluster">multi-cluster support</a>,
-          <a href="assets/video/live.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="live">resource browser with live updates</a>,<br/>
-        <a href="assets/video/editor.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="editor">advanced YAML editor</a>,
+        Free Kubernetes Desktop application.<br/>
+        Simple, secure, modern GUI with solid feature list:<br/>
+          <a href="assets/video/clusters.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="multicluster">multi-cluster support</a>,
+          <a href="assets/video/live.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="live">live updates</a>,
+          <a href="assets/video/editor.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="editor">advanced YAML editor</a>,
           <a href="assets/video/logs.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="logs">context aware log highlighting</a>,
-          CRD support and example generation, <a href="assets/video/exec.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="exec">pod shell access</a> and much more.
+          <a href="assets/video/exec.gif" style="border-bottom: 0.5px dotted #97cdf1" data-lightbox="exec">pod shell access</a>,
+          CRD generator,
+          and much more.
         </span>
       </div>
-
-      <section class="py-2 md:py-2">
+      <section class="py-2 md:py-2 ml-15">
         <div class="container max-w-screen-xl mx-auto px-2">
-          <div class="flex justify-end space-x-3">
-            <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
+          <div class="space-x-2">
+            <button class="mb-1 px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
                     onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-windows-x86_64.zip', '_blank');"
                     title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">
               Windows<br/><span class="text-xs release-version">()</span>
             </button>
-
-<!--            <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"-->
-<!--                    onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-linux_amd64.zip', '_blank');"-->
-<!--                    title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">-->
-<!--              Linux<br><span class="text-xs">free download</span>-->
-<!--            </button>-->
-
-            <button class="px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
+            <button class="w-23 text-center mb-1 px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
+                    onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-linux_amd64.zip', '_blank');"
+                    title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">
+              Linux<br/><span class="text-xs release-version">()</span>
+            </button>
+            <button class="w-23 text-center mb-1 px-3 py-2 md:px-5 md:py-2 bg-white font-medium md:font-semibold text-gray-700 text-md rounded-md hover:bg-gray-700 hover:text-white transition ease-linear duration-500"
                     onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-macos.zip', '_blank');"
                     title="By downloading app, you agree with our terms and conditions" style="cursor: pointer;">
               MacOS<br/><span class="text-xs release-version">()</span>
@@ -94,6 +84,7 @@
         </div>
       </section>
     </nav>
+
     <div class="text-center mb-20">
       <div class="flex justify-center mb-16">
         <a href="assets/images/big.png" data-lightbox="main"><img src="assets/video/ns.gif" class="bg-gray-100 rounded-md p-1" /></a>
@@ -103,230 +94,146 @@
       <p class="font-normal text-gray-600 text-md md:text-xl mb-16">No external dependencies! KubeGUI can work even in `air gapped` environments.</p>
       <a href="#" class="px-7 py-3 md:px-9 md:py-4 font-medium md:font-semibold bg-gray-700 text-gray-50 text-sm rounded-md hover:bg-gray-50 hover:text-gray-700 transition ease-linear duration-500" onclick="window.open('https://ko-fi.com/kubegui#checkoutModal', '_blank');">Support Kubegui</a>
     </div>
-    <div class="table-responsive custom-table-responsive max-[400px]:text-xs">
-      <table class="table custom-table">
-        <thead>
-        <tr>
-          <th scope="col">Feature</th>
-          <th scope="col">Kubegui</th>
-          <th scope="col">LENS</th>
-          <th scope="col">Kubernetes dashboard</th>
-          <th scope="col">k9s</th>
-          <th scope="col">Portainer</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr class="spacer"><td colspan="100"></td></tr>
-        <tr scope="row">
-          <td>Price</td>
-          <td>Free</td>
-          <td>$300</td>
-          <td>Free</td>
-          <td>Free</td>
-          <td>$1200</td>
-        </tr>
-        <tr class="spacer"><td colspan="100"></td></tr>
-        <tr>
-          <td>Desktop version</td>
-          <td><img src="assets/images/supported.png" /></td>
-          <td><img src="assets/images/supported.png" /></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/supported.png"/></td>
-        </tr>
-        <tr class="spacer"><td colspan="100"></td></tr>
-        <tr>
-          <td>Multi cluster support</td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/supported.png"/></td>
-        </tr>
-        <tr class="spacer"><td colspan="100"></td></tr>
-        <tr>
-          <td>AI support for fix suggestions</td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-        </tr>
-        <tr class="spacer"><td colspan="100"></td></tr>
-        <tr>
-          <td>Common resource controls</td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/supported.png"/></td>
-        </tr>
-        <tr class="spacer"><td colspan="100"></td></tr>
-        <tr>
-          <td>Custom resource controls</td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/supported.png"/></td>
-        </tr>
-        <tr class="spacer"><td colspan="100"></td></tr>
-        <tr>
-          <td>Advanced resource editor</td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-        </tr>
-        <tr class="spacer"><td colspan="100"></td></tr>
-        <tr>
-          <td>Custom resource generator</td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-        </tr>
-        <tr class="spacer"><td colspan="100"></td></tr>
-        <tr>
-          <td>Network policies visualization</td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-        </tr>
-        <tr class="spacer"><td colspan="100"></td></tr>
-        <tr>
-          <td>Official Kubernetes libs usage</td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-        </tr>
-        <tr class="spacer"><td colspan="100"></td></tr>
-        <tr>
-          <td>No external dependecies</td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-        </tr>
-        <tr class="spacer"><td colspan="100"></td></tr>
-        <tr>
-          <td>Advanced logs viewer</td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-        </tr>
-        <tr class="spacer"><td colspan="100"></td></tr>
-        <tr>
-          <td>Pods shell direct access</td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-        </tr>
-        <tr class="spacer"><td colspan="100"></td></tr>
-        <tr>
-          <td>Pod port forwarding</td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-          <td><img src="assets/images/supported.png"/></td>
-          <td><img src="assets/images/notsupported.png"/></td>
-        </tr>
-        </tbody>
-      </table>
-    </div>
+
+    <section class="py-10 md:py-16">
+      <div class="container max-w-screen-xl mx-auto px-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="bg-gray-50 px-8 py-10 rounded-md">
+            <nav class="flex items-center justify-between">
+              <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+                <i data-feather="layout"></i>
+              </div>
+              <div class="w-20 flex justify-center rounded-md mb-4">
+                <a href="assets/images/details.png" data-lightbox="details"><img src="assets/images/details.png" class="bg-gray-100 rounded-md p-1" /></a>
+              </div>
+            </nav>
+            <h4 class="font-medium text-gray-700 text-lg mb-4">Effective UI</h4>
+            <p class="font-normal text-gray-500 text-md">Connect to your clusters to see real time state and resources using simple UI with auto-refresh enabled.</p>
+          </div>
+          <div class="bg-gray-50 px-8 py-10 rounded-md">
+            <nav class="flex items-center justify-between">
+              <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+                <i data-feather="file-text"></i>
+              </div>
+              <div class="w-20 flex justify-center rounded-md mb-4">
+                <a href="assets/images/logs.png" data-lightbox="logs"><img src="assets/images/logs.png" class="bg-gray-100 rounded-md p-1" /></a>
+              </div>
+            </nav>
+            <h4 class="font-medium text-gray-700 text-lg mb-4">Logs with syntax highlighting</h4>
+            <p class="font-normal text-gray-500 text-md">Logs highlighting helps to view a log (of any type) with an error/warning syntax, color scheme & extensible severity levels.</p>
+          </div>
+          <div class="bg-gray-50 px-8 py-10 rounded-md">
+            <nav class="flex items-center justify-between">
+              <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+                <i data-feather="command"></i>
+              </div>
+              <div class="w-20 flex justify-center rounded-md mb-4">
+                <a href="assets/images/exec.png" data-lightbox="exec"><img src="assets/images/exec.png" class="bg-gray-100 rounded-md p-1" /></a>
+              </div>
+            </nav>
+            <h4 class="font-medium text-gray-700 text-lg mb-4">One click Pod shell access</h4>
+            <p class="font-normal text-gray-500 text-md">No more unnecessary connections, only direct client to pod communication.</p>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
+          <div class="bg-gray-50 px-8 py-10 rounded-md">
+            <nav class="flex items-center justify-between">
+              <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+                <i data-feather="activity"></i>
+              </div>
+              <div class="w-20 flex justify-center rounded-md mb-4">
+                <a href="assets/images/metrics.png" data-lightbox="metrics"><img src="assets/images/metrics.png" class="bg-gray-100 rounded-md p-1" /></a>
+              </div>
+            </nav>
+            <h4 class="font-medium text-gray-700 text-lg mb-4">Performance metrics</h4>
+            <p class="font-normal text-gray-500 text-md">Integrated Nodes and Pods metrics (metrics-server required).</p>
+          </div>
+          <div class="bg-gray-50 px-8 py-10 rounded-md">
+            <nav class="flex items-center justify-between">
+              <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+                <i data-feather="wind"></i>
+              </div>
+              <div class="w-20 flex justify-center rounded-md mb-4">
+                <a href="assets/images/events.png" data-lightbox="events"><img src="assets/images/events.png" class="bg-gray-100 rounded-md p-1" /></a>
+              </div>
+            </nav>
+            <h4 class="font-medium text-gray-700 text-lg mb-4">Events aggregation</h4>
+            <p class="font-normal text-gray-500 text-md">Deployments centric events viewer.</p>
+          </div>
+          <div class="bg-gray-50 px-8 py-10 rounded-md">
+            <nav class="flex items-center justify-between">
+              <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+                <i data-feather="edit"></i>
+              </div>
+              <div class="w-20 flex justify-center rounded-md mb-4">
+                <a href="assets/images/edit.png" data-lightbox="edit"><img src="assets/images/edit.png" class="bg-gray-100 rounded-md p-1" /></a>
+              </div>
+            </nav>
+            <h4 class="font-medium text-gray-700 text-lg mb-4">Resource editor with YAML validation</h4>
+            <p class="font-normal text-gray-500 text-md">Simple and effective yaml editor with solarized theme support and included linters.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="py-10 md:py-16">
+      <div class="container max-w-screen-xl mx-auto px-4">
+        <div class="flex items-end justify-between gap-4 mb-6">
+          <div>
+            <h3 class="text-2xl font-semibold text-gray-800">Latest release</h3>
+            <p id="release-sub" class="text-gray-500 mt-1 text-sm">
+              Loading release notes…
+            </p>
+          </div>
+
+          <a id="release-link"
+             class="hidden md:inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700"
+             href="https://github.com/gerbil/kubegui/releases"
+             target="_blank"
+             rel="noreferrer">
+            View on GitHub
+          </a>
+        </div>
+
+        <div id="release-grid"
+             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <!-- cards inserted here -->
+        </div>
+
+        <!-- Card template -->
+        <template id="release-card-tpl">
+          <div
+            class="bg-gray-50 px-8 py-10 rounded-md border border-gray-100
+               hover:shadow-sm transition-shadow"
+          >
+            <nav class="flex items-center justify-between">
+              <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
+                <span class="text-gray-700 text-sm font-semibold" data-badge>CHG</span>
+              </div>
+
+              <div class="w-20 flex justify-center rounded-md mb-4">
+            <span class="inline-flex items-center rounded-md bg-white px-2 py-1 text-xs font-medium
+                         text-gray-600 border border-gray-200"
+                  data-tag>
+              v0.0.0
+            </span>
+              </div>
+            </nav>
+
+            <h4 class="font-medium text-gray-700 text-lg mb-4" data-title>
+              Title
+            </h4>
+
+            <p class="font-normal text-gray-500 text-md leading-relaxed" data-desc>
+              Description
+            </p>
+          </div>
+        </template>
+      </div>
+    </section>
   </div>
 </section>
-<section class="py-10 md:py-16">
-  <div class="container max-w-screen-xl mx-auto px-4">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      <div class="bg-gray-50 px-8 py-10 rounded-md">
-        <nav class="flex items-center justify-between">
-          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
-            <i data-feather="layout"></i>
-          </div>
-          <div class="w-20 flex justify-center rounded-md mb-4">
-            <a href="assets/images/details.png" data-lightbox="details"><img src="assets/images/details.png" class="bg-gray-100 rounded-md p-1" /></a>
-          </div>
-        </nav>
-        <h4 class="font-medium text-gray-700 text-lg mb-4">Effective UI</h4>
-        <p class="font-normal text-gray-500 text-md">Connect to your clusters to see real time state and resources using simple UI with auto-refresh enabled.</p>
-      </div>
-      <div class="bg-gray-50 px-8 py-10 rounded-md">
-        <nav class="flex items-center justify-between">
-          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
-            <i data-feather="file-text"></i>
-          </div>
-          <div class="w-20 flex justify-center rounded-md mb-4">
-            <a href="assets/images/logs.png" data-lightbox="logs"><img src="assets/images/logs.png" class="bg-gray-100 rounded-md p-1" /></a>
-          </div>
-        </nav>
-        <h4 class="font-medium text-gray-700 text-lg mb-4">Logs with syntax highlighting</h4>
-        <p class="font-normal text-gray-500 text-md">Logs highlighting helps to view a log (of any type) with an error/warning syntax, color scheme & extensible severity levels.</p>
-      </div>
-      <div class="bg-gray-50 px-8 py-10 rounded-md">
-        <nav class="flex items-center justify-between">
-          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
-            <i data-feather="command"></i>
-          </div>
-          <div class="w-20 flex justify-center rounded-md mb-4">
-            <a href="assets/images/exec.png" data-lightbox="exec"><img src="assets/images/exec.png" class="bg-gray-100 rounded-md p-1" /></a>
-          </div>
-        </nav>
-        <h4 class="font-medium text-gray-700 text-lg mb-4">One click Pod shell access</h4>
-        <p class="font-normal text-gray-500 text-md">No more unnecessary connections, only direct client to pod communication.</p>
-      </div>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-4">
-      <div class="bg-gray-50 px-8 py-10 rounded-md">
-        <nav class="flex items-center justify-between">
-          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
-            <i data-feather="activity"></i>
-          </div>
-          <div class="w-20 flex justify-center rounded-md mb-4">
-            <a href="assets/images/metrics.png" data-lightbox="metrics"><img src="assets/images/metrics.png" class="bg-gray-100 rounded-md p-1" /></a>
-          </div>
-        </nav>
-        <h4 class="font-medium text-gray-700 text-lg mb-4">Performance metrics</h4>
-        <p class="font-normal text-gray-500 text-md">Integrated Nodes and Pods metrics (metrics-server required).</p>
-      </div>
-      <div class="bg-gray-50 px-8 py-10 rounded-md">
-        <nav class="flex items-center justify-between">
-          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
-            <i data-feather="wind"></i>
-          </div>
-          <div class="w-20 flex justify-center rounded-md mb-4">
-            <a href="assets/images/events.png" data-lightbox="events"><img src="assets/images/events.png" class="bg-gray-100 rounded-md p-1" /></a>
-          </div>
-        </nav>
-        <h4 class="font-medium text-gray-700 text-lg mb-4">Events aggregation</h4>
-        <p class="font-normal text-gray-500 text-md">Deployments centric events viewer.</p>
-      </div>
-      <div class="bg-gray-50 px-8 py-10 rounded-md">
-        <nav class="flex items-center justify-between">
-          <div class="w-20 py-6 flex justify-center bg-gray-100 rounded-md mb-4">
-            <i data-feather="edit"></i>
-          </div>
-          <div class="w-20 flex justify-center rounded-md mb-4">
-            <a href="assets/images/edit.png" data-lightbox="edit"><img src="assets/images/edit.png" class="bg-gray-100 rounded-md p-1" /></a>
-          </div>
-        </nav>
-        <h4 class="font-medium text-gray-700 text-lg mb-4">Resource editor with YAML validation</h4>
-        <p class="font-normal text-gray-500 text-md">Simple and effective yaml editor with solarized theme support and included linters.</p>
-      </div>
-    </div>
-  </div>
-</section>
+
 <section class="py-10 md:py-16">
   <div class="container max-w-screen-xl mx-auto px-4">
     <div class="flex flex-col lg:flex-row justify-between">
@@ -363,24 +270,25 @@
     </div>
   </div>
 </section>
+
 <section class="py-10 md:py-16">
   <div class="container max-w-screen-xl mx-auto px-4">
     <h1 class="font-medium text-gray-700 text-3xl md:text-4xl mb-5">Roadmap</h1>
     <p class="font-normal text-gray-500 text-xs md:text-base mb-20">Below is an official product roadmap.</p>
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <div class="bg-gray-50 px-8 py-10 rounded-md">
-        <h4 class="font-medium text-gray-700 text-lg mb-4">2025'Q3 - 2025'Q4</h4>
-        <p class="font-normal text-gray-500 text-md mb-4">Advanced RBAC viewer.</p>
+        <h4 class="font-medium text-gray-700 text-lg mb-4">2026'Q1 - 2026'Q2</h4>
+        <p class="font-normal text-gray-500 text-md mb-4">Wails service usage (rpc) instead of gin http.</p>
         <div class="relative">
-          <h6 class="font-semibold text-gray-500 text-md relative z-10"><a href="https://github.com/gerbil/kubeui-public/discussions">Github discussion</a></h6>
+          <h6 class="font-semibold text-gray-500 text-md relative z-10"><a href="https://github.com/gerbil/kubegui/discussions">Github discussion</a></h6>
           <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
         </div>
       </div>
       <div class="bg-gray-50 px-8 py-10 rounded-md">
-        <h4 class="font-medium text-gray-700 text-lg mb-4">2026'Q1 - 2026'Q2</h4>
-        <p class="font-normal text-gray-500 text-md mb-4">Advanced events aggregation / viewer.</p>
+        <h4 class="font-medium text-gray-700 text-lg mb-4">2026'Q2 - 2026'Q3</h4>
+        <p class="font-normal text-gray-500 text-md mb-4">More configuration options (fonts, sizes, styling etc).</p>
         <div class="relative">
-          <h6 class="font-semibold text-gray-500 text-md relative z-10"><a href="https://github.com/gerbil/kubeui-public/discussions">Github discussion</a></h6>
+          <h6 class="font-semibold text-gray-500 text-md relative z-10"><a href="https://github.com/gerbil/kubegui/discussions">Github discussion</a></h6>
           <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
         </div>
       </div>
@@ -388,18 +296,19 @@
         <h4 class="font-medium text-gray-700 text-lg mb-4">2026'Q3 - 2026'Q4</h4>
         <p class="font-normal text-gray-500 text-md mb-4">Custom events notifications / alert system.</p>
         <div class="relative">
-          <h6 class="font-semibold text-gray-500 text-md relative z-10"><a href="https://github.com/gerbil/kubeui-public/discussions">Github discussion</a></h6>
+          <h6 class="font-semibold text-gray-500 text-md relative z-10"><a href="https://github.com/gerbil/kubegui/discussions">Github discussion</a></h6>
           <span class="w-32 h-1 bg-blue-200 absolute bottom-1 left-0 z-0"></span>
         </div>
       </div>
     </div>
   </div>
 </section>
+
 <footer class="py-10 md:py-16 mb-20 md:mb-40 lg::mb-52">
   <div class="container max-w-screen-xl mx-auto px-4">
     <div class="text-center">
       <h1 class="font-medium text-gray-700 text-4xl md:text-5xl mb-5">Contacts</h1>
-      <p class="font-normal text-gray-400 text-md md:text-lg mb-20">Feel free to contact me anywhere. Community channels available in discord and slack.</p>
+      <p class="font-normal text-gray-400 text-md md:text-lg mb-20">Feel free to contact me anywhere. Community channels available in discord, slack, facebook, linkedin and reddit.</p>
       <div class="flex items-center justify-center space-x-8">
         <a href="https://kubegui.slack.com/app" class="w-16 h-16 flex items-center justify-center rounded-full hover:bg-gray-200 transition ease-in-out duration-500">
           <i data-feather="slack" class="text-gray-500 hover:text-gray-800 transition ease-in-out duration-500"></i>
@@ -417,13 +326,14 @@
     </div>
   </div>
 </footer>
+
 <script>
   feather.replace()
   const popup = new Popup({
     id: "disclaimer",
     title: "",
     content:
-      "Copyright (c) 2024, Jurijs Kobecs. All rights reserved. Redistribution and use in source and binary forms, with or without modification, are not permitted. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JURIJS KOBECS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.",
+      "Copyright (c) 2025, Jurijs Kobecs. All rights reserved. Redistribution in source and binary forms, with or without modification, are not permitted. THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JURIJS KOBECS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.",
     sideMargin: "2.9vw",
     titleColor: "#fff",
     textColor: "#fff",
@@ -446,10 +356,156 @@
       }`
   });
 
-    const owner = 'gerbil';
-    const repo = 'kubegui';
-    // Fetch and display latest release
-    getLatestReleaseVersion(owner, repo);
+  const owner = 'gerbil';
+  const repo = 'kubegui';
+  // Fetch and display latest release
+  getLatestRelease(owner, repo);
 </script>
+
+
+<!--    <div class="table-responsive custom-table-responsive max-[400px]:text-xs">-->
+<!--      <table class="table custom-table">-->
+<!--        <thead>-->
+<!--        <tr>-->
+<!--          <th scope="col">Feature</th>-->
+<!--          <th scope="col">Kubegui</th>-->
+<!--          <th scope="col">LENS</th>-->
+<!--          <th scope="col">Kubernetes dashboard</th>-->
+<!--          <th scope="col">k9s</th>-->
+<!--          <th scope="col">Portainer</th>-->
+<!--        </tr>-->
+<!--        </thead>-->
+<!--        <tbody>-->
+<!--        <tr class="spacer"><td colspan="100"></td></tr>-->
+<!--        <tr scope="row">-->
+<!--          <td>Price</td>-->
+<!--          <td>Free</td>-->
+<!--          <td>$300</td>-->
+<!--          <td>Free</td>-->
+<!--          <td>Free</td>-->
+<!--          <td>$1200</td>-->
+<!--        </tr>-->
+<!--        <tr class="spacer"><td colspan="100"></td></tr>-->
+<!--        <tr>-->
+<!--          <td>Desktop version</td>-->
+<!--          <td><img src="assets/images/supported.png" /></td>-->
+<!--          <td><img src="assets/images/supported.png" /></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--        </tr>-->
+<!--        <tr class="spacer"><td colspan="100"></td></tr>-->
+<!--        <tr>-->
+<!--          <td>Multi cluster support</td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--        </tr>-->
+<!--        <tr class="spacer"><td colspan="100"></td></tr>-->
+<!--        <tr>-->
+<!--          <td>AI support for fix suggestions</td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--        </tr>-->
+<!--        <tr class="spacer"><td colspan="100"></td></tr>-->
+<!--        <tr>-->
+<!--          <td>Common resource controls</td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--        </tr>-->
+<!--        <tr class="spacer"><td colspan="100"></td></tr>-->
+<!--        <tr>-->
+<!--          <td>Custom resource controls</td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--        </tr>-->
+<!--        <tr class="spacer"><td colspan="100"></td></tr>-->
+<!--        <tr>-->
+<!--          <td>Advanced resource editor</td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--        </tr>-->
+<!--        <tr class="spacer"><td colspan="100"></td></tr>-->
+<!--        <tr>-->
+<!--          <td>Custom resource generator</td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--        </tr>-->
+<!--        <tr class="spacer"><td colspan="100"></td></tr>-->
+<!--        <tr>-->
+<!--          <td>Network policies visualization</td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--        </tr>-->
+<!--        <tr class="spacer"><td colspan="100"></td></tr>-->
+<!--        <tr>-->
+<!--          <td>Official Kubernetes libs usage</td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--        </tr>-->
+<!--        <tr class="spacer"><td colspan="100"></td></tr>-->
+<!--        <tr>-->
+<!--          <td>No external dependecies</td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--        </tr>-->
+<!--        <tr class="spacer"><td colspan="100"></td></tr>-->
+<!--        <tr>-->
+<!--          <td>Advanced logs viewer</td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--        </tr>-->
+<!--        <tr class="spacer"><td colspan="100"></td></tr>-->
+<!--        <tr>-->
+<!--          <td>Pods shell direct access</td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--        </tr>-->
+<!--        <tr class="spacer"><td colspan="100"></td></tr>-->
+<!--        <tr>-->
+<!--          <td>Pod port forwarding</td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--          <td><img src="assets/images/supported.png"/></td>-->
+<!--          <td><img src="assets/images/notsupported.png"/></td>-->
+<!--        </tr>-->
+<!--        </tbody>-->
+<!--      </table>-->
+<!--    </div>-->
+
 </body>
+
 </html>

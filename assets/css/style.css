@@ -1,7 +1,7 @@
 html, body {
   overscroll-behavior: none;
-  max-width: 100%;
-  overflow-x: hidden;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
 }
 
 /* Popup container - can be anything you want */
