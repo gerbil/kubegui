@@ -1,6 +1,7 @@
 # KubeGUI - Kubernetes UI / admin desktop application
-Official website - https://kubegui.net
-![kubegui](./assets/images/big.png)
+Official website - https://kubegui.net  
+
+![kubegui](./assets/images/big.png)  
 
 🚀 **Features**
 📋 **Resources list and controls**  
