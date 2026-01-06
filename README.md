@@ -24,5 +24,7 @@ Official website - https://kubegui.net
 
 ### Roadmap (next v1.9.82 release)
 - Init page rework
+- Settings modal bugfix
+
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
