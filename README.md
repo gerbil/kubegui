@@ -26,7 +26,9 @@ Official website - https://kubegui.net
 - Init page rework
 - Settings modal bugfix
 - CRD ui changed/sync fix
+- CRD list -> CRD groups links
 
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
 
