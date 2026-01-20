@@ -28,9 +28,10 @@ Official website - https://kubegui.net
 - CRD ui changed/sync fix
 - CRD list -> CRD groups links
 - Deployment and Pod logs enchanced with Follow toggle (btw deployments logs works on workloads restars/scale)
-
+- Cronjobs schedule tooltip humanizer
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
 
 
 
