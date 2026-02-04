@@ -173,7 +173,6 @@ function renderReleaseNotes(OWNER, REPO) {
         const release = await fetchLatestRelease();
         renderCards(release);
       } catch (err) {
-        subEl.textContent = "Failed to load release notes.";
         gridEl.innerHTML = `
         <div class="col-span-full bg-red-50 px-8 py-10 rounded-md border border-red-100 text-red-700">
           ${escapeHtml(err.message)}
