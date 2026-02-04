@@ -173,12 +173,9 @@ function renderReleaseNotes(OWNER, REPO) {
         const release = await fetchLatestRelease();
         renderCards(release);
       } catch (err) {
-        gridEl.innerHTML = `
-        <div class="col-span-full bg-red-50 px-8 py-10 rounded-md border border-red-100 text-red-700">
-          ${escapeHtml(err.message)}
-        </div>
-      `;
+        console.log(err.message)
       }
     }
   )();
 }
+
