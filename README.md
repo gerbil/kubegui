@@ -24,6 +24,12 @@ Official website - https://kubegui.net
 
 ### Roadmap (next v1.9.82 release)
 - Init page rework
-
+- App loading screen
+- Resource cache sync indication on cluster load
+- Log output is capped at 500 lines to reduce memory footprint
+- Resource viewer performance enhancements
+- CronJobs schedule (tooltip) humanizer
+- New website -> kubegui.net
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
