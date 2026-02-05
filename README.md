@@ -3,24 +3,24 @@ Official website - https://kubegui.net
 
 ![kubegui](./archive/assets/images/big.png)  
 
-🚀 **Features**
-📋 **Resources list and controls**  
-🔄 **Live updates**  
-🧩 **CRD support**   
-🌐 **Multi-cluster support**  
-🤖 **AI suggestions** (optional)  
-🧠 **Advanced resource editor** (yaml validation included)  
-🕸️ **Network policies visualizer**  
-🧱 **Zero external dependencies** (no kubectl needed)  
-🛠️ **Deployments and Pods logs** (with syntax highlighter)  
-💻 **Direct shell access**  
-🔀 **Simple port forwarding**  
-⚙️ **Application auto-updater**
+# Features
+> - Browse and manage Kubernetes resources with intuitive controls  
+> - See changes as they happen with live updates  
+> - Full support for Custom Resource Definitions (CRDs)  
+> - Work seamlessly across multiple clusters  
+> - Optional AI-powered suggestions to speed things up  
+> - Powerful built-in resource editor with YAML validation  
+> - Visualize and understand network policies at a glance  
+> - No external dependencies — no kubectl required  
+> - View Deployments and Pod logs with syntax highlighting  
+> - Open a shell directly into your workloads  
+> - Easy, one-click port forwarding  
+> - Automatic application updates, no manual installs  
 
 ## Scope:
-- Application releases
-- Website src
-- Issues/Bugs/Discussions hub
+1. Application releases
+2. Website src
+3. Issues/Bugs/Discussions hub
 
 ### Roadmap (next v1.9.82 release)
 - Init page rework
@@ -33,5 +33,6 @@ Official website - https://kubegui.net
 - New website -> kubegui.net
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
 
 
