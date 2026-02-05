@@ -29,7 +29,9 @@ Official website - https://kubegui.net
 - Log output is capped at 500 lines to reduce memory footprint
 - Resource viewer performance enhancements
 - CronJobs schedule (tooltip) humanizer
+- DeamonSets logs (sumarized in one view with pods selection if needed)
 - New website -> kubegui.net
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
 
