@@ -13,7 +13,7 @@ Official website - https://kubegui.net
 > - Visualize and understand network policies at a glance  
 > - No external dependencies — no kubectl required  
 > - View Deployments, DaemonSets and single Pod logs with context aware highlighting  
-> - Open a shell directly into your workloads (event to Nodes via admin daemonset) 
+> - Open a shell directly into your workloads (even to Nodes via admin daemonset) 
 > - Easy, one-click port forwarding  
 > - Automatic application updates, no manual installs  
 
@@ -33,6 +33,7 @@ Official website - https://kubegui.net
 - New website -> kubegui.net
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
 
 
 
