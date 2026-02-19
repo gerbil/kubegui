@@ -22,10 +22,12 @@ Official website - https://kubegui.net
 2. Website src
 3. Issues/Bugs/Discussions hub
 
-### Roadmap (next v1.9.83 release)
-- Options rework (fonts, size, colors?)
+### Roadmap
+- Network view
+- Helm view
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
+
 
 
 
