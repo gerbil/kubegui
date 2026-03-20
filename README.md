@@ -22,9 +22,11 @@ Official website - https://kubegui.net
 2. Website src
 3. Issues/Bugs/Discussions hub
 
+### Release 1.9.84
+- Helm view
+
 ### Roadmap
 - Network view
-- Helm view
 
 [![Github All Releases](https://img.shields.io/github/downloads/gerbil/kubegui/total.svg)]()
 
