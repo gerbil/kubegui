@@ -1,8 +1,9 @@
 # Ignore all folders starting with a dot
 .*/
 
-# But keep .gitignore itself
+# But keep some specific dotfolders
 !.gitignore
+!.github
 
 .editorconfig
 
