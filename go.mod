@@ -13,9 +13,9 @@ require (
 	github.com/stretchr/testify v1.11.1
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.93
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
-	k8s.io/api v0.36.1
+	k8s.io/api v0.36.2
 	k8s.io/apiextensions-apiserver v0.35.4
-	k8s.io/apimachinery v0.36.1
+	k8s.io/apimachinery v0.36.2
 	k8s.io/client-go v0.36.1
 	k8s.io/klog/v2 v2.140.0
 	k8s.io/metrics v0.36.1
@@ -33,7 +33,7 @@ require (
 	github.com/tklauser/numcpus v0.11.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	k8s.io/streaming v0.36.1 // indirect
+	k8s.io/streaming v0.36.2 // indirect
 )
 
 require (
