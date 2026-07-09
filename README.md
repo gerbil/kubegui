@@ -41,9 +41,9 @@ wails3 task dev:backend
 - Backend can also emit events to frontend for real-time updates
 
 ## Wails bridge
-`internal/` - real backend implementations, not exposed to the frontend
+`internal/` - real backend implementations, not exposed to the frontend  
 `services/` - backend implementations exposed to the frontend, with wails bindings
-! services are thin bridge for real internal functions for the frontend
+! services are thin bridge for real internal functions for the frontend  
 
 ## Informers design
 - Informers run in the backend, watching Kubernetes resources
