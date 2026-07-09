@@ -1,0 +1,327 @@
+version: '3'
+
+vars:
+  APP_NAME: "kubegui"
+  BIN_DIR: ".bin"
+  VITE_PORT: '{{.WAILS_VITE_PORT | default 9245}}'
+  LOG_LEVEL: '{{.LOG_LEVEL | default "info"}}'
+
+tasks:
+  build:
+    summary: Builds the application
+    cmds:
+      - task: build:windows:dev
+      - task: build:windows:debug
+      - task: build:windows:prod
+      - task: build:linux
+      - task: build:darwin
+      - task: build:mac:dev
+      - task: build:mac:prod
+      - task: release
+      - task: release:mac:prod
+
+  # To run -> version=X.Y.z wails3 task release
+  release:
+    summary: Release
+    env:
+      version: '{{.version}}'
+    cmds:
+      - echo "Release version - {{.version}}!"
+      - jq ".fixed.file_version = \"{{.version}}\"" build/info.json > build/info_new.json && mv build/info_new.json build/info.json
+      - jq ".info.\"0000\".ProductVersion = \"{{.version}}\"" build/info.json > build/info_new.json && mv build/info_new.json build/info.json
+      - jq ".version = \"{{.version}}\"" wails.json > wails_new.json && mv wails_new.json wails.json
+      - jq ".Info.productVersion = \"{{.version}}\"" wails.json > wails_new.json && mv wails_new.json wails.json
+      - yq e ".info.version = \"{{.version}}\"" -i build/win-dev.yml
+      - yq e ".info.version = \"{{.version}}\"" -i build/mac-dev.yml
+#      - xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleVersion']/following-sibling::string[1]" -v {{.version}} build/Info.plist
+#      - xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleShortVersionString']/following-sibling::string[1]" -v {{.version}} build/Info.plist
+#      - xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleVersion']/following-sibling::string[1]" -v {{.version}} build/Info.plist
+#      - xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleShortVersionString']/following-sibling::string[1]" -v {{.version}} build/Info.plist
+
+  # Windows
+  build:windows:dev:
+    summary: Builds DEV application for Windows
+#    deps:
+#      - task: go:mod:tidy
+#      - task: generate:syso
+#        vars:
+#          ARCH: '{{.ARCH}}'
+    cmds:
+      - go build -v -o {{.BIN_DIR}}/{{.APP_NAME}}.exe -gcflags=all="-l" -ldflags="-X 'main.ENV=DEV'" ./bin/desktop
+    env:
+      GOOS: windows
+      CGO_ENABLED: 0
+      GOARCH: '{{.ARCH | default ARCH}}'
+      PRODUCTION: '{{.PRODUCTION | default "false"}}'
+
+  build:windows:debug:
+    summary: Builds DEV-DEBUG application for Windows
+    deps:
+      - task: go:mod:tidy
+      - task: generate:icons
+      - task: generate:syso
+        vars:
+          ARCH: '{{.ARCH}}'
+    cmds:
+      - go build -v -o {{.BIN_DIR}}/{{.APP_NAME}}.exe -gcflags=all="-l" ./bin/desktop
+    env:
+      GOOS: windows
+      CGO_ENABLED: 0
+      GOARCH: '{{.ARCH | default ARCH}}'
+      PRODUCTION: '{{.PRODUCTION | default "false"}}'
+
+  build:windows:prod:
+    summary: Builds PRODUCTION application for Windows
+    deps:
+      - task: build:frontend
+      - task: go:mod:tidy
+      - task: generate:icons
+      - task: generate:syso
+        vars:
+          ARCH: '{{.ARCH}}'
+    cmds:
+      - go build -v -o {{.BIN_DIR}}/{{.APP_NAME}}.exe -tags production -trimpath -ldflags="-w -s -H windowsgui" ./bin/desktop
+    env:
+      GOOS: windows
+      CGO_ENABLED: 0
+      GOARCH: '{{.ARCH | default ARCH}}'
+      PRODUCTION: '{{.PRODUCTION | default "false"}}'
+
+  # MAC
+  build:mac:dev:
+    summary: Creates a dev build of the application
+    deps:
+      - task: go:mod:tidy
+      - task: generate:icons
+    cmds:
+      - go build -v -o {{.BIN_DIR}}/{{.APP_NAME}} -gcflags=all="-l" -ldflags="-X 'main.ENV=DEV'" ./bin/desktop
+    env:
+      GOOS: darwin
+      GOARCH: amd64
+      CGO_LDFLAGS: "-framework UniformTypeIdentifiers -mmacosx-version-min=10.13"
+      CGO_CFLAGS: "-mmacosx-version-min=10.13"
+      CGO_ENABLED: "1"
+
+  build:mac:prod:
+    summary: Release
+    deps:
+      - task: build:frontend
+    env:
+      version: '{{.version}}'
+    cmds:
+      - task: build:mac:prod:cleanup
+      - task: build:mac:prod:arm64
+      - task: build:mac:prod:amd64
+      - task: build:mac:prod:universal
+
+  release:mac:prod:
+    summary: Release
+    env:
+      version: '{{.version}}'
+    cmds:
+      - task: build:mac:prod:cleanup
+      - task: build:mac:prod
+      - task: build:mac:prod:pack
+      - task: build:mac:prod:upload
+
+  build:mac:prod:cleanup:
+    summary: Cleanup
+    cmds:
+      - rm -f wails.syso
+      - rm -rf ./bin/*
+
+  build:mac:prod:arm64:
+    summary: Creates a production build for ARM64
+    deps:
+      - task: go:mod:tidy
+    cmds:
+      - go build -v -o {{.BIN_DIR}}/{{.APP_NAME}}-arm64 -tags production -trimpath -ldflags="-w -s" ./bin/desktop
+    env:
+      GOOS: darwin
+      GOARCH: arm64
+      CGO_LDFLAGS: "-framework UniformTypeIdentifiers -mmacosx-version-min=10.13"
+      CGO_CFLAGS: "-mmacosx-version-min=10.13"
+      CGO_ENABLED: "1"
+
+  build:mac:prod:amd64:
+    summary: Creates a production build of the application for AMD64
+    deps:
+      - task: go:mod:tidy
+    cmds:
+      - go build -v -o {{.BIN_DIR}}/{{.APP_NAME}}-amd64 -tags production -trimpath -ldflags="-w -s" ./bin/desktop
+    env:
+      GOOS: darwin
+      GOARCH: amd64
+      CGO_LDFLAGS: "-framework UniformTypeIdentifiers -mmacosx-version-min=10.13"
+      CGO_CFLAGS: "-mmacosx-version-min=10.13"
+      CGO_ENABLED: "1"
+
+  build:mac:prod:universal:
+    summary: Create Universal Binary
+    cmds:
+      - lipo -create -output {{.BIN_DIR}}/{{.APP_NAME}} {{.BIN_DIR}}/{{.APP_NAME}}-arm64 {{.BIN_DIR}}/{{.APP_NAME}}-amd64
+      - chmod +x {{.BIN_DIR}}/{{.APP_NAME}}
+      - mkdir -p {{.BIN_DIR}}/{{.APP_NAME}}.app/Contents/{MacOS,Resources}
+      - cp build/icons.icns {{.BIN_DIR}}/{{.APP_NAME}}.app/Contents/Resources
+      - cp {{.BIN_DIR}}/{{.APP_NAME}} {{.BIN_DIR}}/{{.APP_NAME}}.app/Contents/MacOS
+      - cp build/Info.plist {{.BIN_DIR}}/{{.APP_NAME}}.app/Contents
+
+  build:mac:prod:sign:
+    summary: Bin sign
+    cmds:
+      - security unlock-keychain -p 'xxx' /Users/xxx/Library/Keychains/xxx
+      - codesign --deep --force --options runtime --sign "xxx" {{.BIN_DIR}}/{{.APP_NAME}}.app
+      - codesign --verify --deep --strict --verbose=2 {{.BIN_DIR}}/{{.APP_NAME}}.app
+
+  build:mac:prod:pack:
+    summary: ZIP
+    cmds:
+      - ditto -c -k --keepParent {{.BIN_DIR}}/{{.APP_NAME}}.app {{.BIN_DIR}}/{{.APP_NAME}}-macos.zip
+
+  build:mac:prod:notarize:
+    summary: Notarization
+    cmds:
+      - xcrun notarytool submit {{.BIN_DIR}}/{{.APP_NAME}}-macos.zip --apple-id "xxx" --team-id "xxx" --password "xxx" --wait
+
+  build:mac:prod:staple:
+    summary: Staple
+    cmds:
+      - xcrun stapler staple {{.BIN_DIR}}/{{.APP_NAME}}.app
+
+  build:mac:prod:upload:
+    summary: Upload to github
+    cmds:
+      - gh release create "v{{.version}}" --title "Release v{{.version}}" --notes "..." -R gerbil/kubegui || true
+      - gh release upload v{{.version}} {{.BIN_DIR}}/{{.APP_NAME}}-macos.zip --clobber -R gerbil/kubegui
+
+  #  MISC
+  generate:syso:
+    summary: Generates Windows `.syso` file
+    dir: build
+    cmds:
+      - wails3 generate syso -arch {{.ARCH}} -icon icon.ico -manifest wails.exe.manifest -info info.json -out ../wails.syso
+    vars:
+      ARCH: '{{.ARCH | default ARCH}}'
+
+  create:nsis:installer:
+    summary: Creates an NSIS installer
+    label: "NSIS Installer ({{.ARCH}})"
+    dir: build/nsis
+    sources:
+      - "{{.ROOT_DIR}}\\{{.BIN_DIR}}\\{{.APP_NAME}}.exe"
+    generates:
+      - "{{.ROOT_DIR}}\\{{.BIN_DIR}}\\{{.APP_NAME}}-{{.ARCH}}-installer.exe"
+    deps:
+      - task: build:windows
+        vars:
+          PRODUCTION: "true"
+          ARCH: '{{.ARCH}}'
+    cmds:
+      - makensis -DARG_WAILS_'{{.ARG_FLAG}}'_BINARY="{{.ROOT_DIR}}\{{.BIN_DIR}}\{{.APP_NAME}}.exe" project.nsi
+    vars:
+      ARCH: '{{.ARCH | default ARCH}}'
+      ARG_FLAG: '{{if eq .ARCH "amd64"}}AMD64{{else}}ARM64{{end}}'
+
+
+  generate:icons:
+    summary: Generates Windows `.ico` and Mac `.icns` files from an image
+    dir: build
+    sources:
+      - "appicon.png"
+    generates:
+      - "icons.icns"
+      - "icons.ico"
+    cmds:
+      # Generates both .ico and .icns files
+      - wails3 generate icons -input appicon.png
+
+  generate:bindings:
+    summary: Generates bindings for the frontend
+    sources:
+      - "**/*.go"
+      - go.mod
+      - go.sum
+    generates:
+      - "ui/bindings/**/*"
+    cmds:
+      # For a complete list of options, run `wails3 generate bindings -help`
+      - wails3 generate bindings ./... -ts -d ui/bindings
+
+  install:frontend:deps:
+    summary: Install frontend dependencies
+    dir: ui
+    preconditions:
+      - sh: npm version
+        msg: "npm is required to run frontend dev server"
+    cmds:
+      - npm install
+      - npm run build
+
+  build:frontend:
+    summary: Builds the frontend for production
+    dir: ui
+    sources:
+      - "src/**/*"
+      - "tsconfig.json"
+      - "vite.config.ts"
+      - "package.json"
+      - "package-lock.json"
+    generates:
+      - "dist/**/*"
+    cmds:
+      - npm run build
+
+  go:mod:tidy:
+    summary: Runs `go mod tidy`
+    internal: true
+    generates:
+      - go.sum
+    sources:
+      - go.mod
+    cmds:
+      - go mod tidy
+
+  # RUN
+  run:
+    summary: Runs the application
+    cmds:
+      - task: run:{{OS}}
+
+  run:windows:
+    env:
+      APPDATA: '{{.APPDATA | default (env "APPDATA")}}'
+      USERPROFILE: '{{.USERPROFILE | default (env "USERPROFILE")}}'
+    cmds:
+      - 'cmd.exe /C "{{.BIN_DIR}}\\{{.APP_NAME}}.exe"'
+
+  run:linux:
+    cmds:
+      - '{{.BIN_DIR}}/{{.APP_NAME}}'
+
+  run:darwin:
+    cmds:
+      - '{{.BIN_DIR}}/{{.APP_NAME}}'
+
+  # DEV
+  dev:frontend:
+    summary: Runs the frontend in development mode
+    dir: ui
+    cmds:
+      - npm run dev -- --host --port {{.VITE_PORT}}
+
+  dev:backend:
+    summary: Runs backend app only (expects frontend dev server already running)
+    env:
+      LOG_LEVEL: '{{.LOG_LEVEL}}'
+    cmds:
+      - wails3 dev -config ./build/win-dev-backend.yml -port {{.VITE_PORT}}
+
+  dev:all:
+    summary: Runs frontend and backend together
+    cmds:
+      - wails3 dev -config ./build/win-dev.yml -port {{.VITE_PORT}}
+
+  dev:reload:
+    summary: Reloads the application
+    cmds:
+      - task: run

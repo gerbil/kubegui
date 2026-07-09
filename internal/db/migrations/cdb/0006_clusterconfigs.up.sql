@@ -1,0 +1,1 @@
+ALTER TABLE clusterconfigs ADD COLUMN source TEXT NOT NULL DEFAULT 'manual';

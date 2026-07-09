@@ -1,0 +1,615 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@keyframes skeleton-shimmer {
+  0%   { background-position: -400% 0; }
+  100% { background-position:  400% 0; }
+}
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    #242a3a 25%,
+    #2f3445 50%,
+    #242a3a 75%
+  );
+  background-size: 400% 100%;
+  animation: skeleton-shimmer 3.5s linear infinite;
+  border-radius: 4px;
+}
+
+@layer base {
+  :root {
+    --background: #0d1322;
+    --foreground: #dde2f8;
+    --card: #191f2f;
+    --card-foreground: #dde2f8;
+    --border: #434655;
+    --muted: #242a3a;
+    --muted-foreground: #c4c5d7;
+    --accent: #151b2b;
+    --accent-foreground: #dde2f8;
+    --primary: #7eb8f7;
+    --primary-foreground: #002d6e;
+    --primary-container: #3b82f6;
+    --on-primary: #001e47;
+    --on-primary-container: #001845;
+    --tertiary: #93c5fd;
+    --surface: #0d1322;
+    --surface-container-lowest: #080e1d;
+    --surface-container-low: #151b2b;
+    --surface-container: #191f2f;
+    --surface-container-high: #242a3a;
+    --surface-container-highest: #2f3445;
+    --surface-bright: #33394a;
+    --on-surface: #dde2f8;
+    --on-surface-variant: #c4c5d7;
+    --outline: #8d90a0;
+    --outline-variant: #434655;
+    --destructive: #ffb4ab;
+    --destructive-foreground: #690005;
+
+    /* Glassmorphism overlay tokens */
+    --glass-bg-soft: #ffffff08;
+    --glass-bg-medium: #ffffff0d;
+    --glass-bg-strong: #ffffff14;
+    --glass-border-light: #ffffff1a;
+    --glass-border-medium: #7eb8f733;
+  }
+
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  * { border-color: var(--border); }
+  body {
+    margin: 0;
+    @apply bg-background text-foreground;
+    font-size: 11px;
+    font-family: 'Space Grotesk', system-ui, sans-serif;
+    font-weight: 300;
+    -webkit-font-smoothing: antialiased;
+    background-image: url('/build/forest.jpg');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    backdrop-filter: blur(10px);
+  }
+
+  aside {
+    font-size: 13px;
+  }
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--background); }
+  ::-webkit-scrollbar-thumb { @apply bg-border rounded-full; }
+
+  .font-headline {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  .font-label {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+
+  .font-mono {
+    font-family: 'Space Grotesk', monospace;
+  }
+
+  .font-modal {
+    font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.005em;
+  }
+  /* ── Table & view text — light weight, no bold ───────────────────── */
+  td, th {
+    font-family: 'Space Grotesk', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-weight: 300;
+  }
+  /* Override Tailwind font-weight utilities inside table cells */
+  td .font-semibold,
+  td .font-bold,
+  td .font-medium,
+  td span,
+  td button,
+  td div {
+    font-weight: 300;
+  }
+  /* Name cells get a slight bump for readability */
+  td .font-label {
+    font-weight: 400;
+  }
+}
+
+@layer components {
+  .lucid-surface {
+    background: #ffffff08;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .lucid-control {
+    background: #ffffff0d;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .lucid-button {
+    background: #ffffff14;
+  }
+
+  .lucid-shell {
+    background:
+      radial-gradient(circle at 20% 30%, #3b82f626 0%, transparent 80%),
+      radial-gradient(circle at 80% 70%, #93c5fd18 0%, transparent 80%),
+      rgba(13, 19, 34, 0.51);
+  }
+
+  .lucid-header,
+  .lucid-footer {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: #ffffff14;
+    backdrop-filter: blur(44px);
+    -webkit-backdrop-filter: blur(44px);
+  }
+
+  .lucid-panel {
+    /*background: rgba(255, 255, 255, 0.06);*/
+    backdrop-filter: blur(44px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+
+  .lucid-panel-elevated {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: #1e2337;
+    border-radius: 12px;
+  }
+
+  .lucid-chip {
+    background: #4d77ff33;
+    color: #dce1ff;
+  }
+
+  /* Legacy glass utilities (kept for pods page) */
+  .glass-surface {
+    background: var(--glass-bg-soft);
+  }
+
+  .glass-surface-elevated {
+    background: var(--glass-bg-medium);
+  }
+
+  .glass-surface-deep {
+    background: var(--glass-bg-strong);
+  }
+
+  .glass-input {
+    background: #0f172a47;
+    border: 1px solid var(--glass-border-light);
+  }
+
+  .glass-card {
+    background: var(--surface-container);
+  }
+
+  .glass-button {
+    background: var(--surface-container-high);
+  }
+}
+
+/* Notyf — restore original structure, override only font size */
+.notyf__toast,
+.notyf-toast {
+  position: relative;
+  width: max-content;
+  font-size: 12px;
+}
+
+.notyf__message {
+  font-size: 12px;
+  line-height: 1.5em;
+}
+
+/* Restore original full-height dismiss strip (undoes our broken overrides) */
+.notyf__dismiss {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: 26px;
+  margin-right: -15px;
+}
+
+.notyf__dismiss-btn {
+  background-color: rgba(0, 0, 0, 0.25);
+  border: none;
+  cursor: pointer;
+  opacity: 0.35;
+  height: 100%;
+  width: 100%;
+  border-radius: 0;
+}
+
+.notyf__dismiss-btn:after,
+.notyf__dismiss-btn:before {
+  content: "";
+  background: #fff;
+  height: 12px;
+  width: 2px;
+  border-radius: 3px;
+  position: absolute;
+  left: calc(50% - 1px);
+  top: calc(50% - 5px);
+}
+
+.notyf__dismiss-btn:after  { transform: rotate(-45deg); }
+.notyf__dismiss-btn:before { transform: rotate(45deg); }
+
+.notyf__dismiss-btn:hover {
+  opacity: 0.7;
+  background-color: rgba(0, 0, 0, 0.15);
+}
+
+.notyf__toast--dismissible .notyf__wrapper {
+  padding-right: 30px;
+}
+
+.notyf__toast:nth-last-child(1),
+.notyf-toast:nth-last-child(1) {
+  margin-bottom: 12px;
+}
+
+.notyf-progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 2px;
+  background: #111827cc;
+  z-index: 11;
+  transform-origin: left center;
+  animation-name: notyf-drain;
+  animation-timing-function: linear;
+  animation-fill-mode: forwards;
+  pointer-events: none;
+}
+
+@keyframes notyf-drain {
+  from {
+    transform: scaleX(1);
+    opacity: 0.6;
+  }
+  to {
+    transform: scaleX(0);
+    opacity: 0.6;
+  }
+}
+
+/* ── Global Choices.js skin ─────────────────────────────────────── */
+
+/* Hide built-in chevron arrow */
+.choices[data-type*='select-one']::after {
+  display: none !important;
+}
+
+/* Wrapper sizing */
+.choices {
+  margin-bottom: 0 !important;
+  min-width: 220px;
+  position: relative;
+  overflow: visible !important;
+}
+
+/* Trigger pill */
+.choices__inner {
+  background: #ffffff0d !important;
+  color: var(--on-surface) !important;
+  min-height: 30px !important;
+  padding: 4px 8px !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-size: 12px !important;
+  cursor: pointer;
+  overflow: visible !important;
+}
+
+.choices__list--single {
+  color: var(--on-surface) !important;
+  padding: 1px 2px !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-size: 12px !important;
+}
+
+
+/* ── Dropdown panel ─── */
+.choices__list--dropdown,
+.choices__list[aria-expanded] {
+  position: absolute !important;
+  top: calc(100% + 6px) !important;
+  left: 0 !important;
+  min-width: 100% !important;
+  background: #191f2f !important;
+  box-shadow: 0 12px 36px #00000070 !important;
+  z-index: 1400 !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  overflow: hidden;
+  padding: 4px !important;
+}
+
+/* Search input inside dropdown — darker background */
+.choices[data-type*='select-one'] .choices__input {
+  background: #080e1d !important;
+  color: var(--on-surface) !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-size: 11px !important;
+  padding: 5px 8px !important;
+  margin: 4px !important;
+  width: calc(100% - 8px) !important;
+  box-sizing: border-box;
+}
+
+/* Option items */
+.choices__item--choice {
+  color: var(--on-surface) !important;
+  font-family: 'Space Grotesk', sans-serif !important;
+  font-size: 12px !important;
+  border-radius: 0.375rem !important;
+  padding: 5px 10px !important;
+}
+
+.choices__item--choice.is-highlighted {
+  background: #2f3445 !important;
+}
+
+/* Overflow containment for toolbars with Choices inside */
+#pods-toolbar {
+  overflow: visible !important;
+}
+
+#namespaces-toolbar {
+  overflow: visible !important;
+}
+
+#deployments-toolbar {
+  overflow: visible !important;
+}
+
+#pods-toolbar .choices {
+  z-index: 1300;
+}
+
+#namespaces-toolbar .choices {
+  z-index: 1300;
+}
+
+#deployments-toolbar .choices {
+  z-index: 1300;
+}
+
+#pods-toolbar .choices__item--choice {
+  color: var(--on-surface) !important;
+}
+
+/* Pods page glassmorphism (scoped to avoid cross-page regressions) */
+.pods-glass-page {
+  background:
+    radial-gradient(circle at 20% 30%, #3b82f626 0%, transparent 50%),
+    radial-gradient(circle at 80% 70%, #93c5fd18 0%, transparent 50%),
+    rgba(13, 19, 34, 0.72);
+}
+
+.pods-glass-surface {
+  background: #ffffff08;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.pods-glass-control {
+  background: #0f172a57 !important;
+  box-shadow: inset 0 1px 0 #ffffff0a;
+  border-color: rgba(148, 163, 184, 0.2) !important;
+  color: var(--on-surface, #e2e8f0) !important;
+}
+
+.pods-glass-control:focus,
+.pods-glass-control[data-expanded] {
+  border-color: #7dd3fc8c !important;
+  box-shadow: 0 0 0 1px #7dd3fc59, inset 0 1px 0 #ffffff0d !important;
+  outline: none !important;
+}
+
+.pods-glass-pill {
+  background: #1e293b7a !important;
+}
+
+.pods-glass-table table {
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.pods-glass-table thead {
+  background: #0f172a85 !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.pods-glass-table thead th {
+  border-bottom-color: #94a3b847 !important;
+}
+
+.pods-glass-table tbody tr {
+  background: #0f172a29;
+}
+
+.pods-glass-table tbody tr:hover {
+  background: #1e293b73 !important;
+}
+
+.pods-glass-table tbody tr + tr td {
+  border-top: 1px solid #94a3b81f;
+}
+
+.table-action-icon-btn {
+  background: #ffffff14;
+  color: #c4c5d7;
+  cursor: pointer;
+}
+
+.table-action-icon-btn:hover {
+  background: #ffffff1f;
+  color: #dde2f8;
+}
+
+.pods-glass-icon-btn {
+  border-color: #94a3b852 !important;
+  background: #0f172a5c !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.pods-glass-icon-btn:hover {
+  background: #1e293b9e !important;
+}
+
+.pods-glass-icon-btn-danger {
+  border-color: #f8717173 !important;
+  background: #7f1d1d3d !important;
+}
+
+/* Status column with improved visibility and layout */
+.pods-status-cell {
+  padding-left: 16px !important;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.pods-status-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 18px;
+  width: 18px;
+}
+
+.pods-status-text {
+  font-size: 10px;
+  line-height: 1.2;
+  color: var(--muted-foreground);
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 500;
+  max-width: 100px;
+  word-break: break-word;
+}
+
+/* General UI elements */
+input[type="text"],
+input[type="search"],
+.pods-glass-control {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* Log viewer toolbar selects — keep monospace font, don't let global override win */
+.log-viewer-select {
+  font-family: 'Space Grotesk', 'Consolas', monospace !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background-color: #1e2330 !important;
+  border: 1px solid rgba(255,255,255,0.10) !important;
+  color: #cbd5e1 !important;
+  font-size: 11px !important;
+  border-radius: 6px !important;
+  padding: 3px 24px 3px 8px !important;
+  cursor: pointer !important;
+  outline: none !important;
+}
+.log-viewer-select:hover {
+  border-color: rgba(255,255,255,0.20) !important;
+  background-color: #252c3d !important;
+}
+.log-viewer-select:focus,
+.log-viewer-select:active {
+  background-color: #1e2330 !important;
+  border-color: rgba(99,179,237,0.45) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 2px rgba(99,179,237,0.15) !important;
+}
+.log-viewer-select option {
+  background-color: #1e2330 !important;
+  color: #cbd5e1 !important;
+}
+
+/* Global cursor fix */
+button,
+[role="button"],
+a[href],
+select,
+label,
+label[for],
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"],
+input[type="submit"],
+input[type="button"],
+input[type="reset"] {
+  cursor: pointer !important;
+}
+button:disabled,
+[role="button"][aria-disabled="true"] {
+  cursor: not-allowed !important;
+}
+
+/* PodActionDrawer font overrides (YAML and Shell kept in monospace) */
+.pods-glass-page h3,
+.pods-glass-page label,
+.pods-glass-page button,
+.pods-glass-page span:not(.font-mono),
+.pods-glass-page p:not(.font-mono) {
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+.choices {
+  padding: 0 !important;
+}
+
+.choices__list--single .choices__item {
+  font-size: 0.75rem !important;
+}
+
+/* ── Deployment / Pod log viewer (HTML-formatted SSE) ─────────────────────── */
+.deployment-log-viewer div {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 1px 0;
+  line-height: 1.6;
+}
+
+.deployment-log-viewer .log-circle {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.deployment-log-viewer .log-normal  { background: #34d399; }
+.deployment-log-viewer .log-warning { background: #fbbf24; }
+.deployment-log-viewer .log-error   { background: #f87171; }
+
+.deployment-log-viewer [class^='container-'] {
+  color: #7dd3fc;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.deployment-log-viewer .code {
+  color: #c8d3f5;
+  word-break: break-all;
+}

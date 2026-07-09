@@ -1,0 +1,39 @@
+# Backend-only dev config for split Vite/Wails development.
+version: '3'
+
+info:
+  companyName: "Yuriy Kobets"
+  productName: "Kubegui"
+  productIdentifier: "kubegui.net"
+  description: "Kubernetes admin desktop client"
+  copyright: "(c) 2026, Kubegui"
+  comments: "Kubernetes admin desktop client"
+  version: "2.0.0"
+
+dev_mode:
+  root_path: .
+  log_level: warn
+  debounce: 200
+  ignore:
+    dir:
+      - .git
+      - node_modules
+      - bin
+      - backend
+    file:
+      - .DS_Store
+      - .gitignore
+      - .gitkeep
+    watched_extension:
+      - "*.go"
+    git_ignore: true
+  executes:
+    - cmd: wails3 task build:windows:dev
+      type: blocking
+    - cmd: wails3 task run
+      type: primary
+
+fileAssociations:
+
+other:
+  - name: My Other Data

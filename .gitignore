@@ -1,3 +1,17 @@
-bin/
-sign.sh
-sign.log
+# Ignore all folders starting with a dot
+.*/
+
+# But keep .gitignore itself
+!.gitignore
+
+.editorconfig
+
+/tmp/
+/.bin/
+
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.db

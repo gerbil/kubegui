@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+  <dict>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>CFBundleName</key>
+    <string>KubeGUI</string>
+    <key>CFBundleExecutable</key>
+    <string>kubegui</string>
+    <key>CFBundleIdentifier</key>
+    <string>kubegui</string>
+    <key>CFBundleVersion</key>
+    <string>2.0.0</string>
+    <key>CFBundleGetInfoString</key>
+    <string>Kubernetes GUI</string>
+    <key>CFBundleShortVersionString</key>
+    <string>2.0.0</string>
+    <key>CFBundleIconFile</key>
+    <string>icons.icns</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>10.13.0</string>
+    <key>NSHighResolutionCapable</key>
+    <string>true</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>&#xA9; 2026, Jurijs Kobecs</string>
+  </dict>
+</plist>

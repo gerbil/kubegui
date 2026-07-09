@@ -1,0 +1,1 @@
+export { ResourcesView as PodsView } from '@/features/resources/ResourcesView'

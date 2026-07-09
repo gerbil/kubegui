@@ -1,0 +1,34 @@
+{
+  "name": "KubeGUI",
+  "assetdir": "./frontend/assets",
+  "reloaddirs": "./frontend/templates",
+  "wailsjsdir": "./frontend/src",
+  "frontend:dev:serverUrl": "http://localhost:9245",
+  "frontend:build": "",
+  "frontend:install": "",
+  "frontend:dev": "",
+  "frontend:dev:watcher": "",
+  "version": "2.0.0",
+  "Path": "",
+  "BuildDir": "",
+  "outputfilename": "kubegui",
+  "OutputType": "",
+  "Platform": "",
+  "runNonNativeBuildHooks": false,
+  "postBuildHooks": null,
+  "Author": {
+    "name": "Jurijs Kobecs",
+    "email": "jurijs.kobecs@gmail.com"
+  },
+  "Info": {
+    "companyName": "KubeGUI",
+    "productName": "kubegui",
+    "productVersion": "2.0.0",
+    "copyright": "(c) 2026 Jurijs Kobecs",
+    "comments": "Kubernetes admin desktop client"
+  },
+  "debounceMS": 500,
+  "devserverurl": "http://localhost:34115",
+  "appargs": "",
+  "nsisType": ""
+}
