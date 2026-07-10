@@ -1,6 +1,6 @@
-import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import { defineConfig, type Plugin } from 'vite'
 
 /**
  * Forwards browser console.error / unhandledrejection back to the Vite
@@ -48,8 +48,8 @@ function browserErrorForwarder(): Plugin {
       ]
     },
     // Receive messages from the browser and print to terminal
-    configureServer(server) {
-      server.hot.on(`${CHANNEL}:log`, (data: { level: string; msg: string }, client) => {
+    configureServer(server: import('vite').ViteDevServer) {
+      server.hot.on(`${CHANNEL}:log`, (data: { level: string; msg: string }, client: import('vite').HotChannelClient) => {
         const prefix = data.level === 'error' ? '\x1b[31m[browser error]\x1b[0m'
           : '\x1b[33m[browser warn]\x1b[0m'
          
