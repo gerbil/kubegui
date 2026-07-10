@@ -99,3 +99,5 @@ Standard resources (required informer list from `internal/resources/kube/resourc
 - Add whoami/auth check view
 - Adjust ns quota modal details view
 - Create roles/bindings react-flow view
+- Settings view
+- AI suggestions for issues/errors/warnings/etc
