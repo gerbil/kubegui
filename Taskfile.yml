@@ -233,7 +233,7 @@ tasks:
       - "icons.ico"
     cmds:
       # Generates both .ico and .icns files
-      - wails3 generate icons -input appicon.png
+      - wails3 generate icons -input appicon.png -windowsfilename icon.ico -macfilename icons.icns
 
   generate:bindings:
     summary: Generates bindings for the frontend

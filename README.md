@@ -1,6 +1,8 @@
 # KubeGUI - Kubernetes UI / admin desktop application
 Official website - https://kubegui.net  
 
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui?ref=badge_shield&issueType=license) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui.svg?type=shield&issueType=security)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui?ref=badge_shield&issueType=security)
+
 ![kubegui](./web/images/kubegui.png)  
 
 # Features
