@@ -137,31 +137,30 @@
       <h2 class="section-title">Download for Your Platform</h2>
 
       <div class="download-grid">
-          <button onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-windows-x86_64.zip', '_blank');"
-                  title="By downloading app, you agree with our terms and conditions"
-                  class="os-button"
-                  data-testid="download-windows-btn">
-            <span class="os-icon"><img src="images/windows.png" /></span>
-            <span class="os-name">Windows</span>
-            <span class="os-version"><span class="text-xs release-version">()</span></span>
-          </button>
-        </a>
+        <button onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-windows-x86_64.zip', '_blank');"
+                title="By downloading app, you agree with our terms and conditions"
+                class="os-button"
+                data-testid="download-windows-btn">
+          <span class="os-icon"><img src="images/windows.png" /></span>
+          <span class="os-name">Windows</span>
+          <span class="os-version"><span class="text-xs release-version">(v2.0.0)</span></span>
+        </button>
 
         <button onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-linux_amd64.zip', '_blank');"
                 title="By downloading app, you agree with our terms and conditions"
                 class="os-button"
-                data-testid="download-mac-btn">
-          <span class="os-icon"><img src="images/apple.png" /></span>
-          <span class="os-name">macOS</span>
-          <span class="os-version"><span class="text-xs release-version">()</span></span>
+                data-testid="download-linux-btn">
+          <span class="os-icon"><img src="images/linux.png" /></span>
+          <span class="os-name">Linux</span>
+          <span class="os-version"><span class="text-xs release-version">(v2.0.0)</span></span>
         </button>
 
         <button onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-macos.zip', '_blank');"
                 class="os-button"
-                data-testid="download-linux-btn">
-          <span class="os-icon"><img src="images/linux.png" /></span>
-          <span class="os-name">Linux</span>
-          <span class="os-version"><span class="text-xs release-version">()</span></span>
+                data-testid="download-mac-btn">
+          <span class="os-icon"><img src="images/apple.png" /></span>
+          <span class="os-name">macOS</span>
+          <span class="os-version"><span class="text-xs release-version">(v2.0.0)</span></span>
         </button>
       </div>
 
@@ -177,7 +176,6 @@
 </div>
 
 <script src="js/app.js"></script>
-<script src="js/release.js"></script>
 </body>
 </html>
 
@@ -186,9 +184,9 @@
     id: "disclaimer",
     title: "",
     content:
-      "Copyright (c) 2025, Jurijs Kobecs. " +
-      "All rights reserved. Redistribution in source and binary forms, with or without modification, are not permitted.\n" +
-      "THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JURIJS KOBECS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.",
+      "Original author: Jurijs Kobecs" +
+      "No rights reserved. Redistribution in source and binary forms, with or without modification - is fully permitted!\n" +
+      "BUT, THIS SOFTWARE IS PROVIDED BY THE CONTRIBUTORS 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JURIJS KOBECS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.",
     sideMargin: "1.9vw",
     titleColor: "#fff",
     textColor: "#fff",
@@ -210,9 +208,4 @@
         margin-bottom: 0% !important;
       }`
   });
-
-  const owner = 'gerbil';
-  const repo = 'kubegui';
-  // Fetch and display latest release
-  getLatestRelease(owner, repo);
 </script>

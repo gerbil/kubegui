@@ -11,7 +11,7 @@ import * as crd$0 from "../internal/resources/crd/models.js";
 
 export class CRDMenuResponse {
     "groups": crd$0.CategoryGroup[];
-    "uiMap": { [_: string]: string };
+    "uiMap": { [_ in string]?: string };
 
     /** Creates a new CRDMenuResponse instance. */
     constructor($$source: Partial<CRDMenuResponse> = {}) {

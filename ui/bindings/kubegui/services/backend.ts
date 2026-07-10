@@ -159,13 +159,13 @@ export function DBUpdatePodPortForwardingsConfig(name: string, $namespace: strin
     return $Call.ByID(1345358601, name, $namespace, status, remotePort, localPort);
 }
 
-export function DeploymentRestart($namespace: string, name: string): $CancellablePromise<{ [_: string]: any }> {
+export function DeploymentRestart($namespace: string, name: string): $CancellablePromise<{ [_ in string]?: any }> {
     return $Call.ByID(1074739546, $namespace, name).then(($result: any) => {
         return $$createType7($result);
     });
 }
 
-export function DeploymentScale($namespace: string, name: string, replicas: number): $CancellablePromise<{ [_: string]: any }> {
+export function DeploymentScale($namespace: string, name: string, replicas: number): $CancellablePromise<{ [_ in string]?: any }> {
     return $Call.ByID(73162315, $namespace, name, replicas).then(($result: any) => {
         return $$createType7($result);
     });
@@ -271,7 +271,7 @@ export function LogsGetPod($namespace: string, name: string, container: string):
     });
 }
 
-export function NodeCordon(name: string): $CancellablePromise<{ [_: string]: any }> {
+export function NodeCordon(name: string): $CancellablePromise<{ [_ in string]?: any }> {
     return $Call.ByID(1978895021, name).then(($result: any) => {
         return $$createType7($result);
     });
@@ -299,7 +299,7 @@ export function NodeSetupShell(name: string): $CancellablePromise<void> {
     return $Call.ByID(1251354497, name);
 }
 
-export function NodeUncordon(name: string): $CancellablePromise<{ [_: string]: any }> {
+export function NodeUncordon(name: string): $CancellablePromise<{ [_ in string]?: any }> {
     return $Call.ByID(2442329246, name).then(($result: any) => {
         return $$createType7($result);
     });
@@ -311,7 +311,7 @@ export function NodesGetMetrics(): $CancellablePromise<nodes$0.NodeMetricRow[]> 
     });
 }
 
-export function PodGetMetrics($namespace: string, name: string): $CancellablePromise<{ [_: string]: any }> {
+export function PodGetMetrics($namespace: string, name: string): $CancellablePromise<{ [_ in string]?: any }> {
     return $Call.ByID(1278193994, $namespace, name).then(($result: any) => {
         return $$createType7($result);
     });
@@ -343,7 +343,7 @@ export function ResizePodShellSession(sessionID: string, rows: number, cols: num
     return $Call.ByID(3871505029, sessionID, rows, cols);
 }
 
-export function ResourceAdd(resource: string, objectJSON: string): $CancellablePromise<{ [_: string]: any }> {
+export function ResourceAdd(resource: string, objectJSON: string): $CancellablePromise<{ [_ in string]?: any }> {
     return $Call.ByID(2570461955, resource, objectJSON).then(($result: any) => {
         return $$createType7($result);
     });
@@ -353,13 +353,13 @@ export function ResourceDelete(resource: string, $namespace: string, name: strin
     return $Call.ByID(1635740699, resource, $namespace, name);
 }
 
-export function ResourceEdit(resource: string, $namespace: string, name: string, patchJSON: string): $CancellablePromise<{ [_: string]: any }> {
+export function ResourceEdit(resource: string, $namespace: string, name: string, patchJSON: string): $CancellablePromise<{ [_ in string]?: any }> {
     return $Call.ByID(2777293668, resource, $namespace, name, patchJSON).then(($result: any) => {
         return $$createType7($result);
     });
 }
 
-export function ResourceGetDetails(resource: string, $namespace: string, name: string): $CancellablePromise<{ [_: string]: any }> {
+export function ResourceGetDetails(resource: string, $namespace: string, name: string): $CancellablePromise<{ [_ in string]?: any }> {
     return $Call.ByID(3170424314, resource, $namespace, name).then(($result: any) => {
         return $$createType7($result);
     });
@@ -368,7 +368,7 @@ export function ResourceGetDetails(resource: string, $namespace: string, name: s
 /**
  * --- resource ---
  */
-export function ResourceList(resource: string, $namespace: string): $CancellablePromise<{ [_: string]: any }[]> {
+export function ResourceList(resource: string, $namespace: string): $CancellablePromise<{ [_ in string]?: any }[]> {
     return $Call.ByID(176858504, resource, $namespace).then(($result: any) => {
         return $$createType23($result);
     });
