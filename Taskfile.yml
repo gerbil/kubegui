@@ -87,6 +87,18 @@ tasks:
       GOARCH: '{{.ARCH | default ARCH}}'
       PRODUCTION: '{{.PRODUCTION | default "false"}}'
 
+  build:linux:
+    summary: Builds PRODUCTION application for Linux
+    deps:
+      - task: build:frontend
+      - task: go:mod:tidy
+    cmds:
+      - go build -v -o {{.BIN_DIR}}/{{.APP_NAME}} -tags production -trimpath -ldflags="-w -s" ./bin/desktop
+    env:
+      GOOS: linux
+      GOARCH: '{{.ARCH | default "amd64"}}'
+      CGO_ENABLED: "1"
+
   # MAC
   build:mac:dev:
     summary: Creates a dev build of the application

@@ -51,12 +51,12 @@ jobs:
 
       - name: Archive Windows
         run: |
-          cd bin
+          cd .bin
           zip kubegui-windows-x86_64.zip kubegui.exe
 
       - name: Archive Linux
         run: |
-          cd bin
+          cd .bin
           zip kubegui-linux-amd64.zip kubegui
 
       - name: Create GitHub Release
@@ -68,4 +68,4 @@ jobs:
           name: ${{ env.VERSION }}
           generate_release_notes: true
           files: |
-            ${{ github.workspace }}/bin/*.zip
+            ${{ github.workspace }}/.bin/*.zip
