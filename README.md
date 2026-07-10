@@ -41,9 +41,9 @@ wails3 task dev:backend
 - Backend can also emit events to frontend for real-time updates
 
 ## Wails bridge
-`internal/` - real backend implementations, not exposed to the frontend
+`internal/` - real backend implementations, not exposed to the frontend  
 `services/` - backend implementations exposed to the frontend, with wails bindings
-! services are thin bridge for real internal functions for the frontend
+! services are thin bridge for real internal functions for the frontend  
 
 ## Informers design
 - Informers run in the backend, watching Kubernetes resources
@@ -88,3 +88,12 @@ Standard resources (required informer list from `internal/resources/kube/resourc
 - Use Object UIDs for Keys: Do not use array indexes for the React key attribute. Use resource.metadata.uid. Kubernetes guarantees this ID is unique.
 - Debounce High-Traffic Events: Use a small buffer loop in Go or debouncing in Zustand so React does not re-render 100 times a second.
 - Auto-Scroll to Bottom: If this list is a live Event stream or Log viewer, you can use rowVirtualizer.scrollToIndex(resources.length - 1) inside a useEffect to snap the view to the latest items.
+
+# TODO:
+- Add FOSS check and badge
+- Add other checks and badges
+- Add port forwarding
+- Add network policies react-flow view
+- Add whoami/auth check view
+- Adjust ns quota modal details view
+- Create roles/bindings react-flow view
