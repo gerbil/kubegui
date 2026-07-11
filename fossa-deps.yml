@@ -1,7 +1,15 @@
-# Manually declared production npm dependencies for the Wails frontend.
-# The npm auto-target is disabled in .fossa.yml to prevent build-only
-# devDependencies (e.g. vite → lightningcss MPL-2.0) from appearing in
-# the license scan. Keep this list in sync with ui/package.json "dependencies".
+# Manually declared npm dependencies for the Wails frontend.
+#
+# Section 1 — Production npm deps (bundled by Vite into the binary).
+#   Auto-target for ui/ is disabled in .fossa.yml to exclude build-only
+#   devDependencies (e.g. vite → lightningcss MPL-2.0).
+#   Keep in sync with ui/package.json "dependencies".
+#
+# Section 2 — Vendored JS assets (ui/public/assets/js/).
+#   These files are loaded at runtime as legacy scripts (not bundled by Vite)
+#   and are embedded in the Go binary by Wails. FOSSA cannot parse minified
+#   single-line bundles, so they are declared here explicitly.
+#   The assets/ path is excluded from FOSSA path scanning in .fossa.yml.
 referenced-dependencies:
   - type: npm
     name: "@mantine/core"
@@ -57,3 +65,27 @@ referenced-dependencies:
   - type: npm
     name: zustand
     version: 5.0.14
+
+# ── Vendored JS assets (ui/public/assets/js/) ─────────────────────────────
+# Versions confirmed from file headers; update when files are replaced.
+  - type: npm
+    name: ace-builds           # ace.js + themes + extensions
+    version: 1.41.0
+  - type: npm
+    name: jquery
+    version: 3.7.1
+  - type: npm
+    name: js-yaml
+    version: 4.1.0
+  - type: npm
+    name: choices.js           # legacy v9 copy in public/assets (distinct from npm v10)
+    version: 9.0.1
+  - type: npm
+    name: xterm                # xterm.js terminal emulator
+    version: 5.3.0
+  - type: npm
+    name: xterm-addon-fit
+    version: 0.8.0
+  - type: npm
+    name: xterm-addon-clipboard
+    version: 0.1.0

@@ -13,6 +13,10 @@ paths:
     # Test fixtures and generated bindings
     - "**/testdata/**"
     - ui/bindings
+    # Vendored JS assets — declared explicitly in fossa-deps.yml below.
+    # FOSSA cannot detect licenses from minified single-file bundles.
+    - ui/public/assets
+    - ui/public/build
 
 # Disable automatic npm detection for the ui/ directory.
 # Production-only npm dependencies are declared explicitly in fossa-deps.yml
