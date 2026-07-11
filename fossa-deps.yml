@@ -1,0 +1,59 @@
+# Manually declared production npm dependencies for the Wails frontend.
+# The npm auto-target is disabled in .fossa.yml to prevent build-only
+# devDependencies (e.g. vite → lightningcss MPL-2.0) from appearing in
+# the license scan. Keep this list in sync with ui/package.json "dependencies".
+referenced-dependencies:
+  - type: npm
+    name: "@mantine/core"
+    version: 8.3.18
+  - type: npm
+    name: "@mantine/hooks"
+    version: 8.3.18
+  - type: npm
+    name: "@reduxjs/toolkit"
+    version: 2.11.2
+  - type: npm
+    name: "@tanstack/react-query"
+    version: 5.100.14
+  - type: npm
+    name: "@tanstack/react-table"
+    version: 8.21.3
+  - type: npm
+    name: "@tanstack/react-virtual"
+    version: 3.13.24
+  - type: npm
+    name: "@wailsio/runtime"
+    version: 3.0.0-alpha.79
+  - type: npm
+    name: choices.js
+    version: 10.2.0
+  - type: npm
+    name: clsx
+    version: 2.1.1
+  - type: npm
+    name: cronstrue
+    version: 3.24.0
+  - type: npm
+    name: highlight.js
+    version: 11.11.1
+  - type: npm
+    name: lucide-react
+    version: 1.8.0
+  - type: npm
+    name: notyf
+    version: 3.10.0
+  - type: npm
+    name: react
+    version: 18.3.1
+  - type: npm
+    name: react-dom
+    version: 18.3.1
+  - type: npm
+    name: react-redux
+    version: 9.2.0
+  - type: npm
+    name: tailwind-merge
+    version: 3.6.0
+  - type: npm
+    name: zustand
+    version: 5.0.14

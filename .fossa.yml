@@ -13,3 +13,13 @@ paths:
     # Test fixtures and generated bindings
     - "**/testdata/**"
     - ui/bindings
+
+# Disable automatic npm detection for the ui/ directory.
+# Production-only npm dependencies are declared explicitly in fossa-deps.yml
+# to avoid including build-time-only devDependencies (e.g. vite → lightningcss MPL-2.0).
+targets:
+  exclude:
+    - type: npm
+      path: ui
+    - type: yarn
+      path: ui
