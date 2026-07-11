@@ -42,9 +42,6 @@ referenced-dependencies:
     name: cronstrue
     version: 3.24.0
   - type: npm
-    name: highlight.js
-    version: 11.11.1
-  - type: npm
     name: lucide-react
     version: 1.8.0
   - type: npm
@@ -89,3 +86,21 @@ referenced-dependencies:
   - type: npm
     name: xterm-addon-clipboard
     version: 0.1.0
+
+# ── highlight.js — partial use declaration ───────────────────────────────
+# The full highlight.js npm package bundles CC BY-SA 4.0 themes (nnfx-dark/
+# nnfx-light) alongside BSD-3-Clause code. Only the following BSD-3-Clause
+# sub-paths are imported by the app:
+#   highlight.js/lib/core, /lib/languages/{json,bash,yaml,accesslog},
+#   /styles/atom-one-dark.css
+# The CC BY-SA themes are never imported or distributed.
+custom-dependencies:
+  - name: highlight.js
+    version: 11.11.1
+    license: BSD-3-Clause
+    metadata:
+      homepage: https://highlightjs.org
+      description: >
+        Only core + json/bash/yaml/accesslog languages + atom-one-dark theme
+        are imported. The CC BY-SA 4.0 nnfx-dark/nnfx-light themes bundled
+        in the npm package are not used or distributed.
