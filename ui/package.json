@@ -1,7 +1,8 @@
 {
-  "name": "v2",
+  "name": "kubegui",
   "private": true,
   "version": "0.0.0",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "bash ./scripts/vite-dev-safe.sh",

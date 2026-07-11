@@ -1,0 +1,15 @@
+version: 3
+
+project:
+  name: kubegui
+  url: https://github.com/gerbil/kubegui
+
+# Exclude paths that are only used during development/testing and
+# are not part of the distributed binary.
+paths:
+  exclude:
+    # Static marketing/docs site — not part of the distributed app
+    - web
+    # Test fixtures and generated bindings
+    - "**/testdata/**"
+    - ui/bindings
