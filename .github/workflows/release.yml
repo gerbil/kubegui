@@ -60,7 +60,7 @@ jobs:
           zip kubegui-linux-amd64.zip kubegui
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         env:
           VERSION: ${{ env.VERSION }}
         with:
