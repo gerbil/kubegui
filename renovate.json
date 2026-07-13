@@ -11,7 +11,8 @@
     },
     {
       "matchUpdateTypes": ["minor", "major"],
-      "automerge": false
+      "automerge": false,
+      "stabilityDays": 7,
     },
     {
       "matchManagers": ["gomod"],
