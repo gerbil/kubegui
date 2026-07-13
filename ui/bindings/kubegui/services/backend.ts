@@ -335,6 +335,25 @@ export function PodsGetStats(): $CancellablePromise<pods$0.Stats> {
     });
 }
 
+export function PortForwardList(): $CancellablePromise<$models.PortForwardSession[]> {
+    return $Call.ByID(4265405356).then(($result: any) => {
+        return $$createType24($result);
+    });
+}
+
+/**
+ * --- port forwarding ---
+ */
+export function PortForwardStart($namespace: string, podName: string, remotePort: string, localPort: string): $CancellablePromise<$models.PortForwardSession> {
+    return $Call.ByID(2528271496, $namespace, podName, remotePort, localPort).then(($result: any) => {
+        return $$createType23($result);
+    });
+}
+
+export function PortForwardStop(sessionID: string): $CancellablePromise<void> {
+    return $Call.ByID(663468780, sessionID);
+}
+
 export function ResizeNodeShellSession(sessionID: string, rows: number, cols: number): $CancellablePromise<void> {
     return $Call.ByID(2098864902, sessionID, rows, cols);
 }
@@ -370,7 +389,7 @@ export function ResourceGetDetails(resource: string, $namespace: string, name: s
  */
 export function ResourceList(resource: string, $namespace: string): $CancellablePromise<{ [_ in string]?: any }[]> {
     return $Call.ByID(176858504, resource, $namespace).then(($result: any) => {
-        return $$createType23($result);
+        return $$createType25($result);
     });
 }
 
@@ -463,4 +482,6 @@ const $$createType19 = $Create.Array($$createType18);
 const $$createType20 = metricsscraper$0.PodMetrics.createFrom;
 const $$createType21 = $Create.Array($$createType20);
 const $$createType22 = pods$0.Stats.createFrom;
-const $$createType23 = $Create.Array($$createType7);
+const $$createType23 = $models.PortForwardSession.createFrom;
+const $$createType24 = $Create.Array($$createType23);
+const $$createType25 = $Create.Array($$createType7);

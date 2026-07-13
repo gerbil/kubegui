@@ -8,5 +8,6 @@ export {
 
 export {
     CRDMenuResponse,
-    ClusterInfo
+    ClusterInfo,
+    PortForwardSession
 } from "./models.js";

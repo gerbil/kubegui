@@ -159,7 +159,7 @@ func (s *Backend) DBUpdateClusterConfigImagePath(filename, context, newImagePath
 func (s *Backend) DBMakeClusterConfigActive(clusterContext, filename string) error {
 	idb.ConnectConfig(clusterContext, filename)
 	go func() {
-			if _, err := clusterruntime.StartForActiveCluster(context.Background()); err != nil {
+		if _, err := clusterruntime.StartForActiveCluster(context.Background()); err != nil {
 			logger.Logger.Warn("informer start failed after connect", "err", err)
 			application.Get().Event.Emit("informerProgress", map[string]any{
 				"stage":   "error",
@@ -393,8 +393,8 @@ func (s *Backend) DeploymentScale(namespace, name string, replicas int) (map[str
 func (s *Backend) NodeCordon(name string) (map[string]any, error)   { return nodes.Cordon(name) }
 func (s *Backend) NodeUncordon(name string) (map[string]any, error) { return nodes.Uncordon(name) }
 func (s *Backend) NodeSetupShell(name string) error                 { return nodes.SetupShellAccess(name) }
-func (s *Backend) PodsGetStats() (pods.Stats, error)         { return pods.GetStats() }
-func (s *Backend) PodGetStatsEndpoint() (pods.Stats, error)  { return pods.GetStats() }
+func (s *Backend) PodsGetStats() (pods.Stats, error)                { return pods.GetStats() }
+func (s *Backend) PodGetStatsEndpoint() (pods.Stats, error)         { return pods.GetStats() }
 func (s *Backend) NodesGetMetrics() ([]nodes.NodeMetricRow, error) {
 	return nodes.GetMetrics()
 }
@@ -404,10 +404,10 @@ func (s *Backend) NodeGetMetrics() ([]nodes.NodeMetricRow, error) {
 func (s *Backend) NodeGetAllocation() ([]nodes.NodeAllocation, error) {
 	return nodes.GetNodesAllocation()
 }
-func (s *Backend) NodeGetMetricsByNameFromDB(name string) ([]metricsscraper.NodeMetrics) {
+func (s *Backend) NodeGetMetricsByNameFromDB(name string) []metricsscraper.NodeMetrics {
 	return metricsscraper.GetNodesMetricsDatabase(name)
 }
-func (s *Backend) PodGetMetricsByNameFromDB(name, namespace string) ([]metricsscraper.PodMetrics) {
+func (s *Backend) PodGetMetricsByNameFromDB(name, namespace string) []metricsscraper.PodMetrics {
 	return metricsscraper.GetPodMetricsDatabase(name, namespace)
 }
 func (s *Backend) PodGetMetrics(namespace, name string) (map[string]any, error) {
@@ -553,6 +553,17 @@ func (s *Backend) ShellStopPodSession(sessionID string) error {
 	return nil
 }
 
+// --- port forwarding ---
+func (s *Backend) PortForwardStart(namespace, podName, remotePort, localPort string) (PortForwardSession, error) {
+	return StartPortForward(namespace, podName, remotePort, localPort)
+}
+func (s *Backend) PortForwardStop(sessionID string) error {
+	return StopPortForward(sessionID)
+}
+func (s *Backend) PortForwardList() []PortForwardSession {
+	return ListPortForwards()
+}
+
 // Aliases for pod shell used by PodActionDrawer.tsx
 func (s *Backend) StartPodShellSession(namespace, podName, containerName string) (string, error) {
 	return s.ShellStartPodSession(namespace, podName, containerName)
@@ -566,4 +577,3 @@ func (s *Backend) ResizePodShellSession(sessionID string, rows, cols int) error 
 func (s *Backend) StopPodShellSession(sessionID string) error {
 	return s.ShellStopPodSession(sessionID)
 }
-

@@ -1,20 +1,21 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef, useState, useCallback, useReducer } from 'react'
-import { createPortal } from 'react-dom'
-import { X, Boxes, Radio, FileText, Terminal, Pencil, Trash2, Save, RotateCcw, Search, RefreshCw } from 'lucide-react'
-import { UiTooltip } from './UiTooltip'
-import { uiNotify } from './UiNotify'
-import { ConfirmDialog } from './Button'
-import { LabelsSection, AnnotationsSection, EventsTimeline, TooltipResourceSection, DynamicResourceSection } from './ResourceManifestOverview'
-import { ensureLegacyEditorAssets, ensureLegacyTerminalAssets } from './podLegacyAssets'
-import { BackendEventSource } from '../../lib/wailsBackendTransport'
 import { configureAceYamlEditor } from '@/lib/aceEditorConfig'
+import { Boxes, FileText, Pencil, Radio, RefreshCw, RotateCcw, Save, Search, Terminal, Trash2, X } from 'lucide-react'
+import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import {
-  ResourceGetDetails,
+  EventsGetForResource,
   ResourceDelete,
   ResourceEdit,
-  EventsGetForResource,
+  ResourceGetDetails,
 } from '../../../bindings/kubegui/services/backend'
+import { BackendEventSource } from '../../lib/wailsBackendTransport'
+import { ConfirmDialog } from './Button'
+import { PortForwardBadges } from './PortForwardBadges'
+import { AnnotationsSection, DynamicResourceSection, EventsTimeline, LabelsSection, TooltipResourceSection } from './ResourceManifestOverview'
+import { uiNotify } from './UiNotify'
+import { UiTooltip } from './UiTooltip'
+import { ensureLegacyEditorAssets, ensureLegacyTerminalAssets } from './podLegacyAssets'
 /** Minimal info needed to open the drawer — satisfied by both K8sResource and ResourceRow */
 export interface ResourceRef {
   uid?: string
@@ -108,7 +109,7 @@ const SPEC_OMIT = [
   'configSource',           // Node dynamic config
 ]
 
-function OverviewTab({ full }: { full: Record<string, unknown> | null }) {
+function OverviewTab({ full, resourceType, namespace, name }: { full: Record<string, unknown> | null; resourceType?: string; namespace?: string; name?: string }) {
   const [detailFilter, setDetailFilter] = useState('')
 
   useEffect(() => {
@@ -123,6 +124,25 @@ function OverviewTab({ full }: { full: Record<string, unknown> | null }) {
   const extraTopLevel = Object.fromEntries(
     Object.entries(full).filter(([k, v]) => !STANDARD_TOP_LEVEL_KEYS.has(k) && v !== null && v !== undefined)
   )
+
+  // Extract container ports for port-forwarding badges (pods only)
+  const containerPorts = (() => {
+    if (resourceType !== 'pods' || !full) return []
+    const spec = full.spec as Record<string, unknown> | undefined
+    const containers = (spec?.containers as Array<Record<string, unknown>> | undefined) ?? []
+    const ports: Array<{ name?: string; containerPort: number; protocol?: string }> = []
+    for (const c of containers) {
+      const cports = (c.ports as Array<Record<string, unknown>> | undefined) ?? []
+      for (const p of cports) {
+        ports.push({
+          name: p.name as string | undefined,
+          containerPort: p.containerPort as number,
+          protocol: p.protocol as string | undefined,
+        })
+      }
+    }
+    return ports
+  })()
 
   const filterBar = (
     <div className="flex items-center gap-1.5 rounded border border-border/50 bg-accent/25 px-2 py-0.5 self-start">
@@ -148,6 +168,9 @@ function OverviewTab({ full }: { full: Record<string, unknown> | null }) {
   return (
     <div className="flex-1 overflow-y-auto p-5 space-y-5">
       {filterBar}
+      {containerPorts.length > 0 && namespace && name && (
+        <PortForwardBadges namespace={namespace} podName={name} ports={containerPorts} />
+      )}
       <DynamicResourceSection title="Details" data={extraTopLevel} query={detailFilter} />
       <TooltipResourceSection
         title="Spec"
@@ -612,7 +635,7 @@ export function ResourceDrawer({ resource, resourceType, onClose, extraHeaderAct
 
         {/* Content */}
         <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
-          {resource && activeTab === 'overview' && <OverviewTab full={full} />}
+          {resource && activeTab === 'overview' && <OverviewTab full={full} resourceType={resourceType} namespace={namespace} name={name} />}
           {resource && activeTab === 'events'   && <EventsTab kind={resource.kind ?? resourceType} namespace={namespace} name={name} />}
           {resource && activeTab === 'logs'     && isPod(resourceType) && (
             <LogsTab namespace={namespace} name={name} containers={containers.length ? containers : [name]} />
