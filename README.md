@@ -1,7 +1,7 @@
 # KubeGUI - Kubernetes UI / admin desktop application
 Official website - https://kubegui.net  
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui?ref=badge_shield&issueType=license) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui.svg?type=shield&issueType=security)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui?ref=badge_shield&issueType=security) [![Release](https://github.com/gerbil/kubegui/actions/workflows/release.yml/badge.svg)](https://github.com/gerbil/kubegui/actions/workflows/release.yml) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/gerbil/kubegui/badge)](https://scorecard.dev/viewer/?uri=github.com/gerbil/kubegui)
+![Discord](https://img.shields.io/discord/1302659567364345866) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui?ref=badge_shield&issueType=license) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui.svg?type=shield&issueType=security)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui?ref=badge_shield&issueType=security) [![Release](https://github.com/gerbil/kubegui/actions/workflows/release.yml/badge.svg)](https://github.com/gerbil/kubegui/actions/workflows/release.yml) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/gerbil/kubegui/badge)](https://scorecard.dev/viewer/?uri=github.com/gerbil/kubegui)
 
 ![kubegui](./web/images/kubegui.png)  
 
