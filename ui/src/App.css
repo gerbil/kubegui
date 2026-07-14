@@ -1,8 +1,15 @@
+/* App-level overrides */
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  max-width: unset;
+  margin: unset;
+  padding: unset;
+  text-align: unset;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+}
+
+/* Ensure every element that hasn't opted into a specific font uses Space Grotesk */
+*, *::before, *::after {
+  font-family: inherit;
 }
 
 .logo {

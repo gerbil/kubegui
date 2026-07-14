@@ -428,7 +428,7 @@ function CreateCRDResourceModal({
 
         {/* Submit error */}
         {submitError && (
-          <div className="mx-4 mt-3 shrink-0 flex items-start gap-2 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-xs text-red-400">
+          <div className="mx-4 mt-3 shrink-0 flex items-start gap-2 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-sm text-red-400">
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <span className="break-all">{submitError}</span>
             <button onClick={() => setSubmitError(null)} className="ml-auto shrink-0 hover:text-red-300">
@@ -441,7 +441,7 @@ function CreateCRDResourceModal({
         <div className="flex-1 min-h-0 p-4 flex flex-col gap-3">
           <div className="relative flex-1 min-h-0 rounded border border-border bg-[#0d1117] overflow-hidden">
             {editorError
-              ? <div className="p-4 text-red-400 text-xs">{editorError}</div>
+              ? <div className="p-4 text-red-400 text-sm">{editorError}</div>
               : <div ref={containerRef} className="absolute inset-0" />
             }
           </div>
@@ -449,10 +449,10 @@ function CreateCRDResourceModal({
 
         {/* Footer */}
         <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-border bg-accent/10 shrink-0">
-          <button type="button" onClick={handleClose} disabled={busy} className="px-4 py-1.5 rounded text-xs font-semibold text-muted-foreground border border-border hover:text-foreground transition-colors disabled:opacity-50">
+          <button type="button" onClick={handleClose} disabled={busy} className="px-4 py-1.5 rounded text-sm font-semibold text-muted-foreground border border-border hover:text-foreground transition-colors disabled:opacity-50">
             Cancel
           </button>
-          <button type="button" onClick={() => void handleCreate()} disabled={busy || hasSyntaxError} className="px-4 py-1.5 rounded text-xs font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90">
+          <button type="button" onClick={() => void handleCreate()} disabled={busy || hasSyntaxError} className="px-4 py-1.5 rounded text-sm font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90">
             {busy ? 'Creating…' : `Create ${definition.kind}`}
           </button>
         </div>
@@ -673,7 +673,7 @@ export function CRDResourcePage({ definition, namespace = '', onNavigateBack, ca
       {/* Header */}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <div className="flex items-center gap-1.5 text-xs text-muted-foreground mb-1">
+          <div className="flex items-center gap-1.5 text-sm text-muted-foreground mb-1">
             {onNavigateBack && (
               <>
                 <button onClick={onNavigateBack} className="hover:text-foreground transition-colors cursor-pointer">
@@ -744,12 +744,12 @@ export function CRDResourcePage({ definition, namespace = '', onNavigateBack, ca
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
             placeholder={`Filter ${definition.kind.toLowerCase()}...`}
-            className="lucid-control rounded px-2 py-1.5 text-xs min-w-[220px] focus:outline-none font-label"
+            className="lucid-control rounded px-2 py-1.5 text-sm min-w-[220px] focus:outline-none font-label"
             autoComplete="off"
             spellCheck={false}
           />
           {selectedItems.length > 0 && (
-            <div className="lucid-control flex items-center gap-1.5 rounded text-xs focus:outline-none px-2 py-1.5 bg-[#0f172a80] min-w-0 max-w-full">
+            <div className="lucid-control flex items-center gap-1.5 rounded text-sm focus:outline-none px-2 py-1.5 bg-[#0f172a80] min-w-0 max-w-full">
               <span className="text-[10px] tracking-wider text-muted-foreground min-w-0 max-w-[460px] truncate" title={selectedNames}>
                 Selected: {selectedNames}
               </span>
@@ -791,7 +791,7 @@ export function CRDResourcePage({ definition, namespace = '', onNavigateBack, ca
               <tr>
                 <th
                   style={{ width: FIRST_COLUMN_STRICT_WIDTH, minWidth: FIRST_COLUMN_STRICT_WIDTH, maxWidth: FIRST_COLUMN_STRICT_WIDTH }}
-                  className="px-3 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-outline-variant/40 whitespace-nowrap overflow-hidden text-ellipsis"
+                  className="px-3 py-2.5 text-left text-sm font-semibold text-muted-foreground uppercase tracking-wider border-b border-outline-variant/40 whitespace-nowrap overflow-hidden text-ellipsis"
                 >
                   <input
                     type="checkbox"
@@ -806,7 +806,7 @@ export function CRDResourcePage({ definition, namespace = '', onNavigateBack, ca
                   return (
                     <th
                       key={col.key}
-                      className="px-3 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-outline-variant/40 whitespace-nowrap overflow-hidden text-ellipsis select-none"
+                      className="px-3 py-2.5 text-left text-sm font-semibold text-muted-foreground uppercase tracking-wider border-b border-outline-variant/40 whitespace-nowrap overflow-hidden text-ellipsis select-none"
                     >
                       <button
                         type="button"
@@ -852,7 +852,7 @@ export function CRDResourcePage({ definition, namespace = '', onNavigateBack, ca
                   >
                     <td
                       style={{ width: FIRST_COLUMN_STRICT_WIDTH, minWidth: FIRST_COLUMN_STRICT_WIDTH, maxWidth: FIRST_COLUMN_STRICT_WIDTH }}
-                      className="px-3 py-2 text-xs text-foreground/80 whitespace-nowrap overflow-hidden text-ellipsis"
+                      className="px-3 py-2 text-sm text-foreground/80 whitespace-nowrap overflow-hidden text-ellipsis"
                     >
                       <input
                         type="checkbox"
@@ -863,7 +863,7 @@ export function CRDResourcePage({ definition, namespace = '', onNavigateBack, ca
                       />
                     </td>
                     {allColumns.map((col) => (
-                      <td key={col.key} className="px-3 py-2 text-xs text-foreground/80 whitespace-nowrap overflow-hidden text-ellipsis max-w-0">
+                      <td key={col.key} className="px-3 py-2 text-sm text-foreground/80 whitespace-nowrap overflow-hidden text-ellipsis max-w-0">
                         {col.key === 'name'
                           ? <span className="block min-w-0 overflow-hidden text-ellipsis whitespace-nowrap font-medium text-foreground">{getCellValue(item, col)}</span>
                           : getCellValue(item, col)

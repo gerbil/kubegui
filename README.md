@@ -1,7 +1,7 @@
 # KubeGUI - Kubernetes UI / admin desktop application
 Official website - https://kubegui.net  
 
-![Discord](https://img.shields.io/discord/1302659567364345866) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui?ref=badge_shield&issueType=license) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui.svg?type=shield&issueType=security)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui?ref=badge_shield&issueType=security) [![Release](https://github.com/gerbil/kubegui/actions/workflows/release.yml/badge.svg)](https://github.com/gerbil/kubegui/actions/workflows/release.yml) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/gerbil/kubegui/badge)](https://scorecard.dev/viewer/?uri=github.com/gerbil/kubegui)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui?ref=badge_shield&issueType=license) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui.svg?type=shield&issueType=security)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui?ref=badge_shield&issueType=security) [![Release](https://github.com/gerbil/kubegui/actions/workflows/release.yml/badge.svg)](https://github.com/gerbil/kubegui/actions/workflows/release.yml) [![OpenSSF Scorecard](https://api.scorecard.dev/projects/github.com/gerbil/kubegui/badge)](https://scorecard.dev/viewer/?uri=github.com/gerbil/kubegui)
 
 ![kubegui](./web/images/kubegui.png)  
 
@@ -101,3 +101,33 @@ Standard resources (required informer list from `internal/resources/kube/resourc
 - Create roles/bindings react-flow view
 - Settings view
 - AI suggestions for issues/errors/warnings/etc
+
+
+## Release for MAC (winlinx versions are released via github actions):
+```
+version=2.0.0 wails3 task release
+version=2.0.0 wails3 task release:mac:prod
+```
+
+## Release builds:
+```
+version=2.0.0 wails3 task build:windows:prod
+version=2.0.0 wails3 task build:mac:prod
+```
+
+### Release sign (win): 
+```
+(bash)
+cd ./bin
+curl -skL https://github.com/gerbil/kubegui/releases/latest/download/kubegui-windows-x86_64.zip -O kubegui-windows-x86_64.zip
+unzip kubegui-windows-x86_64
+(cmd only)
+cmd /C signtool sign /n "Jurijs Kobecs" /t http://time.certum.pl/ /fd sha256 /v kubegui.exe
+-- pin manually
+del kubegui-windows-x86_64.zip
+zip -FSr kubegui-windows-x86_64.zip kubegui.exe
+delete existing kubegui-windows-x86_64.zip in github release - via gh client
+upload to github release - via gh client
+del kubegui.exe
+del kubegui-windows-x86_64.zip
+```

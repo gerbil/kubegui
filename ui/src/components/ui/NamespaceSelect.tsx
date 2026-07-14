@@ -23,7 +23,7 @@ export function NamespaceSelect({
         id={id}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="lucid-control rounded px-2 py-1 text-xs focus:outline-none min-w-[220px] font-label"
+        className="lucid-control rounded px-2 py-1 text-sm focus:outline-none min-w-[220px] font-label"
         spellCheck={false}
         autoComplete="off"
       >

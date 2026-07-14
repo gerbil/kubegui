@@ -293,7 +293,7 @@ export function DataTable<T extends RowData>({
                         }
                       : fixedWidthStyle ?? { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                     className={cn(
-                      'px-3 py-2.5 text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider border-b border-outline-variant/40 select-none',
+                      'px-3 py-2.5 text-left text-sm font-semibold text-muted-foreground uppercase tracking-wider border-b border-outline-variant/40 select-none',
                       canSort && 'cursor-pointer hover:text-foreground transition-colors',
                       meta.thClassName,
                     )}
@@ -401,7 +401,7 @@ export function DataTable<T extends RowData>({
         </tbody>
       </table>
       {rows.length === 0 && (
-        <div className="flex items-center justify-center h-32 text-muted-foreground text-xs">
+        <div className="flex items-center justify-center h-32 text-muted-foreground text-sm">
           {loading ? (
             <div className="flex flex-col items-center gap-2">
               <div className="flex gap-1">

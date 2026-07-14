@@ -21,7 +21,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             'bg-destructive text-destructive-foreground hover:bg-destructive/90': variant === 'destructive',
           },
           {
-            'h-7 px-3 text-xs': size === 'sm',
+            'h-7 px-3 text-sm': size === 'sm',
             'h-9 px-4 text-sm': size === 'md',
             'h-8 w-8 p-0': size === 'icon',
           },
@@ -76,7 +76,7 @@ export function ConfirmDialog({
             )}
             <div className="flex-1 min-w-0 pt-0.5">
               <p className="text-sm font-semibold text-foreground">{title}</p>
-              {description && <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">{description}</p>}
+              {description && <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">{description}</p>}
             </div>
           </div>
           <button onClick={onCancel} className="shrink-0 text-muted-foreground hover:text-foreground transition-colors mt-0.5">
@@ -91,13 +91,13 @@ export function ConfirmDialog({
           </div>
         )}
         <div className="flex items-center justify-end gap-2 px-5 pb-5">
-          <button type="button" onClick={onCancel} className="px-4 py-1.5 rounded-md text-xs font-semibold border border-border text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors">
+          <button type="button" onClick={onCancel} className="px-4 py-1.5 rounded-md text-sm font-semibold border border-border text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors">
             {cancelLabel}
           </button>
           <button
             type="button"
             onClick={onConfirm}
-            className={`px-4 py-1.5 rounded-md text-xs font-semibold transition-colors ${danger ? 'bg-red-500/15 border border-red-500/40 text-red-400 hover:bg-red-500/25' : 'bg-primary/15 border border-primary/40 text-primary hover:bg-primary/25'}`}
+            className={`px-4 py-1.5 rounded-md text-sm font-semibold transition-colors ${danger ? 'bg-red-500/15 border border-red-500/40 text-red-400 hover:bg-red-500/25' : 'bg-primary/15 border border-primary/40 text-primary hover:bg-primary/25'}`}
           >
             {confirmLabel}
           </button>

@@ -138,9 +138,9 @@ function OverviewTab({ deployment }: { deployment: DeploymentRow }) {
     return () => { cancelled = true }
   }, [deployment.namespace, deployment.name])
 
-  if (loading) return <p className="text-xs text-muted-foreground p-4">Loading deployment details…</p>
-  if (err) return <p className="text-xs text-red-400 p-4">Error: {err}</p>
-  if (!details) return <p className="text-xs text-muted-foreground p-4">No details available.</p>
+  if (loading) return <p className="text-sm text-muted-foreground p-4">Loading deployment details…</p>
+  if (err) return <p className="text-sm text-red-400 p-4">Error: {err}</p>
+  if (!details) return <p className="text-sm text-muted-foreground p-4">No details available.</p>
 
   const readyColor = deployment.ready >= deployment.desired && deployment.desired > 0 ? '#10b981'
     : deployment.ready > 0 ? '#f59e0b' : '#ef4444'
@@ -509,7 +509,7 @@ function EditTab({ deployment, onSaved }: { deployment: DeploymentRow; onSaved?:
 
   return (
     <div className="flex flex-col h-full p-4 gap-3">
-      {err && <p className="text-xs text-red-400">Error: {err}</p>}
+      {err && <p className="text-sm text-red-400">Error: {err}</p>}
       <div className="flex items-center justify-between text-[10px] text-muted-foreground px-1">
         <span className="font-mono" />
         <span>{loading ? 'Loading…' : hasSyntaxError ? '⚠ YAML syntax error' : dirty ? 'Unsaved changes' : 'Up to date'}</span>
@@ -517,18 +517,18 @@ function EditTab({ deployment, onSaved }: { deployment: DeploymentRow; onSaved?:
       <div className="relative flex-1 min-h-0 rounded border border-border bg-[#0d1117] overflow-hidden">
         <div ref={hostRef} className="absolute inset-0" />
         {loading && (
-          <div className="absolute inset-0 flex items-center justify-center text-xs text-muted-foreground bg-background/70">
+          <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground bg-background/70">
             Loading YAML editor…
           </div>
         )}
       </div>
       <div className="flex justify-end gap-2">
         <button onClick={discard} disabled={loading || saving || !dirty}
-          className="px-4 py-1.5 rounded text-xs font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90">
+          className="px-4 py-1.5 rounded text-sm font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90">
           Discard
         </button>
         <button onClick={() => void save()} disabled={loading || saving || !dirty || hasSyntaxError}
-          className="px-4 py-1.5 rounded text-xs font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90">
+          className="px-4 py-1.5 rounded text-sm font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90">
           {saving ? 'Saving…' : 'Save Changes'}
         </button>
       </div>

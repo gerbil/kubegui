@@ -53,7 +53,9 @@ createRoot(document.getElementById('root')!).render(
       <MantineProvider
         defaultColorScheme="dark"
         theme={{
-          fontFamily: 'Plus Jakarta Sans, system-ui, sans-serif',
+          fontFamily: 'Space Grotesk, system-ui, sans-serif',
+          fontFamilyMonospace: 'Space Grotesk, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+          headings: { fontFamily: 'Space Grotesk, system-ui, sans-serif' },
         }}
       >
         <App />
