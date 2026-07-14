@@ -5,7 +5,6 @@ go 1.26.0
 require (
 	github.com/Skarlso/crd-to-sample-yaml v1.2.2
 	github.com/cilium/cilium v1.19.5
-	github.com/go-logr/logr v1.4.3
 	github.com/golang-migrate/migrate/v4 v4.19.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 	github.com/matryer/runner v0.0.0-20211213160944-9f99df82ff29
@@ -17,7 +16,6 @@ require (
 	k8s.io/apiextensions-apiserver v0.36.2
 	k8s.io/apimachinery v0.36.2
 	k8s.io/client-go v0.36.2
-	k8s.io/klog/v2 v2.140.0
 	k8s.io/metrics v0.36.2
 	modernc.org/sqlite v1.53.0
 )
@@ -25,6 +23,7 @@ require (
 require (
 	github.com/brianvoe/gofakeit/v6 v6.28.0 // indirect
 	github.com/cheekybits/is v0.0.0-20150225183255-68e9c0620927 // indirect
+	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/lufia/plan9stats v0.0.0-20211012122336-39d0f177ccd0 // indirect
 	github.com/moby/spdystream v0.5.1 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
@@ -33,6 +32,7 @@ require (
 	github.com/tklauser/numcpus v0.11.0 // indirect
 	github.com/yusufpapurcu/wmi v1.2.4 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
+	k8s.io/klog/v2 v2.140.0 // indirect
 	k8s.io/streaming v0.36.2 // indirect
 )
 
