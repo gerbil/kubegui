@@ -25,18 +25,22 @@ tasks:
     summary: Release
     env:
       version: '{{.version}}'
-    cmds:
-      - echo "Release version - {{.version}}!"
-      - jq ".fixed.file_version = \"{{.version}}\"" build/info.json > build/info_new.json && mv build/info_new.json build/info.json
-      - jq ".info.\"0000\".ProductVersion = \"{{.version}}\"" build/info.json > build/info_new.json && mv build/info_new.json build/info.json
-      - jq ".version = \"{{.version}}\"" wails.json > wails_new.json && mv wails_new.json wails.json
-      - jq ".Info.productVersion = \"{{.version}}\"" wails.json > wails_new.json && mv wails_new.json wails.json
-      - yq e ".info.version = \"{{.version}}\"" -i build/win-dev.yml
-      - yq e ".info.version = \"{{.version}}\"" -i build/mac-dev.yml
-#      - xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleVersion']/following-sibling::string[1]" -v {{.version}} build/Info.plist
-#      - xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleShortVersionString']/following-sibling::string[1]" -v {{.version}} build/Info.plist
-#      - xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleVersion']/following-sibling::string[1]" -v {{.version}} build/Info.plist
-#      - xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleShortVersionString']/following-sibling::string[1]" -v {{.version}} build/Info.plist
+    cmds: 
+        - |
+          echo "Release version - {{.version}}!"
+          {{ if eq OS "windows" }} 
+              jq ".fixed.file_version = \"{{.version}}\"" build/info.json > build/info_new.json && mv build/info_new.json build/info.json
+              jq ".info.\"0000\".ProductVersion = \"{{.version}}\"" build/info.json > build/info_new.json && mv build/info_new.json build/info.json
+              jq ".version = \"{{.version}}\"" wails.json > wails_new.json && mv wails_new.json wails.json
+              jq ".Info.productVersion = \"{{.version}}\"" wails.json > wails_new.json && mv wails_new.json wails.json
+              yq e ".info.version = \"{{.version}}\"" -i build/win-dev.yml
+              yq e ".info.version = \"{{.version}}\"" -i build/mac-dev.yml
+          {{ else if eq OS "darwin" }} 
+              xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleVersion']/following-sibling::string[1]" -v {{.version}} build/Info.plist
+              xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleShortVersionString']/following-sibling::string[1]" -v {{.version}} build/Info.plist
+              xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleVersion']/following-sibling::string[1]" -v {{.version}} build/Info.plist
+              xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleShortVersionString']/following-sibling::string[1]" -v {{.version}} build/Info.plist
+          {{ end }}
 
   # Windows
   build:windows:dev:

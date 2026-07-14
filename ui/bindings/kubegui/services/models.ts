@@ -79,6 +79,59 @@ export class ClusterInfo {
     }
 }
 
+/**
+ * PortForwardSession holds the state for a single port-forward tunnel.
+ */
+export class PortForwardSession {
+    "id": string;
+    "namespace": string;
+    "podName": string;
+    "remotePort": string;
+    "localPort": string;
+
+    /**
+     * "active", "stopped", "error"
+     */
+    "status": string;
+    "startedAt": string;
+    "error"?: string;
+
+    /** Creates a new PortForwardSession instance. */
+    constructor($$source: Partial<PortForwardSession> = {}) {
+        if (!("id" in $$source)) {
+            this["id"] = "";
+        }
+        if (!("namespace" in $$source)) {
+            this["namespace"] = "";
+        }
+        if (!("podName" in $$source)) {
+            this["podName"] = "";
+        }
+        if (!("remotePort" in $$source)) {
+            this["remotePort"] = "";
+        }
+        if (!("localPort" in $$source)) {
+            this["localPort"] = "";
+        }
+        if (!("status" in $$source)) {
+            this["status"] = "";
+        }
+        if (!("startedAt" in $$source)) {
+            this["startedAt"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new PortForwardSession instance from a string or object.
+     */
+    static createFrom($$source: any = {}): PortForwardSession {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new PortForwardSession($$parsedSource as Partial<PortForwardSession>);
+    }
+}
+
 // Private type creation functions
 const $$createType0 = crd$0.CategoryGroup.createFrom;
 const $$createType1 = $Create.Array($$createType0);

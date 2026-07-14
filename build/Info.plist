@@ -11,11 +11,11 @@
     <key>CFBundleIdentifier</key>
     <string>kubegui</string>
     <key>CFBundleVersion</key>
-    <string>2.0.1</string>
+    <string>2.0.2</string>
     <key>CFBundleGetInfoString</key>
     <string>Kubernetes GUI</string>
     <key>CFBundleShortVersionString</key>
-    <string>2.0.1</string>
+    <string>2.0.2</string>
     <key>CFBundleIconFile</key>
     <string>icons.icns</string>
     <key>LSMinimumSystemVersion</key>
