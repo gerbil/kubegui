@@ -1,8 +1,14 @@
 @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+@config "../tailwind.config.js";
+
+@theme {
+  --font-sans: 'Space Grotesk', system-ui, sans-serif;
+  --font-headline: 'Space Grotesk', system-ui, sans-serif;
+  --font-label: 'Space Grotesk', system-ui, sans-serif;
+  --font-mono: 'Space Grotesk', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
 
 @keyframes skeleton-shimmer {
   0%   { background-position: -400% 0; }
@@ -65,10 +71,16 @@
     height: 100%;
   }
 
+  /* 1rem = 14px globally — keeps Mantine rem-based sizes consistent with body text */
+  html {
+    font-size: 14px;
+  }
+
   * { border-color: var(--border); }
   body {
     margin: 0;
-    @apply bg-background text-foreground;
+    background-color: var(--background);
+    color: var(--foreground);
     font-size: 11px;
     font-family: 'Space Grotesk', system-ui, sans-serif;
     font-weight: 300;
@@ -86,7 +98,7 @@
   }
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: var(--background); }
-  ::-webkit-scrollbar-thumb { @apply bg-border rounded-full; }
+  ::-webkit-scrollbar-thumb { background-color: var(--border); border-radius: 9999px; }
 
   .font-headline {
     font-family: 'Space Grotesk', sans-serif;
@@ -101,7 +113,7 @@
   }
 
   .font-modal {
-    font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    font-family: 'Space Grotesk', system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
     font-weight: 400;
     letter-spacing: 0.005em;
   }

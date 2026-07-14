@@ -4,17 +4,15 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"kubegui/internal/logger"
 	"net/http"
 	"sync"
 	"time"
-
-	"kubegui/internal/logger"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/tools/portforward"
 	"k8s.io/client-go/transport/spdy"
 )
-
 // PortForwardSession holds the state for a single port-forward tunnel.
 type PortForwardSession struct {
 	ID         string `json:"id"`
@@ -26,18 +24,15 @@ type PortForwardSession struct {
 	StartedAt  string `json:"startedAt"`
 	Error      string `json:"error,omitempty"`
 }
-
 var (
 	pfSessionsMu sync.RWMutex
 	pfSessions   = map[string]*portForwardRunner{}
 )
-
 type portForwardRunner struct {
 	session  PortForwardSession
 	cancel   context.CancelFunc
 	stopOnce sync.Once
 }
-
 // StartPortForward creates a new port-forward tunnel to a pod.
 // localPort can be "0" to let the OS pick a free port.
 func StartPortForward(namespace, podName, remotePort, localPort string) (PortForwardSession, error) {
@@ -45,45 +40,36 @@ func StartPortForward(namespace, podName, remotePort, localPort string) (PortFor
 	if err != nil {
 		return PortForwardSession{}, fmt.Errorf("get kube client: %w", err)
 	}
-
 	// Resolve the pod to ensure it exists
 	_, err = cs.CoreV1().Pods(namespace).Get(context.TODO(), podName, metav1.GetOptions{})
 	if err != nil {
 		return PortForwardSession{}, fmt.Errorf("pod %s/%s not found: %w", namespace, podName, err)
 	}
-
 	sessionID := fmt.Sprintf("pf:%s:%s:%s:%d", namespace, podName, remotePort, time.Now().UnixNano())
-
 	ctx, cancel := context.WithCancel(context.Background())
-
 	// Build the URL for the pod port-forward subresource
 	req := cs.CoreV1().RESTClient().Post().
 		Resource("pods").
 		Namespace(namespace).
 		Name(podName).
 		SubResource("portforward")
-
 	transport, upgrader, err := spdy.RoundTripperFor(restConfig)
 	if err != nil {
 		cancel()
 		return PortForwardSession{}, fmt.Errorf("create spdy transport: %w", err)
 	}
-
 	dialer := spdy.NewDialer(upgrader, &http.Client{Transport: transport}, "POST", req.URL())
-
 	// Prepare ports
 	ports := []string{fmt.Sprintf("%s:%s", localPort, remotePort)}
-
-	// Channels for the result
+	// readyChan is closed by ForwardPorts once the tunnel is up.
+	// stopChan being closed causes ForwardPorts to return.
 	readyChan := make(chan struct{}, 1)
 	stopChan := make(chan struct{}, 1)
-
 	pf, err := portforward.New(dialer, ports, stopChan, readyChan, io.Discard, io.Discard)
 	if err != nil {
 		cancel()
 		return PortForwardSession{}, fmt.Errorf("create portforward: %w", err)
 	}
-
 	runner := &portForwardRunner{
 		session: PortForwardSession{
 			ID:         sessionID,
@@ -96,43 +82,46 @@ func StartPortForward(namespace, podName, remotePort, localPort string) (PortFor
 		},
 		cancel: cancel,
 	}
-
 	pfSessionsMu.Lock()
 	pfSessions[sessionID] = runner
 	pfSessionsMu.Unlock()
-
-	// Store the stopChan reference for cleanup
+	// errChan lets ForwardPorts propagate an early error to the main select
+	// so callers see the real error immediately instead of a 30-second timeout.
+	errChan := make(chan error, 1)
+	// stopOnce ensures stopChan is closed exactly once.
+	var stopOnce sync.Once
+	closeStop := func() { stopOnce.Do(func() { close(stopChan) }) }
+	// Bridge context cancellation → stopChan so ForwardPorts exits cleanly.
+	go func() {
+		<-ctx.Done()
+		closeStop()
+	}()
+	// ForwardPorts MUST start immediately — it is the function that closes
+	// readyChan to signal the tunnel is up.  Waiting on readyChan before
+	// calling ForwardPorts causes a deadlock → 30-second timeout.
 	go func() {
 		defer func() {
+			closeStop() // always close stopChan when ForwardPorts exits
 			pfSessionsMu.Lock()
 			delete(pfSessions, sessionID)
 			pfSessionsMu.Unlock()
 		}()
-
-		// When context is cancelled, close stopChan to signal ForwardPorts to stop
-		select {
-		case <-ctx.Done():
-			close(stopChan)
-		case <-readyChan:
-			// Port-forward is ready - don't close stopChan
-		}
-
-		err := pf.ForwardPorts()
-		if err != nil && runner.session.Status != "stopped" {
-			logger.Logger.Error("port-forward failed", "sessionID", sessionID, "error", err)
-			runner.session.Status = "error"
-			runner.session.Error = err.Error()
+		if fwErr := pf.ForwardPorts(); fwErr != nil {
+			errChan <- fwErr
+			if runner.session.Status != "stopped" {
+				logger.Logger.Error("port-forward failed", "sessionID", sessionID, "error", fwErr)
+				runner.session.Status = "error"
+				runner.session.Error = fwErr.Error()
+			}
 		} else if runner.session.Status != "error" && runner.session.Status != "stopped" {
 			runner.session.Status = "stopped"
 		}
 	}()
-
-	// Wait for ready or error
+	// Wait for the tunnel to become ready, an early error, a cancel, or timeout.
 	select {
 	case <-readyChan:
-		// Get the actual local port that was assigned
-		if ports, err := pf.GetPorts(); err == nil && len(ports) > 0 {
-			runner.session.LocalPort = fmt.Sprintf("%d", ports[0].Local)
+		if assignedPorts, gErr := pf.GetPorts(); gErr == nil && len(assignedPorts) > 0 {
+			runner.session.LocalPort = fmt.Sprintf("%d", assignedPorts[0].Local)
 		}
 		runner.session.Status = "active"
 		logger.Logger.Info("port-forward started",
@@ -142,6 +131,11 @@ func StartPortForward(namespace, podName, remotePort, localPort string) (PortFor
 			"localPort", runner.session.LocalPort,
 			"remotePort", remotePort,
 		)
+	case fwErr := <-errChan:
+		cancel()
+		runner.session.Status = "error"
+		runner.session.Error = fwErr.Error()
+		return runner.session, fmt.Errorf("port-forward failed: %w", fwErr)
 	case <-ctx.Done():
 		runner.session.Status = "error"
 		runner.session.Error = "context cancelled"
@@ -151,10 +145,8 @@ func StartPortForward(namespace, podName, remotePort, localPort string) (PortFor
 		runner.session.Status = "error"
 		runner.session.Error = "timeout waiting for port-forward to become ready"
 	}
-
 	return runner.session, nil
 }
-
 // StopPortForward stops an active port-forward session.
 func StopPortForward(sessionID string) error {
 	pfSessionsMu.RLock()
@@ -169,7 +161,6 @@ func StopPortForward(sessionID string) error {
 	})
 	return nil
 }
-
 // ListPortForwards returns all active port-forward sessions.
 func ListPortForwards() []PortForwardSession {
 	pfSessionsMu.RLock()
@@ -180,7 +171,6 @@ func ListPortForwards() []PortForwardSession {
 	}
 	return sessions
 }
-
 // GetPortForward returns a specific port-forward session by ID.
 func GetPortForward(sessionID string) (PortForwardSession, error) {
 	pfSessionsMu.RLock()

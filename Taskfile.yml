@@ -25,18 +25,22 @@ tasks:
     summary: Release
     env:
       version: '{{.version}}'
-    cmds:
-      - echo "Release version - {{.version}}!"
-      - jq ".fixed.file_version = \"{{.version}}\"" build/info.json > build/info_new.json && mv build/info_new.json build/info.json
-      - jq ".info.\"0000\".ProductVersion = \"{{.version}}\"" build/info.json > build/info_new.json && mv build/info_new.json build/info.json
-      - jq ".version = \"{{.version}}\"" wails.json > wails_new.json && mv wails_new.json wails.json
-      - jq ".Info.productVersion = \"{{.version}}\"" wails.json > wails_new.json && mv wails_new.json wails.json
-      - yq e ".info.version = \"{{.version}}\"" -i build/win-dev.yml
-      - yq e ".info.version = \"{{.version}}\"" -i build/mac-dev.yml
-#      - xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleVersion']/following-sibling::string[1]" -v {{.version}} build/Info.plist
-#      - xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleShortVersionString']/following-sibling::string[1]" -v {{.version}} build/Info.plist
-#      - xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleVersion']/following-sibling::string[1]" -v {{.version}} build/Info.plist
-#      - xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleShortVersionString']/following-sibling::string[1]" -v {{.version}} build/Info.plist
+    cmds: 
+        - |
+          echo "Release version - {{.version}}!"
+          {{ if eq OS "windows" }} 
+              jq ".fixed.file_version = \"{{.version}}\"" build/info.json > build/info_new.json && mv build/info_new.json build/info.json
+              jq ".info.\"0000\".ProductVersion = \"{{.version}}\"" build/info.json > build/info_new.json && mv build/info_new.json build/info.json
+              jq ".version = \"{{.version}}\"" wails.json > wails_new.json && mv wails_new.json wails.json
+              jq ".Info.productVersion = \"{{.version}}\"" wails.json > wails_new.json && mv wails_new.json wails.json
+              yq e ".info.version = \"{{.version}}\"" -i build/win-dev.yml
+              yq e ".info.version = \"{{.version}}\"" -i build/mac-dev.yml
+          {{ else if eq OS "darwin" }} 
+              xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleVersion']/following-sibling::string[1]" -v {{.version}} build/Info.plist
+              xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleShortVersionString']/following-sibling::string[1]" -v {{.version}} build/Info.plist
+              xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleVersion']/following-sibling::string[1]" -v {{.version}} build/Info.plist
+              xmlstarlet ed -L -u "/plist/dict/key[text()='CFBundleShortVersionString']/following-sibling::string[1]" -v {{.version}} build/Info.plist
+          {{ end }}
 
   # Windows
   build:windows:dev:
@@ -140,7 +144,7 @@ tasks:
     summary: Cleanup
     cmds:
       - rm -f wails.syso
-      - rm -rf ./bin/*
+      - rm -rf .{{.BIN_DIR}}/*
 
   build:mac:prod:arm64:
     summary: Creates a production build for ARM64
@@ -178,27 +182,27 @@ tasks:
       - cp {{.BIN_DIR}}/{{.APP_NAME}} {{.BIN_DIR}}/{{.APP_NAME}}.app/Contents/MacOS
       - cp build/Info.plist {{.BIN_DIR}}/{{.APP_NAME}}.app/Contents
 
-  build:mac:prod:sign:
-    summary: Bin sign
-    cmds:
-      - security unlock-keychain -p 'xxx' /Users/xxx/Library/Keychains/xxx
-      - codesign --deep --force --options runtime --sign "xxx" {{.BIN_DIR}}/{{.APP_NAME}}.app
-      - codesign --verify --deep --strict --verbose=2 {{.BIN_DIR}}/{{.APP_NAME}}.app
+  # build:mac:prod:sign:
+  #   summary: Bin sign
+  #   cmds:
+  #     - security unlock-keychain -p 'xxx' /Users/xxx/Library/Keychains/xxx
+  #     - codesign --deep --force --options runtime --sign "xxx" {{.BIN_DIR}}/{{.APP_NAME}}.app
+  #     - codesign --verify --deep --strict --verbose=2 {{.BIN_DIR}}/{{.APP_NAME}}.app
 
   build:mac:prod:pack:
     summary: ZIP
     cmds:
       - ditto -c -k --keepParent {{.BIN_DIR}}/{{.APP_NAME}}.app {{.BIN_DIR}}/{{.APP_NAME}}-macos.zip
 
-  build:mac:prod:notarize:
-    summary: Notarization
-    cmds:
-      - xcrun notarytool submit {{.BIN_DIR}}/{{.APP_NAME}}-macos.zip --apple-id "xxx" --team-id "xxx" --password "xxx" --wait
+  # build:mac:prod:notarize:
+  #   summary: Notarization
+  #   cmds:
+  #     - xcrun notarytool submit {{.BIN_DIR}}/{{.APP_NAME}}-macos.zip --apple-id "xxx" --team-id "xxx" --password "xxx" --wait
 
-  build:mac:prod:staple:
-    summary: Staple
-    cmds:
-      - xcrun stapler staple {{.BIN_DIR}}/{{.APP_NAME}}.app
+  # build:mac:prod:staple:
+  #   summary: Staple
+  #   cmds:
+  #     - xcrun stapler staple {{.BIN_DIR}}/{{.APP_NAME}}.app
 
   build:mac:prod:upload:
     summary: Upload to github

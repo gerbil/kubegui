@@ -8,7 +8,7 @@
   "frontend:install": "",
   "frontend:dev": "",
   "frontend:dev:watcher": "",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "Path": "",
   "BuildDir": "",
   "outputfilename": "kubegui",
@@ -23,7 +23,7 @@
   "Info": {
     "companyName": "KubeGUI",
     "productName": "kubegui",
-    "productVersion": "2.0.0",
+    "productVersion": "2.0.1",
     "copyright": "(c) 2026 Jurijs Kobecs",
     "comments": "Kubernetes admin desktop client"
   },

@@ -331,7 +331,7 @@ export function InitPage({ onContextSelected, hideHeader = false }: InitPageProp
           {logoSrc ? (
             <img src={logoSrc} alt="KubeGUI" className="h-8 w-8 object-contain" onError={() => setLogoSrc(null)} />
           ) : (
-            <div className="h-8 w-8 bg-primary rounded flex items-center justify-center text-xs font-bold text-on-primary">K</div>
+            <div className="h-8 w-8 bg-primary rounded flex items-center justify-center text-sm font-bold text-on-primary">K</div>
           )}
           <div>
             <div className="text-sm font-bold tracking-tight font-headline">KubeGUI</div>
@@ -375,9 +375,9 @@ export function InitPage({ onContextSelected, hideHeader = false }: InitPageProp
                 </div>
                 <div>
                   <div className="text-sm font-semibold mb-1">Upload Kubeconfig</div>
-                  <div className="text-xs text-muted-foreground">Drag & drop YAML or browse files</div>
+                  <div className="text-sm text-muted-foreground">Drag & drop YAML or browse files</div>
                 </div>
-                <button className="mt-1 px-5 py-1.5 lucid-control rounded-full text-xs font-medium text-muted-foreground hover:text-foreground transition-colors">
+                <button className="mt-1 px-5 py-1.5 lucid-control rounded-full text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
                   Browse Files
                 </button>
               </div>
@@ -406,7 +406,7 @@ export function InitPage({ onContextSelected, hideHeader = false }: InitPageProp
                     ))}
                   </div>
                 ) : autoDetectedConfigs.length === 0 ? (
-                  <div className="py-6 text-center text-muted-foreground text-xs">No configs discovered.</div>
+                  <div className="py-6 text-center text-muted-foreground text-sm">No configs discovered.</div>
                 ) : (
                   autoDetectedConfigs.map((cfg, i) => (
                     <label key={i} className="flex items-center justify-between px-4 py-3 rounded-lg cursor-pointer hover:bg-accent/40 transition-colors">
@@ -421,7 +421,7 @@ export function InitPage({ onContextSelected, hideHeader = false }: InitPageProp
                           onError={(e) => { (e.currentTarget as HTMLImageElement).src = defaultClusterIcon }}
                         />
                         <div>
-                          <div className="text-xs font-semibold">{getClusterName(cfg) || getContextName(cfg)}</div>
+                          <div className="text-sm font-semibold">{getClusterName(cfg) || getContextName(cfg)}</div>
                           <div className="text-[11px] text-muted-foreground mt-0.5">{getContextName(cfg)}</div>
                         </div>
                       </div>
@@ -439,7 +439,7 @@ export function InitPage({ onContextSelected, hideHeader = false }: InitPageProp
               <div className="mb-5 flex items-end justify-between">
                 <div>
                   <h2 className="text-2xl font-bold tracking-tight font-headline mb-0.5">Contexts</h2>
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                     {loadingConfigs ? 'Loading...' : `${configs.length} available`}
                   </p>
                 </div>
@@ -463,7 +463,7 @@ export function InitPage({ onContextSelected, hideHeader = false }: InitPageProp
                 {loadingConfigs ? (
                   <ContextCardsSkeleton count={4} />
                 ) : filteredConfigs.length === 0 ? (
-                  <p className="text-center text-muted-foreground text-xs py-6">
+                  <p className="text-center text-muted-foreground text-sm py-6">
                     {searchQuery ? 'No matches.' : 'No contexts found.'}
                   </p>
                 ) : (
@@ -589,15 +589,15 @@ export function InitPage({ onContextSelected, hideHeader = false }: InitPageProp
                   onClick={(e) => e.stopPropagation()}
                 >
                   <div className="border-b border-border/70 py-1">
-                    <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-xs hover:bg-accent/60 min-w-[170px]" onClick={() => { void handleMenuAction('connect') }}>Connect</button>
-                    <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-xs hover:bg-accent/60 min-w-[170px]" onClick={() => { void handleMenuAction('disconnect') }}>Disconnect</button>
+                    <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-sm hover:bg-accent/60 min-w-[170px]" onClick={() => { void handleMenuAction('connect') }}>Connect</button>
+                    <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-sm hover:bg-accent/60 min-w-[170px]" onClick={() => { void handleMenuAction('disconnect') }}>Disconnect</button>
                   </div>
                   <div className="border-b border-border/70 py-1">
-                    <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-xs hover:bg-accent/60 min-w-[170px]" onClick={() => { void handleMenuAction('rename') }}>Rename</button>
-                    <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-xs hover:bg-accent/60 min-w-[170px]" onClick={() => { void handleMenuAction('icon') }}>Change Icon</button>
+                    <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-sm hover:bg-accent/60 min-w-[170px]" onClick={() => { void handleMenuAction('rename') }}>Rename</button>
+                    <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-sm hover:bg-accent/60 min-w-[170px]" onClick={() => { void handleMenuAction('icon') }}>Change Icon</button>
                   </div>
                   <div className="py-1">
-                    <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-xs text-red-400 hover:bg-red-500/10 min-w-[170px]" onClick={() => { void handleMenuAction('delete') }}>Delete</button>
+                    <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 min-w-[170px]" onClick={() => { void handleMenuAction('delete') }}>Delete</button>
                   </div>
                 </div>,
                 document.body,
@@ -649,7 +649,7 @@ export function InitPage({ onContextSelected, hideHeader = false }: InitPageProp
                 </div>
               )}
 
-              {connectError && <p className="mt-3 text-xs text-red-400">{connectError}</p>}
+              {connectError && <p className="mt-3 text-sm text-red-400">{connectError}</p>}
             </div>
 
             <div className="flex items-start gap-3 px-4 py-3 lucid-panel rounded-xl">

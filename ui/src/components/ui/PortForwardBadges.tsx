@@ -1,5 +1,6 @@
 import { Plug, PlugZap, Square } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
+import { Browser } from '@wailsio/runtime'
 import { PortForwardList, PortForwardStart, PortForwardStop } from '../../../bindings/kubegui/services/backend'
 import type { PortForwardSession } from '../../../bindings/kubegui/services/models'
 import { uiNotify } from './UiNotify'
@@ -49,6 +50,7 @@ export function PortForwardBadges({ namespace, podName, ports }: PortForwardBadg
       const session = await PortForwardStart(namespace, podName, remotePort, '0')
       if (session.status === 'active') {
         uiNotify.success(`Port ${remotePort} → localhost:${session.localPort}`)
+        void Browser.OpenURL(`http://localhost:${session.localPort}`)
       } else {
         uiNotify.error(`Port forward failed: ${session.error || 'unknown error'}`)
       }

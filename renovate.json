@@ -12,7 +12,7 @@
     {
       "matchUpdateTypes": ["minor", "major"],
       "automerge": false,
-      "minimumReleaseAge": "7 days",
+      "stabilityDays": 7,
     },
     {
       "matchManagers": ["gomod"],

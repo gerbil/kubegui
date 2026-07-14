@@ -10,6 +10,7 @@ import { ConfirmDialog } from './Button'
 import { podOverviewFields } from '../../features/resources/resourceOverview'
 import { ResourceManifestOverview } from './ResourceManifestOverview'
 import { LabelsSection, AnnotationsSection, EventsTimeline } from './ResourceManifestOverview'
+import { PortForwardBadges } from './PortForwardBadges'
 import { BackendEventSource } from '../../lib/wailsBackendTransport'
 import { Events } from '@wailsio/runtime'
 import { EventsGetResource, ResourceGetDetails, ResourceDelete, PodGetMetricsByNameFromDB, StartPodShellSession, SendPodShellInput, ResizePodShellSession, StopPodShellSession } from '../../../bindings/kubegui/services/backend'
@@ -198,6 +199,24 @@ function OverviewTab({ pod }: { pod: PodRow }) {
     return () => { cancelled = true }
   }, [pod.namespace, pod.name])
 
+  const containerPorts = (() => {
+    if (!resource) return []
+    const spec = resource.spec as Record<string, unknown> | undefined
+    const containers = (spec?.containers as Array<Record<string, unknown>> | undefined) ?? []
+    const ports: Array<{ name?: string; containerPort: number; protocol?: string }> = []
+    for (const c of containers) {
+      const cports = (c.ports as Array<Record<string, unknown>> | undefined) ?? []
+      for (const p of cports) {
+        ports.push({
+          name: p.name as string | undefined,
+          containerPort: p.containerPort as number,
+          protocol: p.protocol as string | undefined,
+        })
+      }
+    }
+    return ports
+  })()
+
   const statusColor = pod.statusText === 'Running' ? 'text-emerald-400'
     : (pod.statusText === 'Pending' || pod.statusText === 'NotReady') ? 'text-amber-400'
     : 'text-red-400'
@@ -234,6 +253,10 @@ function OverviewTab({ pod }: { pod: PodRow }) {
           <p className="font-modal text-[11px] text-muted-foreground/40">Could not load pod manifest.</p>
         )}
       </div>
+
+      {containerPorts.length > 0 && (
+        <PortForwardBadges namespace={pod.namespace} podName={pod.name} ports={containerPorts} />
+      )}
 
       {resource && <LabelsSection resource={resource} />}
       {resource && <AnnotationsSection resource={resource} />}

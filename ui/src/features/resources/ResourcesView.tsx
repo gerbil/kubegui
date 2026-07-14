@@ -53,14 +53,14 @@ function conditionStatusClass(type: string, status: string): string {
 
 
 function labelBadges(labels: Record<string, string> | undefined) {
-  if (!labels) return <span className="text-muted-foreground text-xs">—</span>
+  if (!labels) return <span className="text-muted-foreground text-sm">—</span>
   const entries = Object.entries(labels).slice(0, 4)
   return (
     <div className="flex flex-wrap gap-1">
       {entries.map(([k, v]) => (
-        <span key={k} className="inline-flex items-center rounded px-1.5 py-0.5 text-xs bg-[#354065] text-slate-300 truncate max-w-[160px]" title={`${k}=${v}`}>{k}={v}</span>
+        <span key={k} className="inline-flex items-center rounded px-1.5 py-0.5 text-sm bg-[#354065] text-slate-300 truncate max-w-[160px]" title={`${k}=${v}`}>{k}={v}</span>
       ))}
-      {Object.keys(labels).length > 4 && <span className="text-muted-foreground text-xs">+{Object.keys(labels).length - 4}</span>}
+      {Object.keys(labels).length > 4 && <span className="text-muted-foreground text-sm">+{Object.keys(labels).length - 4}</span>}
     </div>
   )
 }
@@ -132,8 +132,8 @@ export function ResourcesView() {
 
   const columns = useMemo<ColumnDef<K8sResource, any>[]>(
     () => {
-      const xs = 'text-muted-foreground text-xs'
-      const xsTrunc = (w: number) => `text-muted-foreground text-xs truncate max-w-[${w}px] block`
+      const xs = 'text-muted-foreground text-sm'
+      const xsTrunc = (w: number) => `text-muted-foreground text-sm truncate max-w-[${w}px] block`
 
       const selectCol = col.display({
         id: 'select', size: 40, enableSorting: false, header: '',
@@ -173,7 +173,7 @@ export function ResourcesView() {
                   const type = String(condition.type ?? '').trim() || 'Condition'
                   const condStatus = String(condition.status ?? 'Unknown')
                   return (
-                    <div key={`${type}-${idx}`} className={`text-xs font-medium ${conditionStatusClass(type, condStatus)}`}>
+                    <div key={`${type}-${idx}`} className={`text-sm font-medium ${conditionStatusClass(type, condStatus)}`}>
                       {type}
                     </div>
                   )
@@ -183,7 +183,7 @@ export function ResourcesView() {
           }
 
           const status = String(info.getValue<string>() || 'Unknown')
-          return <span className={`text-xs ${statusTextClass(status)}`}>{status}</span>
+          return <span className={`text-sm ${statusTextClass(status)}`}>{status}</span>
         },
       })
 
@@ -194,7 +194,7 @@ export function ResourcesView() {
           nsCol,
           col.accessor((r) => (r as any).lastTimestamp || (r as any).eventTime || r.metadata.creationTimestamp, {
             id: 'last', header: 'Last Seen', size: 140,
-            cell: (info) => <span className="tabular-nums text-xs text-muted-foreground">{formatAge(info.getValue<string>())}</span>,
+            cell: (info) => <span className="tabular-nums text-sm text-muted-foreground">{formatAge(info.getValue<string>())}</span>,
             sortingFn: (a, b) =>
               new Date(((a.original as any).lastTimestamp || a.original.metadata.creationTimestamp) ?? 0).getTime() -
               new Date(((b.original as any).lastTimestamp || b.original.metadata.creationTimestamp) ?? 0).getTime(),
@@ -204,7 +204,7 @@ export function ResourcesView() {
             return inv ? `${inv.kind ?? ''}/${inv.name ?? ''}` : '—'
           }, {
             id: 'object', header: 'Object', size: 240,
-            cell: (info) => <span className="text-xs text-muted-foreground">{info.getValue<string>()}</span>,
+            cell: (info) => <span className="text-sm text-muted-foreground">{info.getValue<string>()}</span>,
           }),
           col.accessor((r) => (r as any).type ?? '—', {
             id: 'type', header: 'Type', size: 100,
@@ -213,15 +213,15 @@ export function ResourcesView() {
           }),
           col.accessor((r) => (r as any).reason ?? '—', {
             id: 'reason', header: 'Reason', size: 160,
-            cell: (info) => <span className="text-xs text-muted-foreground">{info.getValue<string>()}</span>,
+            cell: (info) => <span className="text-sm text-muted-foreground">{info.getValue<string>()}</span>,
           }),
           col.accessor((r) => (r as any).message ?? '—', {
             id: 'message', header: 'Message', size: 400,
-            cell: (info) => <span className="text-xs text-muted-foreground">{info.getValue<string>()}</span>,
+            cell: (info) => <span className="text-sm text-muted-foreground">{info.getValue<string>()}</span>,
           }),
           col.accessor((r) => (r as any).count ?? 1, {
             id: 'count', header: 'Count', size: 70,
-            cell: (info) => <span className="tabular-nums text-xs text-muted-foreground">{info.getValue<number>()}</span>,
+            cell: (info) => <span className="tabular-nums text-sm text-muted-foreground">{info.getValue<number>()}</span>,
           }),
         ]
       }
@@ -251,7 +251,7 @@ export function ResourcesView() {
             cell: (info) => {
               const { statuses, initStatuses } = info.getValue<{ statuses: any; initStatuses: any }>()
               const all = [...(initStatuses ?? []), ...(statuses ?? [])]
-              if (!all.length) return <span className="text-muted-foreground text-xs">—</span>
+              if (!all.length) return <span className="text-muted-foreground text-sm">—</span>
               return (
                 <div className="flex flex-wrap gap-1 items-center">
                   {all.map((cs: any, i: number) => {
@@ -302,7 +302,7 @@ export function ResourcesView() {
           }),
           col.accessor((r) => (r.spec as any)?.replicas ?? 0, {
             id: 'replicas', header: 'Replicas', size: 90,
-            cell: (info) => <span className="tabular-nums text-xs text-muted-foreground">{info.getValue<number>()}</span>,
+            cell: (info) => <span className="tabular-nums text-sm text-muted-foreground">{info.getValue<number>()}</span>,
           }),
         )
       }
@@ -321,7 +321,7 @@ export function ResourcesView() {
           }),
           col.accessor((r) => (r.status as any)?.numberAvailable ?? 0, {
             id: 'nodes', header: 'Nodes', size: 80,
-            cell: (info) => <span className="tabular-nums text-xs text-muted-foreground">{info.getValue<number>()}</span>,
+            cell: (info) => <span className="tabular-nums text-sm text-muted-foreground">{info.getValue<number>()}</span>,
           }),
         )
       }
@@ -345,7 +345,7 @@ export function ResourcesView() {
         base.push(
           col.accessor((r) => (r.status as any)?.active ?? 0, {
             id: 'running', header: 'Running', size: 90,
-            cell: (info) => <span className="tabular-nums text-xs text-muted-foreground">{info.getValue<number>()}</span>,
+            cell: (info) => <span className="tabular-nums text-sm text-muted-foreground">{info.getValue<number>()}</span>,
           }),
           col.accessor((r) => {
             const succeeded = (r.status as any)?.succeeded ?? 0
@@ -385,7 +385,7 @@ export function ResourcesView() {
                 console.warn('[schedule cell] cronstrue failed for:', JSON.stringify(schedule), e)
               }
               console.log('[schedule cell] schedule=', JSON.stringify(schedule), 'human=', human)
-              const inner = <span className="tabular-nums text-xs text-muted-foreground font-mono">{schedule}</span>
+              const inner = <span className="tabular-nums text-sm text-muted-foreground font-mono">{schedule}</span>
               return human
                 ? <FixedTooltip content={human}>{inner}</FixedTooltip>
                 : inner
@@ -396,7 +396,7 @@ export function ResourcesView() {
             return active?.length ?? 0
           }, {
             id: 'active', header: 'Active', size: 80,
-            cell: (info) => <span className="tabular-nums text-xs text-muted-foreground">{info.getValue<number>()}</span>,
+            cell: (info) => <span className="tabular-nums text-sm text-muted-foreground">{info.getValue<number>()}</span>,
           }),
           col.accessor((r) => (r.spec as any)?.suspend ? 'Yes' : 'No', {
             id: 'suspended', header: 'Suspended', size: 100,
@@ -422,7 +422,7 @@ export function ResourcesView() {
           }),
           col.accessor((r) => (r.spec as any)?.clusterIP ?? '—', {
             id: 'clusterIP', header: 'ClusterIP', size: 140,
-            cell: (info) => <span className="text-muted-foreground text-xs tabular-nums">{info.getValue<string>()}</span>,
+            cell: (info) => <span className="text-muted-foreground text-sm tabular-nums">{info.getValue<string>()}</span>,
           }),
           col.accessor((r) => {
             const ips = (r.spec as any)?.externalIPs as string[] | undefined
@@ -431,7 +431,7 @@ export function ResourcesView() {
             return ips?.join(', ') || lbIp || lbHost || '—'
           }, {
             id: 'externalIP', header: 'ExternalIP', size: 160,
-            cell: (info) => <span className="text-muted-foreground text-xs tabular-nums truncate max-w-[140px] block" title={info.getValue<string>()}>{info.getValue<string>()}</span>,
+            cell: (info) => <span className="text-muted-foreground text-sm tabular-nums truncate max-w-[140px] block" title={info.getValue<string>()}>{info.getValue<string>()}</span>,
           }),
         )
       }
@@ -469,19 +469,19 @@ export function ResourcesView() {
             return addrs?.find(a => a.type === 'InternalIP')?.address ?? '—'
           }, {
             id: 'ip', header: 'IP', size: 140,
-            cell: (info) => <span className="tabular-nums text-xs text-muted-foreground">{info.getValue<string>()}</span>,
+            cell: (info) => <span className="tabular-nums text-sm text-muted-foreground">{info.getValue<string>()}</span>,
           }),
           col.accessor((r) => (r.status as any)?.allocatable?.cpu ?? '—', {
             id: 'cpu', header: 'CPU', size: 90,
-            cell: (info) => <span className="tabular-nums text-xs text-muted-foreground">{info.getValue<string>()}</span>,
+            cell: (info) => <span className="tabular-nums text-sm text-muted-foreground">{info.getValue<string>()}</span>,
           }),
           col.accessor((r) => formatK8sMemory((r.status as any)?.allocatable?.memory), {
             id: 'ram', header: 'RAM', size: 100,
-            cell: (info) => <span className="tabular-nums text-xs text-muted-foreground">{info.getValue<string>()}</span>,
+            cell: (info) => <span className="tabular-nums text-sm text-muted-foreground">{info.getValue<string>()}</span>,
           }),
           col.accessor((r) => formatK8sMemory((r.status as any)?.allocatable?.['ephemeral-storage']), {
             id: 'disk', header: 'Disk', size: 100,
-            cell: (info) => <span className="tabular-nums text-xs text-muted-foreground">{info.getValue<string>()}</span>,
+            cell: (info) => <span className="tabular-nums text-sm text-muted-foreground">{info.getValue<string>()}</span>,
           }),
           col.accessor((r) => {
             const taints = (r.spec as any)?.taints as Array<{ key: string; effect: string; value?: string }> | undefined
@@ -517,7 +517,7 @@ export function ResourcesView() {
           }),
           col.accessor((r) => (r.spec as any)?.capacity?.storage ?? '—', {
             id: 'size', header: 'Size', size: 90,
-            cell: (info) => <span className="tabular-nums text-xs text-muted-foreground">{info.getValue<string>()}</span>,
+            cell: (info) => <span className="tabular-nums text-sm text-muted-foreground">{info.getValue<string>()}</span>,
           }),
           col.accessor((r) => {
             const modes = (r.spec as any)?.accessModes as string[] | undefined
@@ -542,7 +542,7 @@ export function ResourcesView() {
           }),
           col.accessor((r) => (r.spec as any)?.resources?.requests?.storage ?? '—', {
             id: 'size', header: 'Size', size: 90,
-            cell: (info) => <span className="tabular-nums text-xs text-muted-foreground">{info.getValue<string>()}</span>,
+            cell: (info) => <span className="tabular-nums text-sm text-muted-foreground">{info.getValue<string>()}</span>,
           }),
           col.accessor((r) => (r.spec as any)?.volumeName ?? '—', {
             id: 'volumeName', header: 'Volume Name', size: 180,
@@ -564,7 +564,7 @@ export function ResourcesView() {
             id: 'keys', header: 'Keys', size: 200,
             cell: (info) => {
               const { count, keys } = info.getValue<{ count: number; keys: string }>()
-              if (count === 0) return <span className="text-muted-foreground text-xs">—</span>
+              if (count === 0) return <span className="text-muted-foreground text-sm">—</span>
               return <span className={xsTrunc(180)} title={keys}>{count} key{count !== 1 ? 's' : ''}: {keys}</span>
             },
           }),
@@ -586,7 +586,7 @@ export function ResourcesView() {
             id: 'keys', header: 'Keys', size: 160,
             cell: (info) => {
               const { count, keys } = info.getValue<{ count: number; keys: string }>()
-              if (count === 0) return <span className="text-muted-foreground text-xs">—</span>
+              if (count === 0) return <span className="text-muted-foreground text-sm">—</span>
               return <span className={xsTrunc(140)} title={keys}>{count} key{count !== 1 ? 's' : ''}</span>
             },
           }),
@@ -718,7 +718,7 @@ export function ResourcesView() {
           options={namespaceOptions}
         />
 
-        <div className="text-xs text-muted-foreground tabular-nums ml-auto">
+        <div className="text-sm text-muted-foreground tabular-nums ml-auto">
           {status === 'success' && `${items.length} ${selectedResource}`}
           {status === 'error' && <span className="text-red-400">Error</span>}
         </div>
