@@ -15,6 +15,15 @@ Official website - https://kubegui.net
 > - View Deployments, DaemonSets and single Pod logs with context aware highlighting  
 > - Open a shell directly into your workloads (even to Nodes via admin daemonset) 
 > - Automatic application updates, no manual installs  
+> - Portforwarding support  
+
+# TODO:
+- Add network policies react-flow view
+- Add whoami/auth check view
+- Adjust ns quota modal details view
+- Create roles/bindings react-flow view
+- Settings view
+- AI suggestions for issues/errors/warnings/etc
 
 ## Scope:
 1. Application code
@@ -90,18 +99,6 @@ Standard resources (required informer list from `internal/resources/kube/resourc
 - Use Object UIDs for Keys: Do not use array indexes for the React key attribute. Use resource.metadata.uid. Kubernetes guarantees this ID is unique.
 - Debounce High-Traffic Events: Use a small buffer loop in Go or debouncing in Zustand so React does not re-render 100 times a second.
 - Auto-Scroll to Bottom: If this list is a live Event stream or Log viewer, you can use rowVirtualizer.scrollToIndex(resources.length - 1) inside a useEffect to snap the view to the latest items.
-
-# TODO:
-- Add FOSS check and badge
-- Add other checks and badges
-- Add port forwarding
-- Add network policies react-flow view
-- Add whoami/auth check view
-- Adjust ns quota modal details view
-- Create roles/bindings react-flow view
-- Settings view
-- AI suggestions for issues/errors/warnings/etc
-
 
 ## Release for MAC (winlinx versions are released via github actions):
 ```
