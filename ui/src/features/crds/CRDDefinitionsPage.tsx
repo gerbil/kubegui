@@ -131,7 +131,7 @@ export function CRDDefinitionsPage() {
             setSelectedCRD(def)
             sidebarNavigateTo(`crd-${def.group}-${def.plural}`, { group: def.group, plural: def.plural })
           }}
-          className="font-mono text-xs text-primary hover:underline underline-offset-2 font-semibold text-left cursor-pointer"
+          className="font-mono text-sm text-primary hover:underline underline-offset-2 font-semibold text-left cursor-pointer"
         >
           {String(info.getValue())}
         </button>
@@ -141,13 +141,13 @@ export function CRDDefinitionsPage() {
       id: 'group',
       header: 'Group',
       accessorKey: 'group',
-      cell: (info) => <span className="text-xs text-muted-foreground">{String(info.getValue() || '—')}</span>,
+      cell: (info) => <span className="text-sm text-muted-foreground">{String(info.getValue() || '—')}</span>,
     },
     {
       id: 'kind',
       header: 'Kind',
       accessorKey: 'kind',
-      cell: (info) => <span className="text-xs text-foreground/80">{String(info.getValue())}</span>,
+      cell: (info) => <span className="text-sm text-foreground/80">{String(info.getValue())}</span>,
     },
     {
       id: 'scope',
@@ -156,7 +156,7 @@ export function CRDDefinitionsPage() {
       cell: (info) => {
         const v = String(info.getValue())
         return (
-          <span className={`text-xs font-medium ${v === 'Cluster' ? 'text-sky-400' : 'text-emerald-400'}`}>{v}</span>
+          <span className={`text-sm font-medium ${v === 'Cluster' ? 'text-sky-400' : 'text-emerald-400'}`}>{v}</span>
         )
       },
     },
@@ -164,7 +164,7 @@ export function CRDDefinitionsPage() {
       id: 'versions',
       header: 'Versions',
       accessorKey: 'versions',
-      cell: (info) => <span className="text-xs text-muted-foreground">{String(info.getValue() || '—')}</span>,
+      cell: (info) => <span className="text-sm text-muted-foreground">{String(info.getValue() || '—')}</span>,
     },
   ], [])
   const selectedNames = useMemo(
@@ -202,12 +202,12 @@ export function CRDDefinitionsPage() {
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
             placeholder="Filter CRD definitions..."
-            className="lucid-control rounded px-2 py-1.5 text-xs min-w-[220px] focus:outline-none font-label"
+            className="lucid-control rounded px-2 py-1.5 text-sm min-w-[220px] focus:outline-none font-label"
             autoComplete="off"
             spellCheck={false}
           />
           {selectedRows.length > 0 && (
-            <div className="lucid-control flex items-center gap-1.5 rounded text-xs focus:outline-none px-2 py-1.5 bg-[#0f172a80]">
+            <div className="lucid-control flex items-center gap-1.5 rounded text-sm focus:outline-none px-2 py-1.5 bg-[#0f172a80]">
               <span className="text-[10px] tracking-wider text-muted-foreground max-w-[460px] truncate" title={selectedNames}>
                 Selected: {selectedNames}
               </span>

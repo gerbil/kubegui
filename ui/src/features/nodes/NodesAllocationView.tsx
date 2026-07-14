@@ -53,7 +53,7 @@ function ProgressBar({ percent, color }: { percent: number; color: string }) {
           style={{ width: `${Math.min(percent, 100)}%` }}
         />
       </div>
-      <span className="text-xs text-muted-foreground tabular-nums w-8 text-right">
+      <span className="text-sm text-muted-foreground tabular-nums w-8 text-right">
         {percent}%
       </span>
     </div>
@@ -120,7 +120,7 @@ export function NodesAllocationView() {
           return (
             <div className="flex flex-col gap-1">
               <ProgressBar percent={percent} color={color} />
-              <span className="text-xs text-muted-foreground">
+              <span className="text-sm text-muted-foreground">
                 {formatMillicores(used)} / {formatMillicores(capacity)}
               </span>
             </div>
@@ -139,7 +139,7 @@ export function NodesAllocationView() {
           return (
             <div className="flex flex-col gap-1">
               <ProgressBar percent={percent} color={color} />
-              <span className="text-xs text-muted-foreground">
+              <span className="text-sm text-muted-foreground">
                 {formatBytes(used)} / {formatBytes(capacity)}
               </span>
             </div>
@@ -173,10 +173,10 @@ export function NodesAllocationView() {
         <h2 className="text-sm font-semibold text-foreground">Nodes Allocation</h2>
         <div className="ml-auto flex items-center gap-2">
           {error && (
-            <div className="text-xs text-red-400 max-w-xs truncate">{error}</div>
+            <div className="text-sm text-red-400 max-w-xs truncate">{error}</div>
           )}
           {lastUpdated && !error && (
-            <div className="text-xs text-muted-foreground">
+            <div className="text-sm text-muted-foreground">
               Updated: {lastUpdated.toLocaleTimeString()}
             </div>
           )}

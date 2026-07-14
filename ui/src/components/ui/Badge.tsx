@@ -17,7 +17,7 @@ const variantMap: Record<string, string> = {
 export function PhaseBadge({ phase }: { phase: string }) {
   const cls = variantMap[phase] ?? variantMap.default
   return (
-    <span className={cn('inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium', cls)}>
+    <span className={cn('inline-flex items-center rounded-full border px-2 py-0.5 text-sm font-medium', cls)}>
       {phase || 'Unknown'}
     </span>
   )
@@ -25,7 +25,7 @@ export function PhaseBadge({ phase }: { phase: string }) {
 
 export function Badge({ children, className }: BadgeProps) {
   return (
-    <span className={cn('inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-medium border-border bg-muted text-muted-foreground', className)}>
+    <span className={cn('inline-flex items-center rounded-full border px-2 py-0.5 text-sm font-medium border-border bg-muted text-muted-foreground', className)}>
       {children}
     </span>
   )

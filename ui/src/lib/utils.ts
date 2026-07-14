@@ -49,7 +49,7 @@ export function ratioBadge(readyOrStr: number | string, desired?: number): Retur
     if (!Number.isFinite(ready) || !Number.isFinite(des)) {
       return createElement(
         'span',
-        { className: 'text-xs tabular-nums text-muted-foreground' },
+        { className: 'text-sm tabular-nums text-muted-foreground' },
         readyOrStr,
       )
     }
@@ -68,7 +68,7 @@ export function ratioBadge(readyOrStr: number | string, desired?: number): Retur
           : 'text-red-400'
   return createElement(
     'span',
-    { className: `text-xs tabular-nums font-medium ${cls}` },
+    { className: `text-sm tabular-nums font-medium ${cls}` },
     `${ready}/${des}`,
   )
 }
@@ -85,7 +85,7 @@ export function countBadge(value: number, _warnAt = 1, errorAt = 5): ReturnType<
         : 'text-red-400'
   return createElement(
     'span',
-    { className: `text-xs tabular-nums font-medium ${cls}` },
+    { className: `text-sm tabular-nums font-medium ${cls}` },
     String(value),
   )
 }
@@ -104,7 +104,7 @@ export function statusBadge(status: string): ReturnType<typeof createElement> {
         : 'text-red-400'
   return createElement(
     'span',
-    { className: `text-xs font-medium ${cls}`, title: status },
+    { className: `text-sm font-medium ${cls}`, title: status },
     status,
   )
 }
@@ -119,7 +119,7 @@ export function booleanBadge(value: boolean, trueLabel = 'True', falseLabel = 'F
     : 'text-red-400'
   return createElement(
     'span',
-    { className: `text-xs font-medium ${cls}` },
+    { className: `text-sm font-medium ${cls}` },
     value ? trueLabel : falseLabel,
   )
 }
@@ -134,7 +134,7 @@ export function eventTypeBadge(type: string): ReturnType<typeof createElement> {
     : 'text-sky-400'
   return createElement(
     'span',
-    { className: `text-xs font-medium ${cls}` },
+    { className: `text-sm font-medium ${cls}` },
     type,
   )
 }
@@ -163,7 +163,7 @@ export function conditionBadge(conditionType: string, conditionStatus?: string):
 
   return createElement(
     'span',
-    { className: `text-xs font-medium ${cls}` },
+    { className: `text-sm font-medium ${cls}` },
     label,
   )
 }

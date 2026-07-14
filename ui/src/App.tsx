@@ -644,7 +644,7 @@ function CreateNamespaceModal({ onClose }: { onClose: () => void }) {
 
         {/* Error banner */}
         {submitError && (
-          <div className="mx-4 mt-3 shrink-0 flex items-start gap-2 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-xs text-red-400">
+          <div className="mx-4 mt-3 shrink-0 flex items-start gap-2 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-sm text-red-400">
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <span className="break-all">{submitError}</span>
             <button onClick={() => setSubmitError(null)} className="ml-auto shrink-0 hover:text-red-300">
@@ -657,7 +657,7 @@ function CreateNamespaceModal({ onClose }: { onClose: () => void }) {
         <div className="flex-1 min-h-0 p-4 flex flex-col gap-3">
           <div className="relative flex-1 min-h-0 rounded border border-border bg-[#0d1117] overflow-hidden">
             {editorError ? (
-              <div className="p-4 text-red-400 text-xs">{editorError}</div>
+              <div className="p-4 text-red-400 text-sm">{editorError}</div>
             ) : (
               <div ref={containerRef} className="absolute inset-0" />
             )}
@@ -666,10 +666,10 @@ function CreateNamespaceModal({ onClose }: { onClose: () => void }) {
 
         {/* Footer */}
         <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-border bg-accent/10 shrink-0">
-          <button type="button" onClick={handleClose} disabled={busy} className="px-4 py-1.5 rounded text-xs font-semibold text-muted-foreground border border-border hover:text-foreground transition-colors disabled:opacity-50">
+          <button type="button" onClick={handleClose} disabled={busy} className="px-4 py-1.5 rounded text-sm font-semibold text-muted-foreground border border-border hover:text-foreground transition-colors disabled:opacity-50">
             Cancel
           </button>
-          <button type="button" onClick={() => void handleCreate()} disabled={busy || hasSyntaxError} className="px-4 py-1.5 rounded text-xs font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90">
+          <button type="button" onClick={() => void handleCreate()} disabled={busy || hasSyntaxError} className="px-4 py-1.5 rounded text-sm font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90">
             {busy ? 'Creating…' : 'Create Namespace'}
           </button>
         </div>
@@ -1240,15 +1240,15 @@ function ClusterRail({ currentContext, onDisconnected }: { currentContext: strin
           onClick={(e) => e.stopPropagation()}
         >
           <div className="border-b border-border/70 py-1">
-            <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-xs hover:bg-accent/60 min-w-[170px]" onClick={() => { void menuAction('connect') }}>Connect</button>
-            <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-xs hover:bg-accent/60 min-w-[170px]" onClick={() => { void menuAction('disconnect') }}>Disconnect</button>
+            <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-sm hover:bg-accent/60 min-w-[170px]" onClick={() => { void menuAction('connect') }}>Connect</button>
+            <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-sm hover:bg-accent/60 min-w-[170px]" onClick={() => { void menuAction('disconnect') }}>Disconnect</button>
           </div>
           <div className="border-b border-border/70 py-1">
-            <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-xs hover:bg-accent/60 min-w-[170px]" onClick={() => { void menuAction('rename') }}>Rename</button>
-            <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-xs hover:bg-accent/60 min-w-[170px]" onClick={() => { void menuAction('icon') }}>Change Icon</button>
+            <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-sm hover:bg-accent/60 min-w-[170px]" onClick={() => { void menuAction('rename') }}>Rename</button>
+            <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-sm hover:bg-accent/60 min-w-[170px]" onClick={() => { void menuAction('icon') }}>Change Icon</button>
           </div>
           <div className="py-1">
-            <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-xs text-red-400 hover:bg-red-500/10 min-w-[170px]" onClick={() => { void menuAction('delete') }}>Delete</button>
+            <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 min-w-[170px]" onClick={() => { void menuAction('delete') }}>Delete</button>
           </div>
         </div>,
         document.body,
@@ -1264,17 +1264,17 @@ function ClusterRail({ currentContext, onDisconnected }: { currentContext: strin
           >
             <div className="px-5 pt-5 pb-4 border-b border-border/60 bg-accent/20">
               <p className="text-sm font-semibold text-foreground">Rename Cluster</p>
-              <p className="mt-1.5 text-xs text-muted-foreground leading-relaxed">Update display name for this cluster entry.</p>
+              <p className="mt-1.5 text-sm text-muted-foreground leading-relaxed">Update display name for this cluster entry.</p>
             </div>
             <div className="px-5 py-4 space-y-2">
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground">Current</p>
-              <p className="text-xs font-mono text-foreground/90">{renameState.item.label}</p>
+              <p className="text-sm font-mono text-foreground/90">{renameState.item.label}</p>
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground pt-1">New Name</p>
               <input
                 autoFocus
                 value={renameState.value}
                 onChange={(e) => setRenameState((prev) => (prev ? { ...prev, value: e.target.value } : prev))}
-                className="w-full lucid-control rounded px-2 py-1.5 text-xs focus:outline-none"
+                className="w-full lucid-control rounded px-2 py-1.5 text-sm focus:outline-none"
                 disabled={renameState.busy}
               />
             </div>
@@ -1283,7 +1283,7 @@ function ClusterRail({ currentContext, onDisconnected }: { currentContext: strin
                 type="button"
                 onClick={closeRenameDialog}
                 disabled={renameState.busy}
-                className="px-4 py-1.5 rounded text-xs font-semibold border border-border text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+                className="px-4 py-1.5 rounded text-sm font-semibold border border-border text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -1291,7 +1291,7 @@ function ClusterRail({ currentContext, onDisconnected }: { currentContext: strin
                 type="button"
                 onClick={() => { void submitRename() }}
                 disabled={renameState.busy}
-                className="px-4 py-1.5 rounded text-xs font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90"
+                className="px-4 py-1.5 rounded text-sm font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90"
               >
                 {renameState.busy ? 'Saving…' : 'Save'}
               </button>
@@ -1861,7 +1861,7 @@ function NodeRowList({ name, ip, instanceType, cpu, ram, disk, pods, cordoned, d
               <Database size={14} />
             </div>
             <div className="min-w-0">
-              <p className="text-xs font-semibold truncate">{name}</p>
+              <p className="text-sm font-semibold truncate">{name}</p>
               <div className="flex items-center gap-1.5 flex-wrap text-[10px] font-mono text-muted-foreground">
                 {ip !== 'n/a' && <span>{ip}</span>}
                 {instanceType && <span>{instanceType}</span>}
@@ -2002,7 +2002,7 @@ function DashboardPage({
               <StatCard title="Failed" value={String(stats.failed)} delta={stats.total > 0 ? `${Math.round((stats.failed / stats.total) * 100)}% of pods` : '—'} icon={<XCircle size={32} />} deltaClass="text-red-400/80" iconClass="text-red-400" percent={stats.total > 0 ? Math.round((stats.failed / stats.total) * 100) : 0} barColor="bg-red-400" />
             </div>
             )}
-            {statsError && <div className="text-xs text-red-400 mt-1">Stats error: {statsError}</div>}
+            {statsError && <div className="text-sm text-red-400 mt-1">Stats error: {statsError}</div>}
 
           <section className="space-y-3">
             <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -2085,7 +2085,7 @@ function DashboardPage({
                 ))}
                 {filteredNodes.length === 0 && (
                   nodeSearch
-                    ? <p className="col-span-full text-xs text-muted-foreground/60 py-4">No nodes match your search.</p>
+                    ? <p className="col-span-full text-sm text-muted-foreground/60 py-4">No nodes match your search.</p>
                     : <NodeCardsSkeleton count={nodesLoading ? 4 : 0} />
                 )}
               </div>
@@ -2123,7 +2123,7 @@ function DashboardPage({
               <div className="p-4 border-b border-border/30 flex justify-between items-center bg-surface-container-low/50">
                 <div className="flex items-center gap-2">
                   <Terminal size={14} />
-                  <h5 className="text-xs font-semibold uppercase tracking-wider">Live Cluster Logs</h5>
+                  <h5 className="text-sm font-semibold uppercase tracking-wider">Live Cluster Logs</h5>
                 </div>
                 <div className="flex items-center gap-2 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
@@ -2160,7 +2160,7 @@ function DashboardPage({
               <div className="p-4 border-b border-border/30 flex justify-between items-center bg-surface-container-low/50">
                 <div className="flex items-center gap-2">
                   <Radio size={14} />
-                  <h5 className="text-xs font-semibold uppercase tracking-wider">Cluster Events</h5>
+                  <h5 className="text-sm font-semibold uppercase tracking-wider">Cluster Events</h5>
                   <span className="text-[9px] text-muted-foreground font-mono">kube-system</span>
                 </div>
               </div>
@@ -2375,7 +2375,7 @@ function NamespacesPage() {
         id: 'name',
         header: 'Name',
         accessorKey: 'name',
-        cell: (info) => <span className="font-label text-xs text-foreground font-semibold">{String(info.getValue())}</span>,
+        cell: (info) => <span className="font-label text-sm text-foreground font-semibold">{String(info.getValue())}</span>,
       },
       {
         id: 'labels',
@@ -2385,7 +2385,7 @@ function NamespacesPage() {
         meta: { fixedWidth: 420 },
         cell: (info) => {
           const entries = Object.entries(info.row.original.labels)
-          if (entries.length === 0) return <span className="text-xs text-muted-foreground/40">—</span>
+          if (entries.length === 0) return <span className="text-sm text-muted-foreground/40">—</span>
           return (
             <div className="flex flex-col gap-0.5">
               {entries.map(([k, v]) => (
@@ -2408,7 +2408,7 @@ function NamespacesPage() {
           const isActive = phase.toLowerCase() === 'active'
           return (
             <div className="flex flex-col gap-1 min-w-[80px]">
-              <span className="text-xs text-muted-foreground whitespace-nowrap">{humanAge(String(info.getValue() ?? ''))}</span>
+              <span className="text-sm text-muted-foreground whitespace-nowrap">{humanAge(String(info.getValue() ?? ''))}</span>
               <UiTooltip content={phase}>
                 <div className="h-1.5 w-full rounded-full bg-surface-container-high overflow-hidden cursor-help">
                   <div className={`h-full w-full rounded-full ${isActive ? 'bg-emerald-400/70' : 'bg-red-400/70'}`} />
@@ -2455,12 +2455,12 @@ function NamespacesPage() {
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
             placeholder="Filter namespaces..."
-            className="lucid-control rounded px-2 py-1.5 text-xs min-w-[220px] focus:outline-none font-label"
+            className="lucid-control rounded px-2 py-1.5 text-sm min-w-[220px] focus:outline-none font-label"
             autoComplete="off"
             spellCheck={false}
           />
           {selectedNamespaceRows.length > 0 && (
-            <div className="lucid-control flex items-center gap-1.5 rounded text-xs focus:outline-none px-2 py-1.5 bg-[#0f172a80]">
+            <div className="lucid-control flex items-center gap-1.5 rounded text-sm focus:outline-none px-2 py-1.5 bg-[#0f172a80]">
               <span className="text-[10px] tracking-wider text-muted-foreground max-w-[460px] truncate" title={selectedNamespaceNames}>
                 Selected namespaces: {selectedNamespaceNames}
               </span>
@@ -2484,6 +2484,7 @@ function NamespacesPage() {
           globalFilter={globalFilter}
           estimateSize={52}
           emptyLabel="No namespaces found."
+          loading={namespacesLoading}
           columnOrder={['select', 'name', 'labels', 'age']}
           persistKey="namespaces"
           onSelectedRowsChange={setSelectedNamespaceRows}
@@ -3041,7 +3042,7 @@ function CreateResourceModal({ resource, label, onClose, onCreated }: { resource
           </button>
         </div>
         {submitError && (
-          <div className="mx-4 mt-3 shrink-0 flex items-start gap-2 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-xs text-red-400">
+          <div className="mx-4 mt-3 shrink-0 flex items-start gap-2 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-sm text-red-400">
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <span className="break-all">{submitError}</span>
             <button onClick={() => setSubmitError(null)} className="ml-auto shrink-0 hover:text-red-300">
@@ -3052,16 +3053,16 @@ function CreateResourceModal({ resource, label, onClose, onCreated }: { resource
         <div className="flex-1 min-h-0 p-4 flex flex-col gap-3">
           <div className="relative flex-1 min-h-0 rounded border border-border bg-[#0d1117] overflow-hidden">
             {editorError
-              ? <div className="p-4 text-red-400 text-xs">{editorError}</div>
+              ? <div className="p-4 text-red-400 text-sm">{editorError}</div>
               : <div ref={containerRef} className="absolute inset-0" />
             }
           </div>
         </div>
         <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-border bg-accent/10 shrink-0">
-          <button type="button" onClick={handleClose} disabled={busy} className="px-4 py-1.5 rounded text-xs font-semibold text-muted-foreground border border-border hover:text-foreground transition-colors disabled:opacity-50">
+          <button type="button" onClick={handleClose} disabled={busy} className="px-4 py-1.5 rounded text-sm font-semibold text-muted-foreground border border-border hover:text-foreground transition-colors disabled:opacity-50">
             Cancel
           </button>
-          <button type="button" onClick={() => void handleCreate()} disabled={busy || hasSyntaxError} className="px-4 py-1.5 rounded text-xs font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90">
+          <button type="button" onClick={() => void handleCreate()} disabled={busy || hasSyntaxError} className="px-4 py-1.5 rounded text-sm font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90">
             {busy ? 'Creating…' : 'Create Namespace'}
           </button>
         </div>
@@ -3183,7 +3184,7 @@ function CreatePodModal({ onClose }: { onClose: () => void }) {
 
         {/* Error banner */}
         {submitError && (
-          <div className="mx-4 mt-3 shrink-0 flex items-start gap-2 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-xs text-red-400">
+          <div className="mx-4 mt-3 shrink-0 flex items-start gap-2 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-sm text-red-400">
             <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             <span className="break-all">{submitError}</span>
             <button onClick={() => setSubmitError(null)} className="ml-auto shrink-0 hover:text-red-300">
@@ -3194,17 +3195,17 @@ function CreatePodModal({ onClose }: { onClose: () => void }) {
         <div className="flex-1 min-h-0 p-4 flex flex-col gap-3">
           <div className="relative flex-1 min-h-0 rounded border border-border bg-[#0d1117] overflow-hidden">
             {editorError ? (
-              <div className="p-4 text-red-400 text-xs">{editorError}</div>
+              <div className="p-4 text-red-400 text-sm">{editorError}</div>
             ) : (
               <div ref={containerRef} className="absolute inset-0" />
             )}
           </div>
         </div>
         <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-border bg-accent/10 shrink-0">
-          <button type="button" onClick={handleClose} disabled={busy} className="px-4 py-1.5 rounded text-xs font-semibold text-muted-foreground border border-border hover:text-foreground transition-colors disabled:opacity-50">
+          <button type="button" onClick={handleClose} disabled={busy} className="px-4 py-1.5 rounded text-sm font-semibold text-muted-foreground border border-border hover:text-foreground transition-colors disabled:opacity-50">
             Cancel
           </button>
-          <button type="button" onClick={() => void handleCreate()} disabled={busy || hasSyntaxError} className="px-4 py-1.5 rounded text-xs font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90">
+          <button type="button" onClick={() => void handleCreate()} disabled={busy || hasSyntaxError} className="px-4 py-1.5 rounded text-sm font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90">
             {busy ? 'Creating…' : 'Create Pod'}
           </button>
         </div>
@@ -3532,7 +3533,7 @@ function PodsPage() {
         id: 'name',
         header: 'Pod',
         accessorKey: 'name',
-        cell: (info) => <span className="text-xs text-muted-foreground">{String(info.getValue())}</span>,
+        cell: (info) => <span className="text-sm text-muted-foreground">{String(info.getValue())}</span>,
       },
       {
         id: 'status',
@@ -3583,7 +3584,7 @@ function PodsPage() {
           return (
             <UiTooltip content={<span className="max-w-[260px] text-[11px] leading-snug whitespace-normal block">{tooltipText}</span>}>
               <div className="flex flex-col gap-0.5 cursor-default">
-                <span className={`text-xs font-medium ${cls}`}>
+                <span className={`text-sm font-medium ${cls}`}>
                   {text}
                 </span>
                 {showSub && (
@@ -3627,7 +3628,7 @@ function PodsPage() {
                 </div>
               )
             }
-            return <span className="text-muted-foreground text-xs">—</span>
+            return <span className="text-muted-foreground text-sm">—</span>
           }
 
           return (
@@ -3663,9 +3664,9 @@ function PodsPage() {
         id: 'namespace',
         header: 'Namespace',
         accessorKey: 'namespace',
-        cell: (info) => <span className="text-xs text-foreground">{String(info.getValue())}</span>,
+        cell: (info) => <span className="text-sm text-foreground">{String(info.getValue())}</span>,
       },
-      { id: 'node', header: 'Node', accessorKey: 'node', cell: (info) => <span className="text-xs text-muted-foreground">{String(info.getValue())}</span> },
+      { id: 'node', header: 'Node', accessorKey: 'node', cell: (info) => <span className="text-sm text-muted-foreground">{String(info.getValue())}</span> },
       {
         id: 'restarts',
         header: 'Restarts',
@@ -3686,7 +3687,7 @@ function PodsPage() {
         accessorFn: (row) => row.createdAt,
         sortingFn: 'datetime',
         meta: { shrink: true },
-        cell: (info) => <span className="text-xs text-muted-foreground whitespace-nowrap">{humanAge(String(info.getValue() ?? ''))}</span>,
+        cell: (info) => <span className="text-sm text-muted-foreground whitespace-nowrap">{humanAge(String(info.getValue() ?? ''))}</span>,
       },
     ],
     [],
@@ -3735,7 +3736,7 @@ function PodsPage() {
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
             placeholder="Filter pods..."
-            className="lucid-control rounded px-2 py-1.5 text-xs min-w-[220px] focus:outline-none font-label"
+            className="lucid-control rounded px-2 py-1.5 text-sm min-w-[220px] focus:outline-none font-label"
             autoComplete="off"
             spellCheck={false}
           />
@@ -3763,7 +3764,7 @@ function PodsPage() {
             })}
           </div>
           {selectedPodRows.length > 0 && (
-            <div className="lucid-control flex items-center gap-1.5 rounded text-xs focus:outline-none px-2 py-1.5 bg-[#0f172a80]">
+            <div className="lucid-control flex items-center gap-1.5 rounded text-sm focus:outline-none px-2 py-1.5 bg-[#0f172a80]">
               <span className="text-[10px] tracking-wider text-muted-foreground max-w-[360px] truncate" title={selectedPodRows.map((r) => r.name).join(', ')}>
                 Selected pods: {selectedPodRows.map((r) => r.name).join(', ')}
               </span>
@@ -3896,13 +3897,13 @@ function renderInformerConditions(
     : []
 
   if (rows.length === 0) {
-    return <span className={`text-xs font-medium ${informerStatusTextClass(fallbackStatus)}`}>{fallbackStatus}</span>
+    return <span className={`text-sm font-medium ${informerStatusTextClass(fallbackStatus)}`}>{fallbackStatus}</span>
   }
 
   return (
     <div className="space-y-0.5 leading-tight break-words">
       {rows.map((condition) => (
-        <div key={condition.key} className={`text-xs font-medium ${conditionStatusClass(condition.type, condition.status)}`}>
+        <div key={condition.key} className={`text-sm font-medium ${conditionStatusClass(condition.type, condition.status)}`}>
           {condition.type}
         </div>
       ))}
@@ -4017,15 +4018,15 @@ function InformerResourcePage({ resource }: { resource: string }) {
   }, [selectedRows, bulkDeleteBusy, resource, storeKey, storeItems, storeSetItems])
 
   const columns = useMemo<ColumnDef<Row>[]>(() => {
-    const xs = (v: unknown) => <span className="text-xs text-muted-foreground">{String(v ?? '—')}</span>
+    const xs = (v: unknown) => <span className="text-sm text-muted-foreground">{String(v ?? '—')}</span>
     const ex = (row: Row, key: string) => row.extra[key]
     const exSpec = (row: Row, key: string) => (row.extra.spec as Record<string, unknown> | undefined)?.[key]
     const exStatus = (row: Row, key: string) => (row.extra.status as Record<string, unknown> | undefined)?.[key]
 
     const selectCol: ColumnDef<Row> = { id: 'select', header: 'select', accessorKey: 'name', enableSorting: false, enableGlobalFilter: false, size: 44, meta: { thClassName: 'pl-3', tdClassName: 'pl-3' }, cell: (info) => (<input type="checkbox" className="w-4 h-4 rounded cursor-pointer align-bottom appearance-none bg-[#354065] checked:bg-[#6a7fc9] checked:border-[#6a7fc9]" checked={info.row.getIsSelected()} onChange={info.row.getToggleSelectedHandler()} onClick={(e) => e.stopPropagation()} />) }
-    const nameCol: ColumnDef<Row> = { id: 'name', header: 'Name', accessorKey: 'name', cell: (info) => <span className="font-label text-xs text-foreground font-semibold">{String(info.getValue())}</span> }
+    const nameCol: ColumnDef<Row> = { id: 'name', header: 'Name', accessorKey: 'name', cell: (info) => <span className="font-label text-sm text-foreground font-semibold">{String(info.getValue())}</span> }
     const nsCol: ColumnDef<Row> = { id: 'namespace', header: 'Namespace', accessorKey: 'namespace', cell: (info) => xs(info.getValue()) }
-    const ageCol: ColumnDef<Row> = { id: 'age', header: 'Age', accessorFn: (row) => row.createdAt, sortingFn: 'datetime', meta: { shrink: true }, cell: (info) => <span className="text-xs text-muted-foreground whitespace-nowrap">{humanAge(String(info.getValue() ?? ''))}</span> }
+    const ageCol: ColumnDef<Row> = { id: 'age', header: 'Age', accessorFn: (row) => row.createdAt, sortingFn: 'datetime', meta: { shrink: true }, cell: (info) => <span className="text-sm text-muted-foreground whitespace-nowrap">{humanAge(String(info.getValue() ?? ''))}</span> }
     const statusCol: ColumnDef<Row> = {
       id: 'status',
       header: 'Status',
@@ -4045,15 +4046,15 @@ function InformerResourcePage({ resource }: { resource: string }) {
 
     const resourceCols: Record<string, ColumnDef<Row>[]> = {
       pods: [
-        { id: 'phase', header: 'Phase', size: 90, accessorFn: (r) => exStatus(r,'phase') ?? 'Unknown', cell: (i) => { const p=String(i.getValue()??'Unknown'); const cls=p==='Running'?'text-emerald-400':p==='Pending'?'text-amber-400':p==='Succeeded'?'text-blue-400':'text-red-400'; return <span className={`text-xs font-semibold ${cls}`}>{p}</span> } },
+        { id: 'phase', header: 'Phase', size: 90, accessorFn: (r) => exStatus(r,'phase') ?? 'Unknown', cell: (i) => { const p=String(i.getValue()??'Unknown'); const cls=p==='Running'?'text-emerald-400':p==='Pending'?'text-amber-400':p==='Succeeded'?'text-blue-400':'text-red-400'; return <span className={`text-sm font-semibold ${cls}`}>{p}</span> } },
         { id: 'ready', header: 'Ready', size: 75, accessorFn: (r) => { const cs=(exStatus(r,'containerStatuses') as Array<{ready:boolean}>|undefined)??[]; return `${cs.filter(c=>c.ready).length}/${cs.length}` }, cell: (i) => xs(i.getValue()) },
-        { id: 'node', header: 'Node', accessorFn: (r) => exSpec(r,'nodeName') ?? '—', cell: (i) => <span className="text-xs text-muted-foreground truncate max-w-[150px] block" title={String(i.getValue())}>{String(i.getValue())}</span> },
+        { id: 'node', header: 'Node', accessorFn: (r) => exSpec(r,'nodeName') ?? '—', cell: (i) => <span className="text-sm text-muted-foreground truncate max-w-[150px] block" title={String(i.getValue())}>{String(i.getValue())}</span> },
       ],
       deployments: [
         { id: 'replicas', header: 'Replicas', size: 100, accessorFn: (r) => exStatus(r,'readyReplicas')??0, cell: (i) => { const r=i.row.original; const ready=Number(exStatus(r,'readyReplicas')??0); const desired=Number(exSpec(r,'replicas')??0); return ratioBadge(ready, desired) } },
       ],
       statefulsets: [
-        { id: 'pods', header: 'Pods', size: 90, accessorFn: (r) => exStatus(r,'availableReplicas')??0, cell: (i) => { const r=i.row.original; const avail=Number(exStatus(r,'availableReplicas')??0); const total=Number(exStatus(r,'replicas')??0); const ok=avail>=total&&total>0; return <span className={`text-xs font-semibold ${ok?'text-emerald-400':(avail>0?'text-amber-400':'text-red-400')}`}>{avail}/{total}</span> } },
+        { id: 'pods', header: 'Pods', size: 90, accessorFn: (r) => exStatus(r,'availableReplicas')??0, cell: (i) => { const r=i.row.original; const avail=Number(exStatus(r,'availableReplicas')??0); const total=Number(exStatus(r,'replicas')??0); const ok=avail>=total&&total>0; return <span className={`text-sm font-semibold ${ok?'text-emerald-400':(avail>0?'text-amber-400':'text-red-400')}`}>{avail}/{total}</span> } },
         { id: 'replicas', header: 'Replicas', size: 80, accessorFn: (r) => exSpec(r,'replicas')??0, cell: (i) => xs(i.getValue()??0) },
       ],
       daemonsets: [
@@ -4063,15 +4064,15 @@ function InformerResourcePage({ resource }: { resource: string }) {
       replicasets: [{ id: 'replicas', header: 'Replicas', size: 100, accessorFn: (r) => exStatus(r,'readyReplicas')??0, cell: (i) => { const r=i.row.original; return xs(`${String(exStatus(r,'readyReplicas')??0)}/${String(exSpec(r,'replicas')??0)}`) } }],
       replicationcontrollers: [{ id: 'replicas', header: 'Replicas', size: 100, accessorFn: (r) => exStatus(r,'readyReplicas')??0, cell: (i) => { const r=i.row.original; const ready=Number(exStatus(r,'readyReplicas')??0); const desired=Number(exSpec(r,'replicas')??0); return ratioBadge(ready, desired) } }],
       cronjobs: [
-        { id: 'schedule', header: 'Schedule', meta: { disableOverflowTooltip: true }, accessorFn: (r) => exSpec(r,'schedule'), cell: (i) => { const schedule = String(i.getValue() ?? '—'); let human = ''; try { human = cronstrue.toString(schedule, { use24HourTimeFormat: true, verbose: true }) } catch { /**/ } const inner = <span className="font-mono text-xs text-muted-foreground">{schedule}</span>; return human ? <FixedTooltipInline content={human}>{inner}</FixedTooltipInline> : inner } },
+        { id: 'schedule', header: 'Schedule', meta: { disableOverflowTooltip: true }, accessorFn: (r) => exSpec(r,'schedule'), cell: (i) => { const schedule = String(i.getValue() ?? '—'); let human = ''; try { human = cronstrue.toString(schedule, { use24HourTimeFormat: true, verbose: true }) } catch { /**/ } const inner = <span className="font-mono text-sm text-muted-foreground">{schedule}</span>; return human ? <FixedTooltipInline content={human}>{inner}</FixedTooltipInline> : inner } },
         { id: 'active', header: 'Active', size: 75, accessorFn: (r) => (exStatus(r,'active') as unknown[]|undefined)?.length??0, cell: (i) => xs(i.getValue()??0) },
-        { id: 'suspend', header: 'Suspended', size: 90, accessorFn: (r) => exSpec(r,'suspend'), cell: (i) => <span className={`text-xs ${i.getValue()?'text-amber-400':'text-muted-foreground'}`}>{i.getValue()?'Yes':'No'}</span> },
+        { id: 'suspend', header: 'Suspended', size: 90, accessorFn: (r) => exSpec(r,'suspend'), cell: (i) => <span className={`text-sm ${i.getValue()?'text-amber-400':'text-muted-foreground'}`}>{i.getValue()?'Yes':'No'}</span> },
       ],
       jobs: [
         { id: 'running', header: 'Running', size: 80, accessorFn: (r) => exStatus(r,'active')??0, cell: (i) => xs(i.getValue()??0) },
         { id: 'succeeded', header: 'Succeeded', size: 110, accessorFn: (r) => exStatus(r,'succeeded')??0, cell: (i) => { const r=i.row.original; return xs(`${String(exStatus(r,'succeeded')??0)}/${String(exSpec(r,'completions')??'—')}`) } },
-        { id: 'failed', header: 'Failed', size: 70, accessorFn: (r) => exStatus(r,'failed')??0, cell: (i) => { const v=Number(i.getValue()??0); return <span className={`text-xs ${v>0?'text-red-400':'text-muted-foreground'}`}>{v}</span> } },
-        { id: 'suspend', header: 'Suspended', size: 90, accessorFn: (r) => exSpec(r,'suspend'), cell: (i) => <span className={`text-xs ${i.getValue()?'text-amber-400':'text-muted-foreground'}`}>{i.getValue()?'Yes':'No'}</span> },
+        { id: 'failed', header: 'Failed', size: 70, accessorFn: (r) => exStatus(r,'failed')??0, cell: (i) => { const v=Number(i.getValue()??0); return <span className={`text-sm ${v>0?'text-red-400':'text-muted-foreground'}`}>{v}</span> } },
+        { id: 'suspend', header: 'Suspended', size: 90, accessorFn: (r) => exSpec(r,'suspend'), cell: (i) => <span className={`text-sm ${i.getValue()?'text-amber-400':'text-muted-foreground'}`}>{i.getValue()?'Yes':'No'}</span> },
       ],
       horizontalpodautoscalers: [
         { id: 'metrics', header: 'Metrics', accessorFn: (r) => { const cm=exStatus(r,'currentMetrics') as Array<Record<string,unknown>>|undefined; if (!cm?.length) return '—'; const m=cm[0]; if (String(m.type)==='Resource') { const res=m.resource as Record<string,unknown>|undefined; const cur=(res?.current as Record<string,unknown>|undefined)?.averageUtilization; const tgt=(exSpec(r,'metrics') as Array<Record<string,unknown>>|undefined)?.[0]; const tgtPct=(tgt?.resource as Record<string,unknown>|undefined)?.target; const tgtVal=(tgtPct as Record<string,unknown>|undefined)?.averageUtilization; const name=(res?.name??'cpu'); return `${cur??'?'}%/${tgtVal??'?'}% (${name})`; } return String(m.type??'—') } },
@@ -4079,14 +4080,14 @@ function InformerResourcePage({ resource }: { resource: string }) {
         { id: 'replicas', header: 'Replicas', size: 90, accessorFn: (r) => exStatus(r,'currentReplicas')??0, cell: (i) => { const r=i.row.original; const cur=Number(exStatus(r,'currentReplicas')??0); const des=Number(exStatus(r,'desiredReplicas')??0); return ratioBadge(cur, des) } },
       ],
       services: [
-        { id: 'ports', header: 'Ports', accessorFn: (r) => exSpec(r,'ports'), enableSorting: false, cell: (i) => { const ports=i.getValue() as Array<Record<string,unknown>>|undefined; if (!ports?.length) return xs('—'); return <span className="text-xs text-muted-foreground">{ports.map((p)=>`${p.port}${p.targetPort?'→'+p.targetPort:''}/${p.protocol??'TCP'}`).join(', ')}</span> } },
+        { id: 'ports', header: 'Ports', accessorFn: (r) => exSpec(r,'ports'), enableSorting: false, cell: (i) => { const ports=i.getValue() as Array<Record<string,unknown>>|undefined; if (!ports?.length) return xs('—'); return <span className="text-sm text-muted-foreground">{ports.map((p)=>`${p.port}${p.targetPort?'→'+p.targetPort:''}/${p.protocol??'TCP'}`).join(', ')}</span> } },
         { id: 'type', header: 'Type', size: 100, accessorFn: (r) => exSpec(r,'type'), cell: (i) => xs(i.getValue()) },
-        { id: 'clusterIP', header: 'ClusterIP', size: 130, accessorFn: (r) => exSpec(r,'clusterIP'), cell: (i) => <span className="font-mono text-xs text-muted-foreground">{String(i.getValue()??'—')}</span> },
+        { id: 'clusterIP', header: 'ClusterIP', size: 130, accessorFn: (r) => exSpec(r,'clusterIP'), cell: (i) => <span className="font-mono text-sm text-muted-foreground">{String(i.getValue()??'—')}</span> },
         { id: 'externalIP', header: 'ExternalIP', accessorFn: (r) => { const ips=exSpec(r,'externalIPs') as string[]|undefined; const lb=exStatus(r,'loadBalancer') as Record<string,unknown>|undefined; const ing=(lb?.ingress as Array<Record<string,unknown>>|undefined)?.[0]; return ips?.[0]??(ing?.ip as string)??(ing?.hostname as string)??'—' }, cell: (i) => xs(i.getValue()) },
       ],
       ingresses: [
         { id: 'lb', header: 'LoadBalancers', accessorFn: (r) => { const lbIng=(exStatus(r,'loadBalancer') as Record<string,unknown>|undefined)?.ingress as Array<{ip?:string;hostname?:string}>|undefined; return lbIng?.map(i=>i.ip??i.hostname).filter(Boolean).join(', ')||'—' }, cell: (i) => xs(i.getValue()) },
-        { id: 'hosts', header: 'Rules', accessorFn: (r) => (exSpec(r,'rules') as Array<{host?:string}>|undefined)?.map(r=>r.host??'*').join(', ')??'—', cell: (i) => <span className="text-xs text-muted-foreground truncate max-w-[280px] block" title={String(i.getValue())}>{String(i.getValue()??'—')}</span> },
+        { id: 'hosts', header: 'Rules', accessorFn: (r) => (exSpec(r,'rules') as Array<{host?:string}>|undefined)?.map(r=>r.host??'*').join(', ')??'—', cell: (i) => <span className="text-sm text-muted-foreground truncate max-w-[280px] block" title={String(i.getValue())}>{String(i.getValue()??'—')}</span> },
       ],
       networkpolicies: [{ id: 'policyTypes', header: 'Policy Types', accessorFn: (r) => (exSpec(r,'policyTypes') as string[]|undefined)?.join(', ')??'—', cell: (i) => xs(i.getValue()) }],
       persistentvolumeclaims: [
@@ -4113,9 +4114,9 @@ function InformerResourcePage({ resource }: { resource: string }) {
       ],
       secrets: [
         { id: 'type', header: 'Type', size: 120, accessorFn: (r) => ex(r,'type'), cell: (i) => xs(i.getValue()) },
-        { id: 'keys', header: 'Keys', accessorFn: (r) => Object.keys((ex(r,'data') as Record<string,unknown>|undefined)??{}).join(', ')||'—', cell: (i) => { const v=String(i.getValue()??'—'); return <span className="text-xs text-muted-foreground truncate max-w-[200px] block" title={v}>{v}</span> } },
+        { id: 'keys', header: 'Keys', accessorFn: (r) => Object.keys((ex(r,'data') as Record<string,unknown>|undefined)??{}).join(', ')||'—', cell: (i) => { const v=String(i.getValue()??'—'); return <span className="text-sm text-muted-foreground truncate max-w-[200px] block" title={v}>{v}</span> } },
       ],
-      configmaps: [{ id: 'keys', header: 'Keys', accessorFn: (r) => Object.keys((ex(r,'data') as Record<string,unknown>|undefined)??{}).join(', ')||'—', cell: (i) => { const v=String(i.getValue()??'—'); return <span className="text-xs text-muted-foreground truncate max-w-[260px] block" title={v}>{v}</span> } }],
+      configmaps: [{ id: 'keys', header: 'Keys', accessorFn: (r) => Object.keys((ex(r,'data') as Record<string,unknown>|undefined)??{}).join(', ')||'—', cell: (i) => { const v=String(i.getValue()??'—'); return <span className="text-sm text-muted-foreground truncate max-w-[260px] block" title={v}>{v}</span> } }],
       rolebindings: [
         { id: 'roleRef', header: 'Role', accessorFn: (r) => { const rr=ex(r,'roleRef') as {kind?:string;name?:string}|undefined; return rr?`${rr.kind??''}/${rr.name??''}`:'—' }, cell: (i) => xs(i.getValue()) },
         { id: 'subjects', header: 'Subjects', size: 80, accessorFn: (r) => (ex(r,'subjects') as unknown[]|undefined)?.length??0, cell: (i) => xs(i.getValue()) },
@@ -4129,13 +4130,13 @@ function InformerResourcePage({ resource }: { resource: string }) {
         { id: 'preemption', header: 'Preemption Policy', accessorFn: (r) => ex(r,'preemptionPolicy'), cell: (i) => xs(i.getValue()) },
       ],
       runtimeclasses: [{ id: 'handler', header: 'Handler', accessorFn: (r) => ex(r,'handler'), cell: (i) => xs(i.getValue()) }],
-      endpoints: [{ id: 'subsets', header: 'Endpoints', accessorFn: (r) => { const ss=ex(r,'subsets') as Array<{addresses?:Array<{ip:string}>;ports?:Array<{port:number;protocol?:string}>}>|undefined; if (!ss?.length) return '—'; const eps=ss.flatMap((s)=>(s.addresses??[]).flatMap((a)=>(s.ports??[]).map((p)=>`${a.ip}:${p.port}`))); return eps.slice(0,6).join(', ')+(eps.length>6?` +${eps.length-6} more`:'') }, cell: (i) => { const v=String(i.getValue()??'—'); return <span className="text-xs text-muted-foreground">{v}</span> } }],
+      endpoints: [{ id: 'subsets', header: 'Endpoints', accessorFn: (r) => { const ss=ex(r,'subsets') as Array<{addresses?:Array<{ip:string}>;ports?:Array<{port:number;protocol?:string}>}>|undefined; if (!ss?.length) return '—'; const eps=ss.flatMap((s)=>(s.addresses??[]).flatMap((a)=>(s.ports??[]).map((p)=>`${a.ip}:${p.port}`))); return eps.slice(0,6).join(', ')+(eps.length>6?` +${eps.length-6} more`:'') }, cell: (i) => { const v=String(i.getValue()??'—'); return <span className="text-sm text-muted-foreground">{v}</span> } }],
       events: [
-        { id: 'lastSeen', header: 'Last Seen', accessorFn: (r) => ex(r,'lastTimestamp')??ex(r,'eventTime'), sortingFn: 'datetime', cell: (i) => <span className="text-xs text-muted-foreground whitespace-nowrap">{humanAge(String(i.getValue()??''))}</span> },
-        { id: 'object', header: 'Object', accessorFn: (r) => { const o=ex(r,'involvedObject') as {kind?:string;name?:string}|undefined; return o?`${o.kind??''}/${o.name??''}`:'—' }, cell: (i) => <span className="text-xs text-muted-foreground">{String(i.getValue())}</span> },
+        { id: 'lastSeen', header: 'Last Seen', accessorFn: (r) => ex(r,'lastTimestamp')??ex(r,'eventTime'), sortingFn: 'datetime', cell: (i) => <span className="text-sm text-muted-foreground whitespace-nowrap">{humanAge(String(i.getValue()??''))}</span> },
+        { id: 'object', header: 'Object', accessorFn: (r) => { const o=ex(r,'involvedObject') as {kind?:string;name?:string}|undefined; return o?`${o.kind??''}/${o.name??''}`:'—' }, cell: (i) => <span className="text-sm text-muted-foreground">{String(i.getValue())}</span> },
         { id: 'evType', header: 'Type', size: 80, accessorFn: (r) => ex(r,'type'), cell: (i) => eventTypeBadge(String(i.getValue()??'') || '—') },
         { id: 'reason', header: 'Reason', size: 130, accessorFn: (r) => ex(r,'reason'), cell: (i) => xs(i.getValue()) },
-        { id: 'message', header: 'Message', accessorFn: (r) => ex(r,'message'), cell: (i) => { const v=String(i.getValue()??'—'); return <span className="text-xs text-muted-foreground">{v}</span> } },
+        { id: 'message', header: 'Message', accessorFn: (r) => ex(r,'message'), cell: (i) => { const v=String(i.getValue()??'—'); return <span className="text-sm text-muted-foreground">{v}</span> } },
         { id: 'count', header: 'Count', size: 70, accessorFn: (r) => ex(r,'count')??1, cell: (i) => xs(i.getValue()) },
       ],
     }
@@ -4249,12 +4250,12 @@ function InformerResourcePage({ resource }: { resource: string }) {
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
             placeholder={`Filter ${label.toLowerCase()}...`}
-            className="lucid-control rounded px-2 py-1.5 text-xs min-w-[220px] focus:outline-none font-label"
+            className="lucid-control rounded px-2 py-1.5 text-sm min-w-[220px] focus:outline-none font-label"
             autoComplete="off"
             spellCheck={false}
           />
           {selectedRows.length > 0 && (
-            <div className="lucid-control flex items-center gap-1.5 rounded text-xs focus:outline-none px-2 py-1.5 bg-[#0f172a80]">
+            <div className="lucid-control flex items-center gap-1.5 rounded text-sm focus:outline-none px-2 py-1.5 bg-[#0f172a80]">
               <span className="text-[10px] tracking-wider text-muted-foreground max-w-[360px] truncate" title={selectedNames}>Selected: {selectedNames}</span>
               <button type="button" onClick={() => setConfirmBulkDeleteOpen(true)} disabled={bulkDeleteBusy} className="px-1 py-0 rounded text-[10px] font-semibold border border-red-500/30 text-red-400 hover:bg-red-500/10 disabled:opacity-50">{bulkDeleteBusy ? 'Deleting…' : 'Delete all'}</button>
             </div>
