@@ -25,8 +25,6 @@ tasks:
     summary: Release
     env:
       version: '{{.version}}'
-    vars:   
-      XMLSTARLET: '{{if eq OS "windows"}}xml{{else}}xmlstarlet{{end}}'
     cmds: 
         - |
           echo "Release version - {{.version}}!"       
@@ -35,15 +33,10 @@ tasks:
           jq ".version = \"{{.version}}\"" wails.json > wails_new.json && mv wails_new.json wails.json
           jq ".Info.productVersion = \"{{.version}}\"" wails.json > wails_new.json && mv wails_new.json wails.json
           yq e ".info.version = \"{{.version}}\"" -i build/win-dev.yml
+          yq e ".info.version = \"{{.version}}\"" -i build/win-dev-backend.yml
           yq e ".info.version = \"{{.version}}\"" -i build/mac-dev.yml
-          {{.XMLSTARLET}} ed -L \
-            -u "/plist/dict/key[text()='CFBundleVersion']/following-sibling::string[1]" \
-            -v "{{.version}}" \
-            build/Info.plist
-          {{.XMLSTARLET}} ed -L \
-            -u "/plist/dict/key[text()='CFBundleShortVersionString']/following-sibling::string[1]" \
-            -v "{{.version}}" \
-            build/Info.plist
+          node -e "const fs=require('fs');let c=fs.readFileSync('build/Info.plist','utf8');['CFBundleVersion','CFBundleShortVersionString'].forEach(k=>{c=c.replace(new RegExp('(<key>'+k+'</key>[^<]*<string>)[^<]*(</string>)'),(_,p1,p2)=>p1+'{{.version}}'+p2);});fs.writeFileSync('build/Info.plist',c);"
+          node -e "const fs=require('fs');let c=fs.readFileSync('build/Info.dev.plist','utf8');['CFBundleVersion','CFBundleShortVersionString'].forEach(k=>{c=c.replace(new RegExp('(<key>'+k+'</key>[^<]*<string>)[^<]*(</string>)'),(_,p1,p2)=>p1+'{{.version}}'+p2);});fs.writeFileSync('build/Info.dev.plist',c);"
 
   # Windows
   build:windows:dev:
