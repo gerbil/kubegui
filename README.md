@@ -24,6 +24,7 @@ Official website - https://kubegui.net
 - Create roles/bindings react-flow view
 - Settings view
 - AI suggestions for issues/errors/warnings/etc
+- Pod debugging options similar to kubectl debug
 
 ## Scope:
 1. Application code
