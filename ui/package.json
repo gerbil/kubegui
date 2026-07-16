@@ -37,7 +37,7 @@
     "@eslint/js": "^10.0.0",
     "@playwright/test": "^1.61.1",
     "@tailwindcss/postcss": "^4.3.2",
-    "@types/node": "^25.6.0",
+    "@types/node": "^26.1.1",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-react": "^6.0.3",
