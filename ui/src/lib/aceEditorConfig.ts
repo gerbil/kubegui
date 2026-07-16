@@ -23,7 +23,7 @@ type ConfigureAceYamlOptions = {
   onValidationChange?: (hasError: boolean) => void
 }
 
-const GLOBAL_ACE_YAML_THEME = 'ace/theme/idle_fingers'
+const GLOBAL_ACE_YAML_THEME = 'ace/theme/solarized_dark'
 const GLOBAL_ACE_YAML_MODE = 'ace/mode/yaml'
 
 export function configureAceYamlEditor(editor: unknown, options: ConfigureAceYamlOptions = {}) {

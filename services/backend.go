@@ -26,6 +26,7 @@ import (
 	"kubegui/internal/resources/events"
 	"kubegui/internal/resources/informers"
 	"kubegui/internal/resources/logs"
+	"kubegui/internal/resources/networkpolicies"
 	"kubegui/internal/resources/nodes"
 	"kubegui/internal/resources/pods"
 	"kubegui/internal/resources/resourceops"
@@ -384,6 +385,15 @@ func (s *Backend) ResourceAdd(resource, objectJSON string) (map[string]any, erro
 	}
 	return created.Object, nil
 }
+// NetworkPolicyGetGraph returns a react-flow compatible graph for a NetworkPolicy.
+func (s *Backend) NetworkPolicyGetGraph(namespace, name string) (networkpolicies.Graph, error) {
+	raw, err := std.GetResource("networkpolicies", namespace, name)
+	if err != nil {
+		return networkpolicies.Graph{}, err
+	}
+	return networkpolicies.BuildGraph(raw.Object), nil
+}
+
 func (s *Backend) DeploymentRestart(namespace, name string) (map[string]any, error) {
 	return deployments.Restart(namespace, name)
 }

@@ -75,6 +75,7 @@ import { useNamespaceOptions } from './hooks/useNamespaceOptions'
 import { useK8sResourceStore, type ResourceRow } from './store/useK8sResourceStore'
 import { configureAceYamlEditor } from './lib/aceEditorConfig'
 import { uiNotify } from './components/ui/UiNotify'
+import { RESOURCE_YAML_TEMPLATES } from './lib/yamlTemplates'
 
 /** Stable empty array – prevents Zustand getSnapshot from returning new ref every call */
 const EMPTY_ROWS: ResourceRow[] = []
@@ -498,186 +499,12 @@ type LegacyAce = {
       getUndoManager: () => { markClean: () => void }
     }
     destroy: () => void
-    resize?: () => void
+    resize?: (force?: boolean) => void
+    renderer?: { updateFull: (force?: boolean) => void; scrollToRow: (row: number) => void }
+    scrollToRow?: (row: number) => void
   }
 }
 type JsYamlWindow = Window & typeof globalThis & { ace?: LegacyAce; jsyaml?: { load: (v: string) => unknown } }
-
-const DEFAULT_NAMESPACE_YAML = `apiVersion: v1
-kind: Namespace
-metadata:
-  name: my-namespace
-  labels: {}
-`
-
-const DEFAULT_POD_YAML = `apiVersion: v1
-kind: Pod
-metadata:
-  name: my-pod
-  namespace: default
-  labels:
-    app: my-pod
-spec:
-  containers:
-    - name: main
-      image: nginx:latest
-      ports:
-        - containerPort: 80
-`
-
-function CreateNamespaceModal({ onClose }: { onClose: () => void }) {
-  const containerRef = useRef<HTMLDivElement | null>(null)
-  const editorRef = useRef<ReturnType<LegacyAce['edit']> | null>(null)
-  const [busy, setBusy] = useState(false)
-  const [editorError, setEditorError] = useState<string | null>(null)
-  const [submitError, setSubmitError] = useState<string | null>(null)
-  const [hasSyntaxError, setHasSyntaxError] = useState(false)
-  const [visible, setVisible] = useState(false)
-
-  // Trigger slide-in after mount
-  useEffect(() => { requestAnimationFrame(() => setVisible(true)) }, [])
-
-  const destroyEditor = () => {
-    const editor = editorRef.current
-    editorRef.current = null
-    if (editor) { try { editor.destroy() } catch { /* ignore */ } }
-    if (containerRef.current) containerRef.current.innerHTML = ''
-  }
-
-  const handleClose = () => {
-    destroyEditor()
-    setVisible(false)
-    setTimeout(onClose, 200)
-  }
-
-
-  useEffect(() => {
-    let destroyed = false
-    const containerEl = containerRef.current
-    const init = async () => {
-      try {
-        const { ensureLegacyEditorAssets } = await import('./components/ui/podLegacyAssets')
-        await ensureLegacyEditorAssets()
-        if (destroyed || !containerEl) return
-        const win = window as JsYamlWindow
-        if (!win.ace) { setEditorError('Ace editor not available'); return }
-        const editor = win.ace.edit(containerEl)
-        configureAceYamlEditor(editor, { onValidationChange: setHasSyntaxError })
-        editor.setValue(DEFAULT_NAMESPACE_YAML, -1)
-        editor.getSession().getUndoManager().markClean()
-        editorRef.current = editor
-        editor.resize?.()
-      } catch (e) {
-        if (!destroyed) setEditorError(e instanceof Error ? e.message : 'Failed to load editor')
-      }
-    }
-    void init()
-    return () => {
-      destroyed = true
-      const editor = editorRef.current
-      editorRef.current = null
-      if (editor) {
-        try { editor.destroy() } catch { /* ignore */ }
-      }
-      // Clear Ace-injected DOM nodes so React can safely unmount the portal
-      if (containerEl) containerEl.innerHTML = ''
-    }
-  }, [])
-
-  const handleCreate = async () => {
-    setSubmitError(null)
-    if (hasSyntaxError) {
-      setSubmitError('YAML validation failed. Fix editor errors before creating.')
-      return
-    }
-    const win = window as JsYamlWindow
-    const yaml = editorRef.current?.getValue() ?? DEFAULT_NAMESPACE_YAML
-    let obj: unknown
-    try {
-      obj = win.jsyaml ? win.jsyaml.load(yaml) : JSON.parse(yaml)
-    } catch (e) {
-      const msg = `Invalid YAML: ${e instanceof Error ? e.message : 'parse error'}`
-      setSubmitError(msg)
-      return
-    }
-    const meta = (obj as Record<string, unknown>)?.metadata as Record<string, unknown> | undefined
-    const name = String(meta?.name ?? '').trim()
-    if (!name) { setSubmitError('metadata.name is required'); return }
-
-    setBusy(true)
-    try {
-      await ResourceAdd('namespaces', JSON.stringify(obj))
-      uiNotify.success(`Namespace "${name}" created"`)
-      destroyEditor()
-      onClose()
-    } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'unknown error')
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  return createPortal(
-    <>
-      {/* Backdrop */}
-      <div
-        className={`fixed inset-0 bg-black/40 z-[999] transition-opacity duration-200 ${visible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
-        onClick={handleClose}
-      />
-      {/* Drawer */}
-      <div
-        className={`fixed top-0 bottom-0 right-0 h-[100dvh] max-h-[100dvh] w-[760px] max-w-[100vw] z-[1000] flex flex-col overflow-hidden bg-card border-l border-border shadow-2xl transition-transform duration-200 ease-out ${visible ? 'translate-x-0' : 'translate-x-full'}`}
-      >
-        {/* Header */}
-        <div className="flex items-start justify-between px-5 py-4 border-b border-border bg-accent/20 shrink-0">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary shrink-0"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
-              <span className="font-mono text-sm font-bold text-foreground">New Namespace</span>
-            </div>
-            <p className="text-[10px] text-muted-foreground font-mono">Edit the YAML manifest and click Create</p>
-          </div>
-          <button onClick={handleClose} className="ml-4 text-muted-foreground hover:text-foreground shrink-0 cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
-        </div>
-
-        {/* Error banner */}
-        {submitError && (
-          <div className="mx-4 mt-3 shrink-0 flex items-start gap-2 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-sm text-red-400">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <span className="break-all">{submitError}</span>
-            <button onClick={() => setSubmitError(null)} className="ml-auto shrink-0 hover:text-red-300">
-              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-          </div>
-        )}
-
-        {/* Editor */}
-        <div className="flex-1 min-h-0 p-4 flex flex-col gap-3">
-          <div className="relative flex-1 min-h-0 rounded border border-border bg-[#0d1117] overflow-hidden">
-            {editorError ? (
-              <div className="p-4 text-red-400 text-sm">{editorError}</div>
-            ) : (
-              <div ref={containerRef} className="absolute inset-0" />
-            )}
-          </div>
-        </div>
-
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-border bg-accent/10 shrink-0">
-          <button type="button" onClick={handleClose} disabled={busy} className="px-4 py-1.5 rounded text-sm font-semibold text-muted-foreground border border-border hover:text-foreground transition-colors disabled:opacity-50">
-            Cancel
-          </button>
-          <button type="button" onClick={() => void handleCreate()} disabled={busy || hasSyntaxError} className="px-4 py-1.5 rounded text-sm font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90">
-            {busy ? 'Creating…' : 'Create Namespace'}
-          </button>
-        </div>
-      </div>
-    </>,
-    document.body,
-  )
-}
 
 function App() {
   // Emit ui-ready after the first real browser paint so window.Show() is called
@@ -2426,8 +2253,16 @@ function NamespacesPage() {
   return (
     <div className="flex-1 min-h-0 px-12 py-8 flex flex-col gap-5 overflow-hidden">
       {showCreateModal && (
-        <CreateNamespaceModal
+        <CreateResourceModal
+          resource="namespaces"
+          label="Namespace"
           onClose={() => setShowCreateModal(false)}
+          onCreated={async () => {
+            try {
+              const list = await listNamespacesViaBinding()
+              setItems(list.map((ns) => toNamespaceRow(ns as Record<string, unknown>)))
+            } catch { /* ignore */ }
+          }}
         />
       )}
       <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -2524,410 +2359,6 @@ function NamespacesPage() {
   )
 }
 
-// --- YAML templates for standard resource types ---
-const RESOURCE_YAML_TEMPLATES: Record<string, string> = {
-  pods: `apiVersion: v1
-kind: Pod
-metadata:
-  name: my-pod
-  namespace: default
-  labels:
-    app: my-pod
-spec:
-  containers:
-    - name: main
-      image: nginx:latest
-      ports:
-        - containerPort: 80
-`,
-  deployments: `apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: my-deployment
-  namespace: default
-  labels:
-    app: my-app
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: my-app
-  template:
-    metadata:
-      labels:
-        app: my-app
-    spec:
-      containers:
-        - name: main
-          image: nginx:latest
-          ports:
-            - containerPort: 80
-`,
-  statefulsets: `apiVersion: apps/v1
-kind: StatefulSet
-metadata:
-  name: my-statefulset
-  namespace: default
-spec:
-  selector:
-    matchLabels:
-      app: my-app
-  serviceName: my-app
-  replicas: 1
-  template:
-    metadata:
-      labels:
-        app: my-app
-    spec:
-      containers:
-        - name: main
-          image: nginx:latest
-`,
-  daemonsets: `apiVersion: apps/v1
-kind: DaemonSet
-metadata:
-  name: my-daemonset
-  namespace: default
-  labels:
-    app: my-daemonset
-spec:
-  selector:
-    matchLabels:
-      app: my-daemonset
-  template:
-    metadata:
-      labels:
-        app: my-daemonset
-    spec:
-      containers:
-        - name: main
-          image: nginx:latest
-`,
-  jobs: `apiVersion: batch/v1
-kind: Job
-metadata:
-  name: my-job
-  namespace: default
-spec:
-  template:
-    spec:
-      containers:
-        - name: main
-          image: busybox:latest
-          command: ["echo", "hello"]
-      restartPolicy: Never
-  backoffLimit: 4
-`,
-  cronjobs: `apiVersion: batch/v1
-kind: CronJob
-metadata:
-  name: my-cronjob
-  namespace: default
-spec:
-  schedule: "0 * * * *"
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          containers:
-            - name: main
-              image: busybox:latest
-              command: ["echo", "hello"]
-          restartPolicy: OnFailure
-`,
-  services: `apiVersion: v1
-kind: Service
-metadata:
-  name: my-service
-  namespace: default
-spec:
-  selector:
-    app: my-app
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 8080
-`,
-  ingresses: `apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: my-ingress
-  namespace: default
-spec:
-  rules:
-    - host: my-app.example.com
-      http:
-        paths:
-          - path: /
-            pathType: Prefix
-            backend:
-              service:
-                name: my-service
-                port:
-                  number: 80
-`,
-  configmaps: `apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: my-configmap
-  namespace: default
-data:
-  key: value
-`,
-  secrets: `apiVersion: v1
-kind: Secret
-metadata:
-  name: my-secret
-  namespace: default
-type: Opaque
-stringData:
-  username: admin
-  password: changeme
-`,
-  persistentvolumeclaims: `apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: my-pvc
-  namespace: default
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 1Gi
-`,
-  persistentvolumes: `apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: my-pv
-spec:
-  capacity:
-    storage: 10Gi
-  accessModes:
-    - ReadWriteOnce
-  persistentVolumeReclaimPolicy: Retain
-  hostPath:
-    path: /mnt/data
-`,
-  namespaces: `apiVersion: v1
-kind: Namespace
-metadata:
-  name: my-namespace
-  labels: {}
-`,
-  roles: `apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  name: my-role
-  namespace: default
-rules:
-  - apiGroups: [""]
-    resources: ["pods"]
-    verbs: ["get", "watch", "list"]
-`,
-  rolebindings: `apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: my-rolebinding
-  namespace: default
-subjects:
-  - kind: ServiceAccount
-    name: default
-    namespace: default
-roleRef:
-  kind: Role
-  name: my-role
-  apiGroup: rbac.authorization.k8s.io
-`,
-  clusterroles: `apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRole
-metadata:
-  name: my-clusterrole
-rules:
-  - apiGroups: [""]
-    resources: ["pods"]
-    verbs: ["get", "watch", "list"]
-`,
-  clusterrolebindings: `apiVersion: rbac.authorization.k8s.io/v1
-kind: ClusterRoleBinding
-metadata:
-  name: my-clusterrolebinding
-subjects:
-  - kind: ServiceAccount
-    name: default
-    namespace: default
-roleRef:
-  kind: ClusterRole
-  name: my-clusterrole
-  apiGroup: rbac.authorization.k8s.io
-`,
-  networkpolicies: `apiVersion: networking.k8s.io/v1
-kind: NetworkPolicy
-metadata:
-  name: my-networkpolicy
-  namespace: default
-spec:
-  podSelector:
-    matchLabels:
-      app: my-app
-  policyTypes:
-    - Ingress
-    - Egress
-`,
-  serviceaccounts: `apiVersion: v1
-kind: ServiceAccount
-metadata:
-  name: my-serviceaccount
-  namespace: default
-`,
-  storageclasses: `apiVersion: storage.k8s.io/v1
-kind: StorageClass
-metadata:
-  name: my-storageclass
-provisioner: kubernetes.io/no-provisioner
-volumeBindingMode: WaitForFirstConsumer
-`,
-  resourcequotas: `apiVersion: v1
-kind: ResourceQuota
-metadata:
-  name: my-quota
-  namespace: default
-spec:
-  hard:
-    pods: "10"
-    requests.cpu: "2"
-    requests.memory: 2Gi
-    limits.cpu: "4"
-    limits.memory: 4Gi
-`,
-  limitranges: `apiVersion: v1
-kind: LimitRange
-metadata:
-  name: my-limitrange
-  namespace: default
-spec:
-  limits:
-    - type: Container
-      default:
-        cpu: 500m
-        memory: 256Mi
-      defaultRequest:
-        cpu: 100m
-        memory: 64Mi
-`,
-  horizontalpodautoscalers: `apiVersion: autoscaling/v2
-kind: HorizontalPodAutoscaler
-metadata:
-  name: my-hpa
-  namespace: default
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: my-deployment
-  minReplicas: 1
-  maxReplicas: 10
-  metrics:
-    - type: Resource
-      resource:
-        name: cpu
-        target:
-          type: Utilization
-          averageUtilization: 80
-`,
-  replicasets: `apiVersion: apps/v1
-kind: ReplicaSet
-metadata:
-  name: my-replicaset
-  namespace: default
-  labels:
-    app: my-app
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: my-app
-  template:
-    metadata:
-      labels:
-        app: my-app
-    spec:
-      containers:
-        - name: main
-          image: nginx:latest
-`,
-    runtimeclasses: `apiVersion: node.k8s.io/v1
-kind: RuntimeClass
-metadata:
-  name: my-runtimeclass
-handler: my-handler
-`,
-  endpoints: `apiVersion: v1
-kind: Endpoints
-metadata:
-  name: my-endpoints
-  namespace: default
-subsets:
-  - addresses:
-      - ip: 192.168.1.1
-    ports:
-      - port: 80
-        protocol: TCP
-`,
-  volumeattachments: `apiVersion: storage.k8s.io/v1
-kind: VolumeAttachment
-metadata:
-  name: my-volumeattachment
-spec:
-  attacher: kubernetes.io/no-provisioner
-  source:
-    persistentVolumeName: my-pv
-  nodeName: my-node
-`,
-  poddisruptionbudgets: `apiVersion: policy/v1
-kind: PodDisruptionBudget
-metadata:
-  name: my-pdb
-  namespace: default
-spec:
-  minAvailable: 1
-  selector:
-    matchLabels:
-      app: my-app
-`,
-  priorityclasses: `apiVersion: scheduling.k8s.io/v1
-kind: PriorityClass
-metadata:
-  name: my-priorityclass
-value: 1000000
-globalDefault: false
-description: "Custom priority class"
-`,
-  customresourcedefinitions: `apiVersion: apiextensions.k8s.io/v1
-kind: CustomResourceDefinition
-metadata:
-  name: myresources.example.com
-spec:
-  group: example.com
-  names:
-    plural: myresources
-    singular: myresource
-    kind: MyResource
-    shortNames:
-      - mr
-  scope: Namespaced
-  versions:
-    - name: v1
-      served: true
-      storage: true
-      schema:
-        openAPIV3Schema:
-          type: object
-          properties:
-            spec:
-              type: object
-`,
-  }
 
 // --- Generic create-resource slide-in modal ---
 function CreateResourceModal({ resource, label, onClose, onCreated }: { resource: string; label: string; onClose: () => void; onCreated?: () => void }) {
@@ -2938,54 +2369,60 @@ function CreateResourceModal({ resource, label, onClose, onCreated }: { resource
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [hasSyntaxError, setHasSyntaxError] = useState(false)
   const [visible, setVisible] = useState(false)
+  const [editorLoading, setEditorLoading] = useState(true)
 
   const defaultYaml = RESOURCE_YAML_TEMPLATES[resource] ?? `apiVersion: v1\nkind: ${label}\nmetadata:\n  name: my-resource\nspec: {}\n`
-
+  // Keep a ref so the ACE init effect can read yaml without stale-closure issues
+  const defaultYamlRef = useRef(defaultYaml)
+  defaultYamlRef.current = defaultYaml
   useEffect(() => { requestAnimationFrame(() => setVisible(true)) }, [])
-
   const destroyEditor = () => {
     const editor = editorRef.current
     editorRef.current = null
     if (editor) { try { editor.destroy() } catch { /* ignore */ } }
     if (containerRef.current) containerRef.current.innerHTML = ''
   }
-
   const handleClose = () => {
     destroyEditor()
     setVisible(false)
     setTimeout(onClose, 200)
   }
-
   useEffect(() => {
     let destroyed = false
-    const containerEl = containerRef.current
-    const init = async () => {
+    const initEditor = async () => {
+      const containerEl = containerRef.current
+      if (!containerEl) return
       try {
         const { ensureLegacyEditorAssets } = await import('./components/ui/podLegacyAssets')
         await ensureLegacyEditorAssets()
-        if (destroyed || !containerEl) return
+        if (destroyed || editorRef.current) return
         const win = window as JsYamlWindow
         if (!win.ace) { setEditorError('Ace editor not available'); return }
         const editor = win.ace.edit(containerEl)
         configureAceYamlEditor(editor, { onValidationChange: setHasSyntaxError })
-        editor.setValue(defaultYaml, -1)
+        editor.setValue(defaultYamlRef.current, -1)
         editor.getSession().getUndoManager().markClean()
         editorRef.current = editor
-        editor.resize?.()
+        await new Promise<void>(r => requestAnimationFrame(() => r()))
+        if (destroyed) return
+        editor.resize?.(true)
+        editor.renderer?.updateFull(true)
+        editor.scrollToRow?.(0)
+        if (!destroyed) setEditorLoading(false)
       } catch (e) {
         if (!destroyed) setEditorError(e instanceof Error ? e.message : 'Failed to load editor')
       }
     }
-    void init()
+    void initEditor()
     return () => {
       destroyed = true
       const editor = editorRef.current
       editorRef.current = null
       if (editor) { try { editor.destroy() } catch { /* ignore */ } }
-      if (containerEl) containerEl.innerHTML = ''
+      if (containerRef.current) containerRef.current.innerHTML = ''
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
-
   const handleCreate = async () => {
     setSubmitError(null)
     if (hasSyntaxError) {
@@ -2993,7 +2430,7 @@ function CreateResourceModal({ resource, label, onClose, onCreated }: { resource
       return
     }
     const win = window as JsYamlWindow
-    const yaml = editorRef.current?.getValue() ?? defaultYaml
+    const yaml = editorRef.current?.getValue() ?? defaultYamlRef.current
     let obj: unknown
     try {
       obj = win.jsyaml ? win.jsyaml.load(yaml) : JSON.parse(yaml)
@@ -3051,11 +2488,16 @@ function CreateResourceModal({ resource, label, onClose, onCreated }: { resource
           </div>
         )}
         <div className="flex-1 min-h-0 p-4 flex flex-col gap-3">
-          <div className="relative flex-1 min-h-0 rounded border border-border bg-[#0d1117] overflow-hidden">
-            {editorError
-              ? <div className="p-4 text-red-400 text-sm">{editorError}</div>
-              : <div ref={containerRef} className="absolute inset-0" />
-            }
+          <div className="relative flex-1 min-h-0 rounded border border-border bg-[#0d1117] overflow-hidden" style={{ minHeight: "200px" }}>
+            <div ref={containerRef} style={{ position: "absolute", inset: 0, color: "#dedede" }} />
+            {editorLoading && !editorError && (
+              <div className="absolute inset-0 flex items-center justify-center text-xs text-muted-foreground">
+                Loading editor…
+              </div>
+            )}
+            {editorError && (
+              <div className="absolute inset-0 p-4 text-red-400 text-sm">{editorError}</div>
+            )}
           </div>
         </div>
         <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-border bg-accent/10 shrink-0">
@@ -3071,151 +2513,8 @@ function CreateResourceModal({ resource, label, onClose, onCreated }: { resource
     document.body
   )
 }
-
-function CreatePodModal({ onClose }: { onClose: () => void }) {
-  const containerRef = useRef<HTMLDivElement | null>(null)
-  const editorRef = useRef<ReturnType<LegacyAce['edit']> | null>(null)
-  const [busy, setBusy] = useState(false)
-  const [editorError, setEditorError] = useState<string | null>(null)
-  const [submitError, setSubmitError] = useState<string | null>(null)
-  const [hasSyntaxError, setHasSyntaxError] = useState(false)
-  const [visible, setVisible] = useState(false)
-
-  // Trigger slide-in after mount
-  useEffect(() => { requestAnimationFrame(() => setVisible(true)) }, [])
-
-  const destroyEditor = () => {
-    const editor = editorRef.current
-    editorRef.current = null
-    if (editor) { try { editor.destroy() } catch { /* ignore */ } }
-    if (containerRef.current) containerRef.current.innerHTML = ''
-  }
-
-  const handleClose = () => {
-    destroyEditor()
-    setVisible(false)
-    setTimeout(onClose, 200)
-  }
-
-  useEffect(() => {
-    let destroyed = false
-    const containerEl = containerRef.current
-    const init = async () => {
-      try {
-        const { ensureLegacyEditorAssets } = await import('./components/ui/podLegacyAssets')
-        await ensureLegacyEditorAssets()
-        if (destroyed || !containerEl) return
-        const win = window as JsYamlWindow
-        if (!win.ace) { setEditorError('Ace editor not available'); return }
-        const editor = win.ace.edit(containerEl)
-        configureAceYamlEditor(editor, { onValidationChange: setHasSyntaxError })
-        editor.setValue(DEFAULT_POD_YAML, -1)
-        editor.getSession().getUndoManager().markClean()
-        editorRef.current = editor
-        editor.resize?.()
-      } catch (e) {
-        if (!destroyed) setEditorError(e instanceof Error ? e.message : 'Failed to load editor')
-      }
-    }
-    void init()
-    return () => {
-      destroyed = true
-      const editor = editorRef.current
-      editorRef.current = null
-      if (editor) { try { editor.destroy() } catch { /* ignore */ } }
-      if (containerEl) containerEl.innerHTML = ''
-    }
-  }, [])
-
-  const handleCreate = async () => {
-    setSubmitError(null)
-    if (hasSyntaxError) {
-      setSubmitError('YAML validation failed. Fix editor errors before creating.')
-      return
-    }
-    const win = window as JsYamlWindow
-    const yaml = editorRef.current?.getValue() ?? DEFAULT_POD_YAML
-    let obj: unknown
-    try {
-      obj = win.jsyaml ? win.jsyaml.load(yaml) : JSON.parse(yaml)
-    } catch (e) {
-      setSubmitError(`Invalid YAML: ${e instanceof Error ? e.message : 'parse error'}`)
-      return
-    }
-    const meta = (obj as Record<string, unknown>)?.metadata as Record<string, unknown> | undefined
-    const name = String(meta?.name ?? '').trim()
-    const namespace = String(meta?.namespace ?? 'default').trim()
-    if (!name) { setSubmitError('metadata.name is required'); return }
-
-    setBusy(true)
-    try {
-      await ResourceAdd('pods', JSON.stringify(obj))
-      uiNotify.success(`Pod "${name}" created in namespace "${namespace}"`)
-      destroyEditor()
-      onClose()
-    } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'unknown error')
-    } finally {
-      setBusy(false)
-    }
-  }
-
-  return createPortal(
-    <>
-      <div
-        className={`fixed inset-0 bg-black/40 z-[999] transition-opacity duration-200 ${visible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
-        onClick={handleClose}
-      />
-      <div
-        className={`fixed top-0 bottom-0 right-0 h-[100dvh] max-h-[100dvh] w-[760px] max-w-[100vw] z-[1000] flex flex-col overflow-hidden bg-card border-l border-border shadow-2xl transition-transform duration-200 ease-out ${visible ? 'translate-x-0' : 'translate-x-full'}`}
-      >
-        <div className="flex items-start justify-between px-5 py-4 border-b border-border bg-accent/20 shrink-0">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-1">
-              <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="text-primary shrink-0"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M9 9h6M9 12h6M9 15h4"/></svg>
-              <span className="font-mono text-sm font-bold text-foreground">New Pod</span>
-            </div>
-            <p className="text-[10px] text-muted-foreground font-mono">Edit the YAML manifest and click Create</p>
-          </div>
-          <button onClick={handleClose} className="ml-4 text-muted-foreground hover:text-foreground shrink-0 cursor-pointer">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
-        </div>
-
-        {/* Error banner */}
-        {submitError && (
-          <div className="mx-4 mt-3 shrink-0 flex items-start gap-2 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-sm text-red-400">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <span className="break-all">{submitError}</span>
-            <button onClick={() => setSubmitError(null)} className="ml-auto shrink-0 hover:text-red-300">
-              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-          </div>
-        )}
-        <div className="flex-1 min-h-0 p-4 flex flex-col gap-3">
-          <div className="relative flex-1 min-h-0 rounded border border-border bg-[#0d1117] overflow-hidden">
-            {editorError ? (
-              <div className="p-4 text-red-400 text-sm">{editorError}</div>
-            ) : (
-              <div ref={containerRef} className="absolute inset-0" />
-            )}
-          </div>
-        </div>
-        <div className="flex items-center justify-end gap-2 px-5 py-4 border-t border-border bg-accent/10 shrink-0">
-          <button type="button" onClick={handleClose} disabled={busy} className="px-4 py-1.5 rounded text-sm font-semibold text-muted-foreground border border-border hover:text-foreground transition-colors disabled:opacity-50">
-            Cancel
-          </button>
-          <button type="button" onClick={() => void handleCreate()} disabled={busy || hasSyntaxError} className="px-4 py-1.5 rounded text-sm font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90">
-            {busy ? 'Creating…' : 'Create Pod'}
-          </button>
-        </div>
-      </div>
-    </>,
-    document.body,
-  )
-}
-
 type PodStatusFilter = 'all' | 'running' | 'restarting' | 'warning' | 'error' | 'terminating'
+
 function podStatusFilterLabel(f: PodStatusFilter): string {
   switch (f) {
     case 'all': return 'All'
@@ -3696,7 +2995,11 @@ function PodsPage() {
   return (
     <div className="flex-1 min-h-0 px-12 py-8 flex flex-col gap-5 overflow-hidden">
       {showCreatePodModal && (
-        <CreatePodModal onClose={() => setShowCreatePodModal(false)} />
+        <CreateResourceModal
+          resource='pods'
+          label='Pod'
+          onClose={() => setShowCreatePodModal(false)}
+        />
       )}
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>

@@ -1,7 +1,8 @@
 # KubeGUI - Kubernetes UI / admin desktop application
 Official website - https://kubegui.net  
 
-[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui?ref=badge_shield&issueType=license) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui.svg?type=shield&issueType=security)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui?ref=badge_shield&issueType=security) [![Release](https://github.com/gerbil/kubegui/actions/workflows/release.yml/badge.svg)](https://github.com/gerbil/kubegui/actions/workflows/release.yml) [![CodeQL](https://github.com/gerbil/kubegui/actions/workflows/codeql.yml/badge.svg)](https://github.com/gerbil/kubegui/actions/workflows/codeql.yml)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui?ref=badge_shield&issueType=license) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui.svg?type=shield&issueType=security)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui?ref=badge_shield&issueType=security) [![Release](https://github.com/gerbil/kubegui/actions/workflows/release.yml/badge.svg)](https://github.com/gerbil/kubegui/actions/workflows/release.yml) [![CodeQL](https://github.com/gerbil/kubegui/actions/workflows/codeql.yml/badge.svg)](https://github.com/gerbil/kubegui/actions/workflows/codeql.yml)  
+
 
 ![kubegui](./web/images/kubegui.png)  
 
@@ -16,15 +17,15 @@ Official website - https://kubegui.net
 > - Open a shell directly into your workloads (even to Nodes via admin daemonset) 
 > - Automatic application updates, no manual installs  
 > - Portforwarding support  
+> - Network policy graph  
 
 # TODO:
-- Add network policies react-flow view
+- Add cilium network policies react-flow view
 - Add whoami/auth check view
 - Adjust ns quota modal details view
 - Create roles/bindings react-flow view
 - Settings view
 - AI suggestions for issues/errors/warnings/etc
-- Pod debugging options similar to kubectl debug  
 
 ## Scope:
 1. Application code

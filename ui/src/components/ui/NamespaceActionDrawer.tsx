@@ -410,7 +410,7 @@ function EditTab({ namespace, onSaved }: { namespace: NamespaceActionTarget; onS
       </div>
 
       <div className="relative flex-1 min-h-0 rounded border border-border bg-[#0d1117] overflow-hidden">
-        <div ref={hostRef} className="absolute inset-0" />
+        <div ref={hostRef} style={{ position: "absolute", inset: 0 }} />
         {loading && (
           <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground bg-background/70">
             Loading YAML editor…

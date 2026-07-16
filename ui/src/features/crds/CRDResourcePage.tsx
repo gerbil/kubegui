@@ -442,7 +442,7 @@ function CreateCRDResourceModal({
           <div className="relative flex-1 min-h-0 rounded border border-border bg-[#0d1117] overflow-hidden">
             {editorError
               ? <div className="p-4 text-red-400 text-sm">{editorError}</div>
-              : <div ref={containerRef} className="absolute inset-0" />
+              : <div ref={containerRef} style={{ position: "absolute", inset: 0 }} />
             }
           </div>
         </div>

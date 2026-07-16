@@ -13,7 +13,7 @@ import { LabelsSection, AnnotationsSection, EventsTimeline } from './ResourceMan
 import { PortForwardBadges } from './PortForwardBadges'
 import { BackendEventSource } from '../../lib/wailsBackendTransport'
 import { Events } from '@wailsio/runtime'
-import { EventsGetResource, ResourceGetDetails, ResourceDelete, PodGetMetricsByNameFromDB, StartPodShellSession, SendPodShellInput, ResizePodShellSession, StopPodShellSession } from '../../../bindings/kubegui/services/backend'
+import { EventsGetResource, ResourceGetDetails, ResourceDelete, ResourceEdit, PodGetMetricsByNameFromDB, StartPodShellSession, SendPodShellInput, ResizePodShellSession, StopPodShellSession } from '../../../bindings/kubegui/services/backend'
 import hljs from 'highlight.js/lib/core'
 import hljsJson from 'highlight.js/lib/languages/json'
 import hljsBash from 'highlight.js/lib/languages/bash'
@@ -710,18 +710,19 @@ function ShellTab({ pod }: { pod: PodRow }) {
 function EditTab({ pod }: { pod: PodRow }) {
   const editorRef = useRef<LegacyAceEditor | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const [manifest, setManifest] = useState<string>('')
+  const originalRef = useRef<string>('')
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [err, setErr] = useState<string | null>(null)
+  const [dirty, setDirty] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [hasSyntaxError, setHasSyntaxError] = useState(false)
 
   useEffect(() => {
-    let cancelled = false
-    const loadManifest = async () => {
+    let destroyed = false
+    const init = async () => {
       try {
-        // Load assets first so jsyaml is on window before we call dump()
         await ensureLegacyEditorAssets()
         const raw = await ResourceGetDetails('pods', pod.namespace, pod.name) as Record<string, unknown>
-        // Strip managedFields + status
         const meta = { ...(raw.metadata as Record<string, unknown> | undefined) }
         delete meta['managedFields']
         const annotations = meta.annotations
@@ -732,41 +733,109 @@ function EditTab({ pod }: { pod: PodRow }) {
         delete cleaned.status
         const win = window as LegacyEditorWindow
         const yaml = win.jsyaml?.dump(cleaned) || JSON.stringify(cleaned, null, 2)
-        if (!cancelled) { setManifest(yaml); setError(null) }
-      } catch (err) {
-        if (!cancelled) setError(err instanceof Error ? err.message : 'fetch error')
-      } finally {
-        if (!cancelled) setLoading(false)
+        if (destroyed || !containerRef.current) return
+        const editor = win.ace!.edit(containerRef.current)
+        configureAceYamlEditor(editor, { onValidationChange: setHasSyntaxError })
+        editor.setValue(yaml, -1)
+        editor.getSession().getUndoManager().markClean()
+        originalRef.current = yaml
+        editor.getSession().on('change', () => {
+          setDirty(!editor.getSession().getUndoManager().isClean())
+        })
+        editorRef.current = editor
+        await new Promise<void>(r => requestAnimationFrame(() => r()))
+        if (!destroyed) { editor.resize?.(); setLoading(false) }
+      } catch (e) {
+        if (!destroyed) setErr(e instanceof Error ? e.message : 'fetch error')
       }
     }
-    void loadManifest()
-    return () => { cancelled = true }
+    void init()
+    return () => {
+      destroyed = true
+      const editor = editorRef.current
+      editorRef.current = null
+      if (editor) { try { editor.destroy() } catch { /* ignore */ } }
+      if (containerRef.current) containerRef.current.innerHTML = ''
+    }
   }, [pod.namespace, pod.name])
 
-  useEffect(() => {
-    if (loading || !containerRef.current || !manifest) return
-    let cancelled = false
-    const initEditor = async () => {
-      try {
-        if (cancelled || !containerRef.current) return
-        const win = window as LegacyEditorWindow
-        if (!win.ace) return
-        editorRef.current = win.ace.edit(containerRef.current)
-        configureAceYamlEditor(editorRef.current)
-        editorRef.current.setValue(manifest, -1)
-        editorRef.current.resize?.()
-      } catch (err) { console.error('Failed to init editor:', err) }
-    }
-    void initEditor()
-    return () => { cancelled = true; editorRef.current?.destroy() }
-  }, [manifest, loading])
+  const discard = () => {
+    const editor = editorRef.current
+    if (!editor) return
+    editor.setValue(originalRef.current, -1)
+    editor.getSession().getUndoManager().markClean()
+    setDirty(false)
+  }
 
-  if (loading) return <div className="flex-1 flex items-center justify-center"><p className="font-modal text-[11px] text-muted-foreground">Loading manifest...</p></div>
-  if (error) return <div className="flex-1 flex items-center justify-center"><p className="text-[11px] text-red-400">Error: {error}</p></div>
+  const save = async () => {
+    const editor = editorRef.current
+    if (!editor) return
+    if (hasSyntaxError) { setErr('YAML syntax error — fix before saving'); return }
+    setSaving(true)
+    setErr(null)
+    try {
+      const win = window as LegacyEditorWindow
+      if (!win.jsyaml) throw new Error('YAML parser not available')
+      const text = editor.getValue()
+      const parsed = win.jsyaml.load(text)
+      const clone = parsed && typeof parsed === 'object'
+        ? (JSON.parse(JSON.stringify(parsed)) as Record<string, unknown>)
+        : ({} as Record<string, unknown>)
+      delete clone.status
+      const metadata = clone.metadata
+      if (metadata && typeof metadata === 'object') {
+        const meta = metadata as Record<string, unknown>
+        delete meta.resourceVersion; delete meta.managedFields
+        delete meta.uid; delete meta.creationTimestamp; delete meta.generation
+      }
+      await ResourceEdit('pods', pod.namespace, pod.name, JSON.stringify(clone))
+      originalRef.current = text
+      editor.getSession().getUndoManager().markClean()
+      setDirty(false)
+      uiNotify.success(`Pod ${pod.name} updated successfully`)
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'save failed'
+      setErr(msg)
+      uiNotify.error(`Save failed: ${msg}`)
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
-    <div className="flex-1 overflow-hidden flex flex-col">
-      <div ref={containerRef} style={{ height: '100%', width: '100%' }} />
+    <div className="flex flex-col h-full p-4 gap-3">
+      {err && <p className="text-sm text-red-400">Error: {err}</p>}
+
+      <div className="flex items-center justify-between text-[10px] text-muted-foreground px-1">
+        <span className="font-mono" />
+        <span>{loading ? 'Loading…' : hasSyntaxError ? '⚠ YAML syntax error' : dirty ? 'Unsaved changes' : 'Up to date'}</span>
+      </div>
+
+      <div className="relative flex-1 min-h-0 rounded border border-border bg-[#0d1117] overflow-hidden">
+        <div ref={containerRef} style={{ position: 'absolute', inset: 0 }} />
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground bg-background/70">
+            Loading YAML editor…
+          </div>
+        )}
+      </div>
+
+      <div className="flex justify-end gap-2">
+        <button
+          onClick={discard}
+          disabled={loading || saving || !dirty}
+          className="px-4 py-1.5 rounded text-sm font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90"
+        >
+          Discard
+        </button>
+        <button
+          onClick={() => void save()}
+          disabled={loading || saving || !dirty || hasSyntaxError}
+          className="px-4 py-1.5 rounded text-sm font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90"
+        >
+          {saving ? 'Saving…' : 'Save Changes'}
+        </button>
+      </div>
     </div>
   )
 }
