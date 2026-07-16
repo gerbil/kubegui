@@ -16,3 +16,4 @@
 *.so
 *.dylib
 *.db
+.DS_Store
