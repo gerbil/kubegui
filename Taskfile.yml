@@ -281,7 +281,9 @@ tasks:
     generates:
       - "dist/**/*"
     cmds:
-      - npm ci
+      - npm ci --ignore-engines
+      # Ensure the rolldown native binding is present (optional dep skipped when Node engine version is too old)
+      - node -e "if(process.platform==='win32'){require('child_process').execSync('npm install @rolldown/binding-win32-x64-msvc --no-save --ignore-engines',{stdio:'inherit'})}"
       - npm run build
 
   go:mod:tidy:
