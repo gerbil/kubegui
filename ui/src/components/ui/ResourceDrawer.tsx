@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { configureAceYamlEditor } from '@/lib/aceEditorConfig'
-import { Boxes, FileText, Pencil, Radio, RefreshCw, RotateCcw, Save, Search, Terminal, Trash2, X } from 'lucide-react'
+import { Boxes, FileText, GitBranch, Pencil, Radio, RefreshCw, Search, Terminal, Trash2, X } from 'lucide-react'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
@@ -16,6 +16,7 @@ import { AnnotationsSection, DynamicResourceSection, EventsTimeline, LabelsSecti
 import { uiNotify } from './UiNotify'
 import { UiTooltip } from './UiTooltip'
 import { ensureLegacyEditorAssets, ensureLegacyTerminalAssets } from './podLegacyAssets'
+import { NetworkPolicyFlowTab } from '../../features/resources/NetworkPolicyFlowTab'
 /** Minimal info needed to open the drawer — satisfied by both K8sResource and ResourceRow */
 export interface ResourceRef {
   uid?: string
@@ -25,7 +26,7 @@ export interface ResourceRef {
   apiVersion?: string
 }
 
-type Tab = 'overview' | 'events' | 'edit' | 'logs' | 'shell'
+type Tab = 'overview' | 'events' | 'edit' | 'logs' | 'shell' | 'netflow'
 
 // ── Ace / jsyaml types ────────────────────────────────────────────────────────
 
@@ -41,6 +42,7 @@ type AceEditor = {
     setUseSoftTabs?: (v: boolean) => void
     getAnnotations?: () => { type: string }[]
     on?: (event: string, cb: () => void) => void
+    getUndoManager?: () => { markClean: () => void; isClean: () => boolean }
   }
   resize?: () => void
   destroy: () => void
@@ -60,6 +62,10 @@ type TerminalWindow = Window & typeof globalThis & {
 
 function isPod(resourceType: string) {
   return resourceType === 'pods'
+}
+
+function isNetworkPolicy(resourceType: string) {
+  return resourceType === 'networkpolicies'
 }
 
 function TabBtn({ id, label, icon, active, onClick }: {
@@ -288,9 +294,11 @@ function EditTab({
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const editorRef    = useRef<AceEditor | null>(null)
-  const [ready,   setReady]   = useState(false)
-  const [saving,  setSaving]  = useState(false)
-  const [initYaml, setInitYaml] = useState<string>('')
+  const initYamlRef  = useRef<string>('')
+  const [ready,          setReady]          = useState(false)
+  const [saving,         setSaving]         = useState(false)
+  const [dirty,          setDirty]          = useState(false)
+  const [err,            setErr]            = useState<string | null>(null)
   const [hasSyntaxError, setHasSyntaxError] = useState(false)
 
   // Init Ace once full manifest arrives
@@ -307,30 +315,40 @@ function EditTab({
         const yaml = win.jsyaml?.dump(cleaned) ?? JSON.stringify(cleaned, null, 2)
         if (editorRef.current) {
           editorRef.current.setValue(yaml, -1)
+          editorRef.current.getSession().getUndoManager?.().markClean()
         } else {
           const ed = win.ace.edit(containerRef.current)
           configureAceYamlEditor(ed, { onValidationChange: setHasSyntaxError })
           ed.setValue(yaml, -1)
+          ed.getSession().getUndoManager?.().markClean()
+          ed.getSession().on?.('change', () => {
+            setDirty(!ed.getSession().getUndoManager?.().isClean())
+          })
           ed.resize?.()
           editorRef.current = ed
         }
-        setInitYaml(yaml)
+        initYamlRef.current = yaml
+        setDirty(false)
         if (!cancelled) setReady(true)
-      } catch (err) { console.error('editor init failed', err) }
+      } catch (e) { console.error('editor init failed', e) }
     })()
     return () => { cancelled = true }
   }, [full])
 
   useEffect(() => () => { editorRef.current?.destroy(); editorRef.current = null }, [])
 
-  const handleReset = () => {
-    editorRef.current?.setValue(initYaml, -1)
+  const discard = () => {
+    const ed = editorRef.current
+    if (!ed) return
+    ed.setValue(initYamlRef.current, -1)
+    ed.getSession().getUndoManager?.().markClean()
+    setDirty(false)
   }
 
   const handleSave = async () => {
     if (!editorRef.current) return
     if (hasSyntaxError) {
-      uiNotify.error('YAML validation failed. Fix editor errors before saving.')
+      setErr('YAML syntax error — fix before saving')
       return
     }
     const yaml = editorRef.current.getValue()
@@ -339,16 +357,22 @@ function EditTab({
     try {
       obj = win.jsyaml?.load(yaml) ?? JSON.parse(yaml)
     } catch (e) {
-      uiNotify.error(`YAML parse error: ${e instanceof Error ? e.message : 'invalid'}`)
+      setErr(`YAML parse error: ${e instanceof Error ? e.message : 'invalid'}`)
       return
     }
     setSaving(true)
+    setErr(null)
     try {
       await ResourceEdit(resourceType, namespace, name, JSON.stringify(obj))
       uiNotify.success(`Saved ${resourceType}/${name}`)
+      initYamlRef.current = yaml
+      editorRef.current?.getSession().getUndoManager?.().markClean()
+      setDirty(false)
       onSaved()
     } catch (e) {
-      uiNotify.error(`Save failed: ${e instanceof Error ? e.message : 'unknown'}`)
+      const msg = e instanceof Error ? e.message : 'unknown'
+      setErr(`Save failed: ${msg}`)
+      uiNotify.error(`Save failed: ${msg}`)
     } finally {
       setSaving(false)
     }
@@ -357,25 +381,39 @@ function EditTab({
   if (!full) return <div className="flex-1 flex items-center justify-center"><p className="text-[11px] text-muted-foreground">Loading manifest…</p></div>
 
   return (
-    <div className="flex-1 overflow-hidden flex flex-col">
-      <div className="flex items-center gap-2 px-3 py-1.5 border-b border-border/40 bg-accent/10 shrink-0">
-        <span className="text-[10px] text-muted-foreground flex-1">Edit YAML — changes apply immediately on save</span>
+    <div className="flex flex-col h-full p-4 gap-3">
+      {err && <p className="text-sm text-red-400">Error: {err}</p>}
+
+      <div className="flex items-center justify-between text-[10px] text-muted-foreground px-1">
+        <span className="font-mono" />
+        <span>{!ready ? 'Loading…' : hasSyntaxError ? '⚠ YAML syntax error' : dirty ? 'Unsaved changes' : 'Up to date'}</span>
+      </div>
+
+      <div className="relative flex-1 min-h-0 rounded border border-border bg-[#0d1117] overflow-hidden">
+        <div ref={containerRef} style={{ position: 'absolute', inset: 0 }} />
+        {!ready && (
+          <div className="absolute inset-0 flex items-center justify-center text-sm text-muted-foreground bg-background/70">
+            Loading YAML editor…
+          </div>
+        )}
+      </div>
+
+      <div className="flex justify-end gap-2">
         <button
-          onClick={handleReset}
-          disabled={saving || !ready}
-          className="flex items-center gap-1 px-2 py-1 rounded text-[11px] border border-border text-muted-foreground hover:text-foreground hover:bg-accent/60 disabled:opacity-40 transition-colors"
+          onClick={discard}
+          disabled={!ready || saving || !dirty}
+          className="px-4 py-1.5 rounded text-sm font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90"
         >
-          <RotateCcw size={11} /> Reset
+          Discard
         </button>
         <button
           onClick={() => void handleSave()}
-          disabled={saving || !ready || hasSyntaxError}
-          className="flex items-center gap-1 px-2 py-1 rounded text-[11px] border border-emerald-500/40 text-emerald-400 hover:bg-emerald-500/10 disabled:opacity-40 transition-colors"
+          disabled={!ready || saving || !dirty || hasSyntaxError}
+          className="px-4 py-1.5 rounded text-sm font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90"
         >
-          <Save size={11} /> {saving ? 'Saving…' : 'Save'}
+          {saving ? 'Saving…' : 'Save Changes'}
         </button>
       </div>
-      <div ref={containerRef} className="flex-1 overflow-hidden" />
     </div>
   )
 }
@@ -559,6 +597,7 @@ export function ResourceDrawer({ resource, resourceType, onClose, extraHeaderAct
     { id: 'logs',     label: 'Logs',      icon: <FileText size={13} />, hidden: !isPod(resourceType) },
     { id: 'shell',    label: 'Shell',     icon: <Terminal size={13} />, hidden: !isPod(resourceType) },
     { id: 'edit',     label: 'Edit YAML', icon: <Pencil   size={13} /> },
+    { id: 'netflow',  label: 'Netflow',   icon: <GitBranch size={13} />, hidden: !isNetworkPolicy(resourceType) },
   ]
 
   const subtitleParts = [
@@ -637,6 +676,9 @@ export function ResourceDrawer({ resource, resourceType, onClose, extraHeaderAct
         <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
           {resource && activeTab === 'overview' && <OverviewTab full={full} resourceType={resourceType} namespace={namespace} name={name} />}
           {resource && activeTab === 'events'   && <EventsTab kind={resource.kind ?? resourceType} namespace={namespace} name={name} />}
+          {resource && activeTab === 'netflow'  && isNetworkPolicy(resourceType) && (
+            <NetworkPolicyFlowTab full={full} />
+          )}
           {resource && activeTab === 'logs'     && isPod(resourceType) && (
             <LogsTab namespace={namespace} name={name} containers={containers.length ? containers : [name]} />
           )}

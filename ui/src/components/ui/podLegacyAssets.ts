@@ -82,7 +82,7 @@ export function ensureLegacyEditorAssets() {
     await loadLegacyScript('/assets/js/ace.js')
     await loadLegacyScript('/assets/js/ace-ext-searchbox.js')
     await loadLegacyScript('/assets/js/ace-mode-yaml.js')
-    await loadLegacyScript('/assets/js/theme-idle_fingers.js')
+    await loadLegacyScript('/assets/js/theme-solarized_dark.js')
     await loadLegacyScript('/assets/js/js-yaml.js')
   })()
 

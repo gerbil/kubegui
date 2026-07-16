@@ -19,6 +19,9 @@ import * as metricsscraper$0 from "../internal/metricsscraper/models.js";
 import * as informers$0 from "../internal/resources/informers/models.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
+import * as networkpolicies$0 from "../internal/resources/networkpolicies/models.js";
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore: Unused imports
 import * as nodes$0 from "../internal/resources/nodes/models.js";
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-ignore: Unused imports
@@ -271,6 +274,15 @@ export function LogsGetPod($namespace: string, name: string, container: string):
     });
 }
 
+/**
+ * NetworkPolicyGetGraph returns a react-flow compatible graph for a NetworkPolicy.
+ */
+export function NetworkPolicyGetGraph($namespace: string, name: string): $CancellablePromise<networkpolicies$0.Graph> {
+    return $Call.ByID(3613427860, $namespace, name).then(($result: any) => {
+        return $$createType14($result);
+    });
+}
+
 export function NodeCordon(name: string): $CancellablePromise<{ [_ in string]?: any }> {
     return $Call.ByID(1978895021, name).then(($result: any) => {
         return $$createType7($result);
@@ -279,19 +291,19 @@ export function NodeCordon(name: string): $CancellablePromise<{ [_ in string]?: 
 
 export function NodeGetAllocation(): $CancellablePromise<nodes$0.NodeAllocation[]> {
     return $Call.ByID(3502056818).then(($result: any) => {
-        return $$createType15($result);
+        return $$createType16($result);
     });
 }
 
 export function NodeGetMetrics(): $CancellablePromise<nodes$0.NodeMetricRow[]> {
     return $Call.ByID(1632746153).then(($result: any) => {
-        return $$createType17($result);
+        return $$createType18($result);
     });
 }
 
 export function NodeGetMetricsByNameFromDB(name: string): $CancellablePromise<metricsscraper$0.NodeMetrics[]> {
     return $Call.ByID(2397378193, name).then(($result: any) => {
-        return $$createType19($result);
+        return $$createType20($result);
     });
 }
 
@@ -307,7 +319,7 @@ export function NodeUncordon(name: string): $CancellablePromise<{ [_ in string]?
 
 export function NodesGetMetrics(): $CancellablePromise<nodes$0.NodeMetricRow[]> {
     return $Call.ByID(3393351316).then(($result: any) => {
-        return $$createType17($result);
+        return $$createType18($result);
     });
 }
 
@@ -319,25 +331,25 @@ export function PodGetMetrics($namespace: string, name: string): $CancellablePro
 
 export function PodGetMetricsByNameFromDB(name: string, $namespace: string): $CancellablePromise<metricsscraper$0.PodMetrics[]> {
     return $Call.ByID(262545522, name, $namespace).then(($result: any) => {
-        return $$createType21($result);
+        return $$createType22($result);
     });
 }
 
 export function PodGetStatsEndpoint(): $CancellablePromise<pods$0.Stats> {
     return $Call.ByID(1135899641).then(($result: any) => {
-        return $$createType22($result);
+        return $$createType23($result);
     });
 }
 
 export function PodsGetStats(): $CancellablePromise<pods$0.Stats> {
     return $Call.ByID(2323628195).then(($result: any) => {
-        return $$createType22($result);
+        return $$createType23($result);
     });
 }
 
 export function PortForwardList(): $CancellablePromise<$models.PortForwardSession[]> {
     return $Call.ByID(4265405356).then(($result: any) => {
-        return $$createType24($result);
+        return $$createType25($result);
     });
 }
 
@@ -346,7 +358,7 @@ export function PortForwardList(): $CancellablePromise<$models.PortForwardSessio
  */
 export function PortForwardStart($namespace: string, podName: string, remotePort: string, localPort: string): $CancellablePromise<$models.PortForwardSession> {
     return $Call.ByID(2528271496, $namespace, podName, remotePort, localPort).then(($result: any) => {
-        return $$createType23($result);
+        return $$createType24($result);
     });
 }
 
@@ -389,7 +401,7 @@ export function ResourceGetDetails(resource: string, $namespace: string, name: s
  */
 export function ResourceList(resource: string, $namespace: string): $CancellablePromise<{ [_ in string]?: any }[]> {
     return $Call.ByID(176858504, resource, $namespace).then(($result: any) => {
-        return $$createType25($result);
+        return $$createType26($result);
     });
 }
 
@@ -473,15 +485,16 @@ const $$createType10 = informers$0.GlobalStatus.createFrom;
 const $$createType11 = $Create.Array($Create.Any);
 const $$createType12 = informers$0.ResourceInfo.createFrom;
 const $$createType13 = $Create.Array($$createType12);
-const $$createType14 = nodes$0.NodeAllocation.createFrom;
-const $$createType15 = $Create.Array($$createType14);
-const $$createType16 = nodes$0.NodeMetricRow.createFrom;
-const $$createType17 = $Create.Array($$createType16);
-const $$createType18 = metricsscraper$0.NodeMetrics.createFrom;
-const $$createType19 = $Create.Array($$createType18);
-const $$createType20 = metricsscraper$0.PodMetrics.createFrom;
-const $$createType21 = $Create.Array($$createType20);
-const $$createType22 = pods$0.Stats.createFrom;
-const $$createType23 = $models.PortForwardSession.createFrom;
-const $$createType24 = $Create.Array($$createType23);
-const $$createType25 = $Create.Array($$createType7);
+const $$createType14 = networkpolicies$0.Graph.createFrom;
+const $$createType15 = nodes$0.NodeAllocation.createFrom;
+const $$createType16 = $Create.Array($$createType15);
+const $$createType17 = nodes$0.NodeMetricRow.createFrom;
+const $$createType18 = $Create.Array($$createType17);
+const $$createType19 = metricsscraper$0.NodeMetrics.createFrom;
+const $$createType20 = $Create.Array($$createType19);
+const $$createType21 = metricsscraper$0.PodMetrics.createFrom;
+const $$createType22 = $Create.Array($$createType21);
+const $$createType23 = pods$0.Stats.createFrom;
+const $$createType24 = $models.PortForwardSession.createFrom;
+const $$createType25 = $Create.Array($$createType24);
+const $$createType26 = $Create.Array($$createType7);
