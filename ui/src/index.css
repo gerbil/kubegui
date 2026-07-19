@@ -153,13 +153,13 @@
 
 @layer components {
   .lucid-surface {
-    background: #ffffff08;
+    background: rgba(25, 31, 47, 0.25);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
   }
 
   .lucid-control {
-    background: #ffffff0d;
+    background: rgba(25, 31, 47, 0.35);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
   }
@@ -184,7 +184,7 @@
   }
 
   .lucid-panel {
-    /*background: rgba(255, 255, 255, 0.06);*/
+    background: rgba(25, 31, 47, 0.4);
     backdrop-filter: blur(44px);
     -webkit-backdrop-filter: blur(24px);
   }
