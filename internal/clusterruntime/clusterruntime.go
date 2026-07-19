@@ -89,6 +89,22 @@ func StartForActiveCluster(ctx context.Context) (*informers.GlobalInformers, err
 	}
 	resourceCount := len(manager.GetResources())
 
+	// Double-check that this cluster is still the active one after a potentially
+	// slow discovery call. The user may have disconnected while discovery was
+	// running (e.g. via the async goroutine in DBMakeClusterConfigActive).
+	// If the active config changed, stop the newly created manager and return
+	// silently — the caller that initiated the switch is responsible for its own
+	// StartForActiveCluster call.
+	activeNow, checkErr := idb.GetActiveClusterconfig()
+	if checkErr == nil {
+		activeClusterKey := activeNow.ConfigPath + "|" + activeNow.Context
+		if activeClusterKey != clusterKey {
+			_ = manager.Stop()
+			logger.Logger.Debug("cluster disconnected during informer discovery, discarding manager", "clusterKey", clusterKey)
+			return nil, fmt.Errorf("cluster disconnected during informer discovery")
+		}
+	}
+
 	informers.SetGlobalManager(manager, clusterKey)
 
 	emitProgress("discovered", fmt.Sprintf("Found %d resources", resourceCount), resourceCount)

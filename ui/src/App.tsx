@@ -828,11 +828,15 @@ function ClusterRail({ currentContext, onDisconnected }: { currentContext: strin
   }, [loadClusterRailItems])
 
   const onDisconnect = useCallback(async () => {
+    // Signal the frontend that the cluster is no longer initialized BEFORE
+    // stopping the backend informer manager. This triggers the isInitialized
+    // effect cleanup which cancels the InformerGetStatus poll timer, preventing
+    // "global informer manager not started" binding errors after disconnect.
+    onDisconnected?.()
     try {
       await DBDisconnectClusterConfig()
       await loadClusterRailItems()
       uiNotify.success('Disconnected active cluster')
-      onDisconnected?.()
     } catch (err) {
       uiNotify.error(`Disconnect failed: ${err instanceof Error ? err.message : 'unknown error'}`)
     }

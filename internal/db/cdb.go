@@ -98,9 +98,12 @@ func GetActiveClusterconfig() (clusterconfig Clusterconfig, err error) {
 	clusterconfig = Clusterconfig{}
 	row := CDB.QueryRow("SELECT filename, contextname, context, configpath, imagepath, active, source FROM clusterconfigs WHERE active = 1 LIMIT 1")
 	err = row.Scan(&clusterconfig.FileName, &clusterconfig.ContextName, &clusterconfig.Context, &clusterconfig.ConfigPath, &clusterconfig.ImagePath, &clusterconfig.Active, &clusterconfig.Source)
-	if err == nil {
-		clusterconfig.User = resolveClusterUser(clusterconfig.ConfigPath, clusterconfig.Context)
+	if err != nil {
+		// Return empty config with nil error when no active config exists,
+		// instead of sql.ErrNoRows which would be logged by Wails as a binding error.
+		return Clusterconfig{}, nil
 	}
+	clusterconfig.User = resolveClusterUser(clusterconfig.ConfigPath, clusterconfig.Context)
 	return
 }
 

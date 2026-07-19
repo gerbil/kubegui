@@ -4,7 +4,6 @@ import { createPortal } from 'react-dom'
 import { X, Boxes, Radio, Terminal, Trash2, FileText, Pencil } from 'lucide-react'
 import { UiTooltip } from './UiTooltip'
 import { uiNotify } from './UiNotify'
-import { ensureLegacyEditorAssets, ensureLegacyTerminalAssets } from './podLegacyAssets'
 import { configureAceYamlEditor } from '@/lib/aceEditorConfig'
 import { ConfirmDialog } from './Button'
 import { podOverviewFields } from '../../features/resources/resourceOverview'
@@ -569,6 +568,7 @@ function ShellTab({ pod }: { pod: PodRow }) {
 
     const bootTerminal = async () => {
       try {
+        const { ensureLegacyTerminalAssets } = await import('./podLegacyAssets')
         await ensureLegacyTerminalAssets()
         if (cancelled || !hostRef.current) return
 
@@ -721,6 +721,7 @@ function EditTab({ pod }: { pod: PodRow }) {
     let destroyed = false
     const init = async () => {
       try {
+        const { ensureLegacyEditorAssets } = await import('./podLegacyAssets')
         await ensureLegacyEditorAssets()
         const raw = await ResourceGetDetails('pods', pod.namespace, pod.name) as Record<string, unknown>
         const meta = { ...(raw.metadata as Record<string, unknown> | undefined) }

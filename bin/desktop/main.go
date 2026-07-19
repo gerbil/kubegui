@@ -100,8 +100,12 @@ func main() {
 
   // Creates a new window with the necessary options.
   // 'URL' is the URL that will be loaded into the webview on startup.
+  // NOTE: Hidden MUST be false on Windows because WebView2 fails to properly
+  // initialize when created in a hidden state, producing the error:
+  //   "Focus failed: The parameter is incorrect."
+  // which results in a grey window with no visible UI.
   window := wails.Window.NewWithOptions(application.WebviewWindowOptions{
-    Hidden:                     true,
+    Hidden:                     false,
     URL:                        "/",
     Title:                      "KubeGUI",
     Name:                       "KubeGUI",
@@ -136,10 +140,8 @@ func main() {
   // Initialize config handling and wire window-based events before the run loop.
   clusterconfigs.Init(window)
 
-  // Show the window only after React signals it has fully painted to avoid gray/blank startup flash.
-  wails.Event.On("ui-ready", func(_ *application.CustomEvent) {
-    window.Show()
-  })
+  // Window is visible immediately so WebView2 initialises correctly on Windows.
+  // The React app should render a splash/loading screen while booting.
 
   // Runs the application (blocks until exit).
   if err := wails.Run(); err != nil {
