@@ -1844,13 +1844,15 @@ function DashboardPage({
               <div className="flex items-center gap-2 flex-wrap">
                 {/* Search */}
                 <div className="relative">
-                  <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                  <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
                   <input
                     type="search"
-                    className="lucid-control rounded-md pl-7 pr-3 py-1 text-[11px] w-48 focus:outline-none"
+                    className="lucid-control rounded pl-7 pr-3 py-0.5 text-[10px] w-40 focus:outline-none"
                     placeholder="Search nodes…"
                     value={nodeSearch}
                     onChange={(e) => setNodeSearch(e.target.value)}
+                    autoComplete="off"
+                    spellCheck={false}
                   />
                 </div>
                 {/* Sort buttons */}
@@ -2289,15 +2291,18 @@ function NamespacesPage() {
       )}
       <div id="namespaces-toolbar" className="lucid-surface pods-glass-surface rounded-lg p-3 flex items-center justify-between gap-3 flex-wrap relative z-[120] overflow-visible">
         <div className="flex items-center gap-3 flex-wrap">
-          <input
-            type="search"
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder="Filter namespaces..."
-            className="lucid-control rounded px-2 py-1.5 text-sm min-w-[220px] focus:outline-none font-label"
-            autoComplete="off"
-            spellCheck={false}
-          />
+          <div className="relative">
+            <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <input
+              type="search"
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder="Filter namespaces..."
+              className="lucid-control rounded pl-7 pr-3 py-0.5 text-[10px] min-w-[180px] focus:outline-none font-label"
+              autoComplete="off"
+              spellCheck={false}
+            />
+          </div>
           {selectedNamespaceRows.length > 0 && (
             <div className="lucid-control flex items-center gap-1.5 rounded text-sm focus:outline-none px-2 py-1.5 bg-[#0f172a80]">
               <span className="text-[10px] tracking-wider text-muted-foreground max-w-[460px] truncate" title={selectedNamespaceNames}>
@@ -3038,15 +3043,18 @@ function PodsPage() {
               styles={{ input: { fontFamily: 'Space Grotesk, sans-serif', fontSize: '0.75rem' } }}
             />
           </div>
-          <input
-            type="search"
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder="Filter pods..."
-            className="lucid-control rounded px-2 py-1.5 text-sm min-w-[220px] focus:outline-none font-label"
-            autoComplete="off"
-            spellCheck={false}
-          />
+          <div className="relative">
+            <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <input
+              type="search"
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder="Filter pods..."
+              className="lucid-control rounded pl-7 pr-3 py-1 text-[10px] min-w-[200px] focus:outline-none font-label"
+              autoComplete="off"
+              spellCheck={false}
+            />
+          </div>
           {/* Status filter buttons – styled like the dashboard nodes sort buttons */}
           <div className="flex items-center gap-1 text-[10px]">
             {(['all', 'running', 'restarting', 'warning', 'error', 'terminating'] as PodStatusFilter[]).map((f) => {
@@ -3552,15 +3560,18 @@ function InformerResourcePage({ resource }: { resource: string }) {
               />
             </div>
           )}
-          <input
-            type="search"
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder={`Filter ${label.toLowerCase()}...`}
-            className="lucid-control rounded px-2 py-1.5 text-sm min-w-[220px] focus:outline-none font-label"
-            autoComplete="off"
-            spellCheck={false}
-          />
+          <div className="relative">
+            <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <input
+              type="search"
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder={`Filter ${label.toLowerCase()}...`}
+              className="lucid-control rounded pl-6 pr-3 py-1 text-[11px] min-w-[200px] focus:outline-none font-label"
+              autoComplete="off"
+              spellCheck={false}
+            />
+          </div>
           {selectedRows.length > 0 && (
             <div className="lucid-control flex items-center gap-1.5 rounded text-sm focus:outline-none px-2 py-1.5 bg-[#0f172a80]">
               <span className="text-[10px] tracking-wider text-muted-foreground max-w-[360px] truncate" title={selectedNames}>Selected: {selectedNames}</span>
