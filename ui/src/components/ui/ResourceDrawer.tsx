@@ -17,6 +17,7 @@ import { uiNotify } from './UiNotify'
 import { UiTooltip } from './UiTooltip'
 import { ensureLegacyEditorAssets, ensureLegacyTerminalAssets } from './podLegacyAssets'
 import { NetworkPolicyFlowTab } from '../../features/resources/NetworkPolicyFlowTab'
+import { CiliumNetworkPolicyFlowTab } from '../../features/resources/CiliumNetworkPolicyFlowTab'
 /** Minimal info needed to open the drawer — satisfied by both K8sResource and ResourceRow */
 export interface ResourceRef {
   uid?: string
@@ -66,6 +67,10 @@ function isPod(resourceType: string) {
 
 function isNetworkPolicy(resourceType: string) {
   return resourceType === 'networkpolicies'
+}
+
+function isCiliumNetworkPolicy(resourceType: string) {
+  return resourceType === 'ciliumnetworkpolicies' || resourceType === 'ciliumclusterwidenetworkpolicies'
 }
 
 function TabBtn({ id, label, icon, active, onClick }: {
@@ -597,7 +602,7 @@ export function ResourceDrawer({ resource, resourceType, onClose, extraHeaderAct
     { id: 'logs',     label: 'Logs',      icon: <FileText size={13} />, hidden: !isPod(resourceType) },
     { id: 'shell',    label: 'Shell',     icon: <Terminal size={13} />, hidden: !isPod(resourceType) },
     { id: 'edit',     label: 'Edit YAML', icon: <Pencil   size={13} /> },
-    { id: 'netflow',  label: 'Netflow',   icon: <GitBranch size={13} />, hidden: !isNetworkPolicy(resourceType) },
+    { id: 'netflow',  label: 'Netflow',   icon: <GitBranch size={13} />, hidden: !isNetworkPolicy(resourceType) && !isCiliumNetworkPolicy(resourceType) },
   ]
 
   const subtitleParts = [
@@ -678,6 +683,9 @@ export function ResourceDrawer({ resource, resourceType, onClose, extraHeaderAct
           {resource && activeTab === 'events'   && <EventsTab kind={resource.kind ?? resourceType} namespace={namespace} name={name} />}
           {resource && activeTab === 'netflow'  && isNetworkPolicy(resourceType) && (
             <NetworkPolicyFlowTab full={full} />
+          )}
+          {resource && activeTab === 'netflow'  && isCiliumNetworkPolicy(resourceType) && (
+            <CiliumNetworkPolicyFlowTab full={full} />
           )}
           {resource && activeTab === 'logs'     && isPod(resourceType) && (
             <LogsTab namespace={namespace} name={name} containers={containers.length ? containers : [name]} />

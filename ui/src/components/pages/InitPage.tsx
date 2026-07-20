@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { CloudUpload, FileText, User, CheckCircle2, Loader2, Server, FolderOpen, Network, Wifi, Database, Zap, X } from 'lucide-react'
+import { CloudUpload, FileText, User, CheckCircle2, Loader2, Server, FolderOpen, Network, Wifi, Database, Zap, X, Search } from 'lucide-react'
 import { ContextCardsSkeleton } from '../ui/Skeleton'
 import {
   AppGetVersion,
@@ -450,13 +450,16 @@ export function InitPage({ onContextSelected, hideHeader = false }: InitPageProp
                 )}
               </div>
 
-              <input
-                type="text"
-                placeholder="Filter contexts..."
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                className="lucid-control w-full rounded-lg px-4 py-2 text-sm mb-4 focus:outline-none"
-              />
+              <div className="relative w-full mb-4">
+                <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                <input
+                  type="text"
+                  placeholder="Filter contexts..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="lucid-control w-full rounded-lg pl-7 pr-3 py-1 text-xxs focus:outline-none"
+                />
+              </div>
 
               {/* Cards grid */}
               <div className="max-h-[400px] overflow-y-auto pr-1">

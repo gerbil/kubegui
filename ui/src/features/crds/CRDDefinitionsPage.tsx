@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
 import { Events } from '@wailsio/runtime'
 import type { ColumnDef } from '@tanstack/react-table'
+import { Search } from 'lucide-react'
 import { InformerGetCRDDefinitions, ResourceDelete } from '../../../bindings/kubegui/services/backend'
 import type { CRDDefinition } from '../../../bindings/kubegui/internal/resources/informers/models'
 import { DataTable } from '@/components/table/DataTable'
@@ -197,15 +198,18 @@ export function CRDDefinitionsPage() {
       )}
       <div className="lucid-surface pods-glass-surface rounded-lg p-3 flex items-center justify-between gap-3 flex-wrap relative z-[120] overflow-visible">
         <div className="flex items-center gap-3 flex-wrap">
-          <input
-            type="search"
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder="Filter CRD definitions..."
-            className="lucid-control rounded px-2 py-1.5 text-sm min-w-[220px] focus:outline-none font-label"
-            autoComplete="off"
-            spellCheck={false}
-          />
+          <div className="relative">
+            <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <input
+              type="search"
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder="Filter CRD definitions..."
+              className="lucid-control rounded pl-7 pr-3 py-1 text-xxs min-w-[220px] focus:outline-none font-label"
+              autoComplete="off"
+              spellCheck={false}
+            />
+          </div>
           {selectedRows.length > 0 && (
             <div className="lucid-control flex items-center gap-1.5 rounded text-sm focus:outline-none px-2 py-1.5 bg-[#0f172a80]">
               <span className="text-[10px] tracking-wider text-muted-foreground max-w-[460px] truncate" title={selectedNames}>

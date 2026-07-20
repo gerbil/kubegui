@@ -43,6 +43,11 @@ interface PolicyPort {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
+/** Insert zero-width spaces after natural break chars so text wraps at sensible spots */
+function softBreak(text: string): string {
+  return text.replace(/([./=\-_,])/g, '$1\u200B')
+}
+
 function labelSelectorStr(sel: Record<string, unknown> | undefined): string {
   if (!sel) return ''
   const parts: string[] = []
@@ -104,8 +109,10 @@ function nodeStyle(type: string): React.CSSProperties {
     padding: '8px 14px',
     fontSize: 9,
     fontFamily: 'var(--font-modal, monospace)',
-    maxWidth: 200,
+    width: 190,
     whiteSpace: 'pre-wrap' as const,
+    wordBreak: 'break-word' as const,
+    overflowWrap: 'break-word' as const,
     lineHeight: 1.4,
     textAlign: 'center' as const,
   }
@@ -130,7 +137,7 @@ function buildFlowGraph(full: Record<string, unknown>): { nodes: Node[]; edges: 
   nodes.push({
     id: 'policy',
     position: { x: 400, y: 220 },
-    data: { label: policyLabel },
+    data: { label: softBreak(policyLabel) },
     style: nodeStyle('policy'),
     sourcePosition: Position.Right,
     targetPosition: Position.Left,
@@ -145,7 +152,7 @@ function buildFlowGraph(full: Record<string, unknown>): { nodes: Node[]; edges: 
       nodes.push({
         id,
         position: { x, y },
-        data: { label },
+        data: { label: softBreak(label) },
         style: nodeStyle(type),
         sourcePosition: Position.Right,
         targetPosition: Position.Left,

@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { createPortal } from 'react-dom'
-import { ArrowDown, ArrowUp, ArrowUpDown, ChevronRight } from 'lucide-react'
+import { ArrowDown, ArrowUp, ArrowUpDown, ChevronRight, Search } from 'lucide-react'
 import { Select as MantineSelect } from '@mantine/core'
 import { Events } from '@wailsio/runtime'
 import { ResourceList, ResourceAdd, ResourceDelete, CRDGenerateTemplate } from '../../../bindings/kubegui/services/backend'
@@ -739,15 +739,18 @@ export function CRDResourcePage({ definition, namespace = '', onNavigateBack, ca
               />
             </div>
           )}
-          <input
-            type="search"
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder={`Filter ${definition.kind.toLowerCase()}...`}
-            className="lucid-control rounded px-2 py-1.5 text-sm min-w-[220px] focus:outline-none font-label"
-            autoComplete="off"
-            spellCheck={false}
-          />
+          <div className="relative">
+            <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <input
+              type="search"
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder={`Filter ${definition.kind.toLowerCase()}...`}
+              className="lucid-control rounded pl-7 pr-3 py-1 text-xxs min-w-[220px] focus:outline-none font-label"
+              autoComplete="off"
+              spellCheck={false}
+            />
+          </div>
           {selectedItems.length > 0 && (
             <div className="lucid-control flex items-center gap-1.5 rounded text-sm focus:outline-none px-2 py-1.5 bg-[#0f172a80] min-w-0 max-w-full">
               <span className="text-[10px] tracking-wider text-muted-foreground min-w-0 max-w-[460px] truncate" title={selectedNames}>

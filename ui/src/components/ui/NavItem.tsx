@@ -38,7 +38,7 @@ export function NavItem({
     <button
       onClick={onClick}
       className={clsx(
-        'relative w-full flex items-center gap-3 px-3 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-150 group cursor-pointer',
+        'relative w-full flex items-center gap-2 px-3 py-1 rounded-lg text-[12px] font-medium transition-all duration-150 group cursor-pointer',
         isActive
           ? 'text-primary'
           : 'text-muted-foreground hover:text-foreground hover:bg-accent/60'

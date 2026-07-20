@@ -33,11 +33,11 @@ export function MenuSection({
   }
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-0.5">
       {items.map((item) => (
         <div key={item.id}>
           <NavItem
-            icon={<item.icon size={16} />}
+            icon={<item.icon size={14} />}
             label={item.label}
             isActive={activeItem === item.id}
             onClick={() => handleItemClick(item.id, !!(item.subsections?.length), item.href)}
@@ -48,11 +48,11 @@ export function MenuSection({
           />
           {/* Subsections */}
           {item.subsections && expandedItems.has(item.id) && (
-            <div className="space-y-1">
+            <div className="space-y-0.5">
               {item.subsections.map((subsection) => (
                 <NavItem
                   key={subsection.id}
-                  icon={<subsection.icon size={14} />}
+                  icon={<subsection.icon size={13} />}
                   label={subsection.label}
                   isActive={activeItem === subsection.id}
                   onClick={() => {

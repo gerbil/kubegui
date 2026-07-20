@@ -1066,16 +1066,16 @@ function ClusterRail({ currentContext, onDisconnected }: { currentContext: strin
           role="menu"
           onClick={(e) => e.stopPropagation()}
         >
-          <div className="border-b border-border/70 py-1">
-            <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-sm hover:bg-accent/60 min-w-[170px]" onClick={() => { void menuAction('connect') }}>Connect</button>
-            <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-sm hover:bg-accent/60 min-w-[170px]" onClick={() => { void menuAction('disconnect') }}>Disconnect</button>
+          <div className="border-b border-border/70">
+            <button type="button" className="block whitespace-nowrap text-left px-3 py-1 text-sm hover:bg-accent/60 min-w-[170px]" onClick={() => { void menuAction('connect') }}>Connect</button>
+            <button type="button" className="block whitespace-nowrap text-left px-3 py-1 text-sm hover:bg-accent/60 min-w-[170px]" onClick={() => { void menuAction('disconnect') }}>Disconnect</button>
           </div>
-          <div className="border-b border-border/70 py-1">
-            <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-sm hover:bg-accent/60 min-w-[170px]" onClick={() => { void menuAction('rename') }}>Rename</button>
-            <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-sm hover:bg-accent/60 min-w-[170px]" onClick={() => { void menuAction('icon') }}>Change Icon</button>
+          <div className="border-b border-border/70">
+            <button type="button" className="block whitespace-nowrap text-left px-3 py-1 text-sm hover:bg-accent/60 min-w-[170px]" onClick={() => { void menuAction('rename') }}>Rename</button>
+            <button type="button" className="block whitespace-nowrap text-left px-3 py-1 text-sm hover:bg-accent/60 min-w-[170px]" onClick={() => { void menuAction('icon') }}>Change Icon</button>
           </div>
-          <div className="py-1">
-            <button type="button" className="block whitespace-nowrap text-left px-3 py-2 text-sm text-red-400 hover:bg-red-500/10 min-w-[170px]" onClick={() => { void menuAction('delete') }}>Delete</button>
+          <div>
+            <button type="button" className="block whitespace-nowrap text-left px-3 py-1 text-sm text-red-400 hover:bg-red-500/10 min-w-[170px]" onClick={() => { void menuAction('delete') }}>Delete</button>
           </div>
         </div>,
         document.body,
@@ -2285,15 +2285,18 @@ function NamespacesPage() {
       )}
       <div id="namespaces-toolbar" className="lucid-surface pods-glass-surface rounded-lg p-3 flex items-center justify-between gap-3 flex-wrap relative z-[120] overflow-visible">
         <div className="flex items-center gap-3 flex-wrap">
-          <input
-            type="search"
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder="Filter namespaces..."
-            className="lucid-control rounded px-2 py-1.5 text-sm min-w-[220px] focus:outline-none font-label"
-            autoComplete="off"
-            spellCheck={false}
-          />
+          <div className="relative">
+            <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <input
+              type="search"
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder="Filter namespaces..."
+              className="lucid-control rounded pl-7 pr-3 py-1 text-xxs min-w-[220px] focus:outline-none font-label"
+              autoComplete="off"
+              spellCheck={false}
+            />
+          </div>
           {selectedNamespaceRows.length > 0 && (
             <div className="lucid-control flex items-center gap-1.5 rounded text-sm focus:outline-none px-2 py-1.5 bg-[#0f172a80]">
               <span className="text-[10px] tracking-wider text-muted-foreground max-w-[460px] truncate" title={selectedNamespaceNames}>
@@ -3034,15 +3037,18 @@ function PodsPage() {
               styles={{ input: { fontFamily: 'Space Grotesk, sans-serif', fontSize: '0.75rem' } }}
             />
           </div>
-          <input
-            type="search"
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder="Filter pods..."
-            className="lucid-control rounded px-2 py-1.5 text-sm min-w-[220px] focus:outline-none font-label"
-            autoComplete="off"
-            spellCheck={false}
-          />
+          <div className="relative">
+            <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <input
+              type="search"
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder="Filter pods..."
+              className="lucid-control rounded pl-7 pr-3 py-1 text-xxs min-w-[220px] focus:outline-none font-label"
+              autoComplete="off"
+              spellCheck={false}
+            />
+          </div>
           {/* Status filter buttons – styled like the dashboard nodes sort buttons */}
           <div className="flex items-center gap-1 text-[10px]">
             {(['all', 'running', 'restarting', 'warning', 'error', 'terminating'] as PodStatusFilter[]).map((f) => {
@@ -3548,15 +3554,18 @@ function InformerResourcePage({ resource }: { resource: string }) {
               />
             </div>
           )}
-          <input
-            type="search"
-            value={globalFilter}
-            onChange={(e) => setGlobalFilter(e.target.value)}
-            placeholder={`Filter ${label.toLowerCase()}...`}
-            className="lucid-control rounded px-2 py-1.5 text-sm min-w-[220px] focus:outline-none font-label"
-            autoComplete="off"
-            spellCheck={false}
-          />
+          <div className="relative">
+            <Search size={11} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <input
+              type="search"
+              value={globalFilter}
+              onChange={(e) => setGlobalFilter(e.target.value)}
+              placeholder={`Filter ${label.toLowerCase()}...`}
+              className="lucid-control rounded pl-7 pr-3 py-1 text-xxs min-w-[220px] focus:outline-none font-label"
+              autoComplete="off"
+              spellCheck={false}
+            />
+          </div>
           {selectedRows.length > 0 && (
             <div className="lucid-control flex items-center gap-1.5 rounded text-sm focus:outline-none px-2 py-1.5 bg-[#0f172a80]">
               <span className="text-[10px] tracking-wider text-muted-foreground max-w-[360px] truncate" title={selectedNames}>Selected: {selectedNames}</span>

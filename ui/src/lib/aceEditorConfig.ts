@@ -41,7 +41,7 @@ export function configureAceYamlEditor(editor: unknown, options: ConfigureAceYam
     showPrintMargin: false,
     tabSize: 2,
     useSoftTabs: true,
-    useWorker: true,
+    useWorker: false,
     readOnly,
     highlightActiveLine: true,
     highlightSelectedWord: true,

@@ -135,6 +135,34 @@
   td .font-label {
     font-weight: 400;
   }
+
+}
+
+/* Unlayered — beats all @layer rules including Tailwind utilities */
+input, textarea, select {
+  font-family: 'Space Grotesk', system-ui, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 300 !important;
+}
+
+/* Buttons: fix font-family only — let Tailwind size classes through */
+button {
+  font-family: 'Space Grotesk', system-ui, sans-serif !important;
+}
+
+::placeholder {
+  font-family: 'Space Grotesk', system-ui, sans-serif !important;
+  font-size: 11px !important;
+  font-weight: 300 !important;
+  opacity: 0.5;
+}
+
+/* Remove only the left-side WebKit search decoration — keep the cancel (×) button */
+input[type="search"]::-webkit-search-decoration,
+input[type="search"]::-webkit-search-results-button,
+input[type="search"]::-webkit-search-results-decoration {
+  -webkit-appearance: none;
+  display: none;
 }
 
 @layer components {

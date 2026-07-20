@@ -57,14 +57,17 @@ export default {
         bold: '500',
         extrabold: '500',
       },
-      backdropBlur: {
+      fontSize: {
+        xxs: ['10px', { lineHeight: '1.4' }],
+      },
+      borderRadius: {
         xs: '2px',
-        sm: '4px',
-        DEFAULT: '8px',
-        md: '12px',
-        lg: '14px',
-        xl: '16px',
-        '2xl': '20px',
+        sm: '3px',
+        DEFAULT: '4px',
+        md: '5px',
+        lg: '6px',
+        xl: '8px',
+        '2xl': '10px',
       },
       backdropSaturate: {
         75: '0.75',

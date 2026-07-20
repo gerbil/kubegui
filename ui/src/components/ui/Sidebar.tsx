@@ -103,10 +103,10 @@ export function Sidebar({ userRole = 'admin', health: runtimeHealth, currentPath
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
+      <nav className="flex-1 px-4 space-y-1 overflow-y-auto">
         {activeMenuConfig.map((section) => (
           <div key={section.id}>
-            <p className="px-2 mb-1 text-[9px] font-bold text-muted-foreground/50 uppercase tracking-[0.12em]">
+            <p className="px-2 mb-0.5 text-[9px] font-bold text-muted-foreground/50 uppercase tracking-[0.12em]">
               {section.label}
             </p>
             <MenuSectionComponent
