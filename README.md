@@ -17,7 +17,7 @@ Official website - https://kubegui.net
 > - Open a shell directly into your workloads (even to Nodes via admin daemonset) 
 > - Automatic application updates, no manual installs  
 > - Portforwarding support  
-> - Network policy graph  
+> - Network policy graph (native/cilium)
 
 # TODO:
 - Add cilium network policies react-flow view

@@ -15,7 +15,6 @@ import { PortForwardBadges } from './PortForwardBadges'
 import { AnnotationsSection, DynamicResourceSection, EventsTimeline, LabelsSection, TooltipResourceSection } from './ResourceManifestOverview'
 import { uiNotify } from './UiNotify'
 import { UiTooltip } from './UiTooltip'
-import { ensureLegacyEditorAssets, ensureLegacyTerminalAssets } from './podLegacyAssets'
 import { NetworkPolicyFlowTab } from '../../features/resources/NetworkPolicyFlowTab'
 /** Minimal info needed to open the drawer — satisfied by both K8sResource and ResourceRow */
 export interface ResourceRef {
@@ -307,6 +306,7 @@ function EditTab({
     let cancelled = false
     void (async () => {
       try {
+        const { ensureLegacyEditorAssets } = await import('./podLegacyAssets')
         await ensureLegacyEditorAssets()
         if (cancelled || !containerRef.current) return
         const win = window as EditorWindow
@@ -494,6 +494,7 @@ function ShellTab({ namespace, name, container }: { namespace: string; name: str
     let cancelled = false
     void (async () => {
       try {
+        const { ensureLegacyTerminalAssets } = await import('./podLegacyAssets')
         await ensureLegacyTerminalAssets()
         if (cancelled || !shellRef.current) return
         const win = window as TerminalWindow
