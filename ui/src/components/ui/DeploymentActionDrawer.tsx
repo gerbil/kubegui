@@ -4,7 +4,6 @@ import { createPortal } from 'react-dom'
 import { Container, Pencil, Radio, Trash2, X, Eye, FileText, RotateCw, Scaling } from 'lucide-react'
 import { UiTooltip } from './UiTooltip'
 import { uiNotify } from './UiNotify'
-import { ensureLegacyEditorAssets } from './podLegacyAssets'
 import { ResourceManifestOverview, LabelsSection, AnnotationsSection, EventsTimeline, type KubeEventItem } from './ResourceManifestOverview'
 import { deploymentOverviewFields } from '../../features/resources/resourceOverview'
 import { ConfirmDialog } from './Button'
@@ -425,6 +424,7 @@ function EditTab({ deployment, onSaved }: { deployment: DeploymentRow; onSaved?:
     const setup = async () => {
       setLoading(true); setErr(null); setDirty(false); setHasSyntaxError(false)
       try {
+        const { ensureLegacyEditorAssets } = await import('./podLegacyAssets')
         await ensureLegacyEditorAssets()
         if (cancelled) return
         const win = window as LegacyEditorWindow

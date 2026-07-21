@@ -280,7 +280,6 @@ function EditTab({ namespace, onSaved }: { namespace: NamespaceActionTarget; onS
   const baselineYamlRef = useRef('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [err, setErr] = useState<string | null>(null)
   const [dirty, setDirty] = useState(false)
   const [hasSyntaxError, setHasSyntaxError] = useState(false)
 
@@ -289,7 +288,6 @@ function EditTab({ namespace, onSaved }: { namespace: NamespaceActionTarget; onS
 
     const setup = async () => {
       setLoading(true)
-      setErr(null)
       setDirty(false)
 
       try {
@@ -326,7 +324,6 @@ function EditTab({ namespace, onSaved }: { namespace: NamespaceActionTarget; onS
       } catch (e) {
         if (cancelled) return
         const msg = e instanceof Error ? e.message : 'editor setup failed'
-        setErr(msg)
         uiNotify.error(`Failed to load namespace YAML editor: ${msg}`)
       } finally {
         if (!cancelled) setLoading(false)
@@ -348,12 +345,11 @@ function EditTab({ namespace, onSaved }: { namespace: NamespaceActionTarget; onS
     const editor = editorRef.current
     if (!editor) return
     if (hasSyntaxError) {
-      setErr('YAML validation failed. Fix editor errors before saving.')
+      uiNotify.error('YAML validation failed. Fix editor errors before saving.')
       return
     }
 
     setSaving(true)
-    setErr(null)
     try {
       const win = window as LegacyEditorWindow
       if (!win.jsyaml) throw new Error('YAML parser is not available')
@@ -385,7 +381,6 @@ function EditTab({ namespace, onSaved }: { namespace: NamespaceActionTarget; onS
       onSaved?.(namespace.name)
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'save failed'
-      setErr(msg)
       uiNotify.error(`YAML save failed: ${msg}`)
     } finally {
       setSaving(false)
@@ -402,7 +397,6 @@ function EditTab({ namespace, onSaved }: { namespace: NamespaceActionTarget; onS
 
   return (
     <div className="flex flex-col h-full p-4 gap-3">
-      {err && <p className="text-sm text-red-400">Error: {err}</p>}
 
       <div className="flex items-center justify-between text-[10px] text-muted-foreground px-1">
         <span className="font-mono"></span>

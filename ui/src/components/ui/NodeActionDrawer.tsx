@@ -241,7 +241,7 @@ function ensureLegacyEditorAssets() {
     await loadLegacyScript('/assets/js/ace.js')
     await loadLegacyScript('/assets/js/ace-ext-language-tools.js')
     await loadLegacyScript('/assets/js/ace-mode-yaml.js')
-    await loadLegacyScript('/assets/js/theme-idle_fingers.js')
+    await loadLegacyScript('/assets/js/theme-solarized_dark.js')
     await loadLegacyScript('/assets/js/js-yaml.js')
   })()
 
@@ -1028,7 +1028,6 @@ function EditTab({ node }: { node: NodeActionTarget }) {
   const baselineYamlRef = useRef('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [err, setErr] = useState<string | null>(null)
   const [dirty, setDirty] = useState(false)
   const [hasSyntaxError, setHasSyntaxError] = useState(false)
 
@@ -1048,7 +1047,6 @@ function EditTab({ node }: { node: NodeActionTarget }) {
     const setup = async () => {
       setLoading(true)
       setSaving(false)
-      setErr(null)
       setDirty(false)
       setHasSyntaxError(false)
 
@@ -1087,7 +1085,6 @@ function EditTab({ node }: { node: NodeActionTarget }) {
       } catch (e) {
         if (cancelled) return
         const msg = e instanceof Error ? e.message : 'editor setup failed'
-        setErr(msg)
         uiNotify.error(`Failed to load node YAML editor: ${msg}`)
       } finally {
         if (!cancelled) setLoading(false)
@@ -1113,12 +1110,11 @@ function EditTab({ node }: { node: NodeActionTarget }) {
     const editor = editorRef.current
     if (!editor) return
     if (hasSyntaxError) {
-      setErr('YAML validation failed. Fix editor errors before saving.')
+      uiNotify.error('YAML validation failed. Fix editor errors before saving.')
       return
     }
 
     setSaving(true)
-    setErr(null)
     uiNotify.info(`Saving node ${node.name} YAML...`)
 
     try {
@@ -1167,7 +1163,6 @@ function EditTab({ node }: { node: NodeActionTarget }) {
       refreshEditorFlags()
       uiNotify.success(`Node ${node.name} updated successfully`)
     } catch (e) {
-      setErr(e instanceof Error ? e.message : 'save failed')
       uiNotify.error(`YAML save failed: ${e instanceof Error ? e.message : 'unknown error'}`)
     } finally {
       setSaving(false)
@@ -1186,7 +1181,6 @@ function EditTab({ node }: { node: NodeActionTarget }) {
 
   return (
     <div className="flex flex-col h-full p-4 gap-3">
-      {err && <p className="font-modal text-[11.5px] text-red-400">Error: {err}</p>}
       <div className="flex items-center justify-between text-[10px] text-muted-foreground px-1">
         <span className="font-mono" />
         <span>{loading ? 'Loading…' : hasSyntaxError ? '⚠ YAML syntax error' : dirty ? 'Unsaved changes' : 'Up to date'}</span>

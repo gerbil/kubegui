@@ -60,11 +60,34 @@ function browserErrorForwarder(): Plugin {
   }
 }
 
+const vendorChunks: Record<string, string[]> = {
+  'vendor-react': ['react', 'react-dom', 'react-redux', '@reduxjs/toolkit'],
+  'vendor-mantine': ['@mantine/core', '@mantine/hooks'],
+  'vendor-tanstack': ['@tanstack/react-query', '@tanstack/react-table', '@tanstack/react-virtual'],
+  'vendor-highlight': ['highlight.js'],
+  'vendor-lucide': ['lucide-react'],
+  'vendor-wails': ['@wailsio/runtime'],
+}
+
 export default defineConfig({
   plugins: [react(), browserErrorForwarder()],
   resolve: { alias: { '@': path.resolve(__dirname, './src') } },
   server: {
     port: Number(process.env.WAILS_VITE_PORT) || 9245,
     strictPort: true,
+  },
+  build: {
+    chunkSizeWarningLimit: 1000,
+    rollupOptions: {
+      output: {
+        manualChunks(id: string) {
+          for (const [chunkName, modules] of Object.entries(vendorChunks)) {
+            if (modules.some(m => id.includes(m))) {
+              return chunkName
+            }
+          }
+        },
+      },
+    },
   },
 })

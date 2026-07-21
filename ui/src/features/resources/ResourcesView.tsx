@@ -700,14 +700,14 @@ export function ResourcesView() {
   return (
     <div className="flex flex-col h-full">
       <div className="flex flex-wrap items-center gap-3 px-4 py-3 border-b border-border bg-card shrink-0">
-        <div className="flex items-center gap-2 flex-1 min-w-[240px] max-w-sm">
-          <Search size={14} className="text-muted-foreground shrink-0" />
+        <div className="flex items-center gap-1.5 flex-1 min-w-[200px] max-w-sm">
+          <Search size={12} className="text-muted-foreground shrink-0" />
           <Input
             type="search"
             placeholder={`Search ${selectedResource}...`}
             value={globalFilter}
             onChange={(e) => setGlobalFilter(e.target.value)}
-            className="h-7"
+            className="h-6 text-[11px] py-1"
           />
         </div>
 

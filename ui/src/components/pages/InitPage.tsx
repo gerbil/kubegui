@@ -1,20 +1,20 @@
-import { useState, useEffect, useCallback, useRef, type ReactNode } from 'react'
-import { createPortal } from 'react-dom'
-import { CloudUpload, FileText, User, CheckCircle2, Loader2, Server, FolderOpen, Network, Wifi, Database, Zap, X } from 'lucide-react'
-import { ContextCardsSkeleton } from '../ui/Skeleton'
-import {
-  AppGetVersion,
-  DBGetClusterConfigs,
-  DBGetActiveClusterConfig,
-  DBMakeClusterConfigActive,
-  DBDisconnectClusterConfig,
-  DBRenameClusterConfig,
-  DBDeleteClusterConfig,
-  AppConfigPickClusterIcon,
-} from '../../../bindings/kubegui/services/backend'
-import type { Clusterconfig } from '../../../bindings/kubegui/internal/db'
 import { Events } from '@wailsio/runtime'
+import { CheckCircle2, CloudUpload, Database, FileText, FolderOpen, Loader2, Network, Server, User, Wifi, X, Zap } from 'lucide-react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import { createPortal } from 'react-dom'
+import type { Clusterconfig } from '../../../bindings/kubegui/internal/db'
+import {
+  AppConfigPickClusterIcon,
+  AppGetVersion,
+  DBDeleteClusterConfig,
+  DBDisconnectClusterConfig,
+  DBGetActiveClusterConfig,
+  DBGetClusterConfigs,
+  DBMakeClusterConfigActive,
+  DBRenameClusterConfig,
+} from '../../../bindings/kubegui/services/backend'
 import defaultClusterIcon from '../../assets/icons/cluster.svg'
+import { ContextCardsSkeleton } from '../ui/Skeleton'
 
 const PRODUCT_VERSION_FALLBACK = '2.0.0'
 

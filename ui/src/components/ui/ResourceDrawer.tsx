@@ -15,7 +15,6 @@ import { PortForwardBadges } from './PortForwardBadges'
 import { AnnotationsSection, DynamicResourceSection, EventsTimeline, LabelsSection, TooltipResourceSection } from './ResourceManifestOverview'
 import { uiNotify } from './UiNotify'
 import { UiTooltip } from './UiTooltip'
-import { ensureLegacyEditorAssets, ensureLegacyTerminalAssets } from './podLegacyAssets'
 import { NetworkPolicyFlowTab } from '../../features/resources/NetworkPolicyFlowTab'
 /** Minimal info needed to open the drawer — satisfied by both K8sResource and ResourceRow */
 export interface ResourceRef {
@@ -298,7 +297,6 @@ function EditTab({
   const [ready,          setReady]          = useState(false)
   const [saving,         setSaving]         = useState(false)
   const [dirty,          setDirty]          = useState(false)
-  const [err,            setErr]            = useState<string | null>(null)
   const [hasSyntaxError, setHasSyntaxError] = useState(false)
 
   // Init Ace once full manifest arrives
@@ -307,6 +305,7 @@ function EditTab({
     let cancelled = false
     void (async () => {
       try {
+        const { ensureLegacyEditorAssets } = await import('./podLegacyAssets')
         await ensureLegacyEditorAssets()
         if (cancelled || !containerRef.current) return
         const win = window as EditorWindow
@@ -348,7 +347,7 @@ function EditTab({
   const handleSave = async () => {
     if (!editorRef.current) return
     if (hasSyntaxError) {
-      setErr('YAML syntax error — fix before saving')
+      uiNotify.error('YAML syntax error — fix before saving')
       return
     }
     const yaml = editorRef.current.getValue()
@@ -357,11 +356,10 @@ function EditTab({
     try {
       obj = win.jsyaml?.load(yaml) ?? JSON.parse(yaml)
     } catch (e) {
-      setErr(`YAML parse error: ${e instanceof Error ? e.message : 'invalid'}`)
+      uiNotify.error(`YAML parse error: ${e instanceof Error ? e.message : 'invalid'}`)
       return
     }
     setSaving(true)
-    setErr(null)
     try {
       await ResourceEdit(resourceType, namespace, name, JSON.stringify(obj))
       uiNotify.success(`Saved ${resourceType}/${name}`)
@@ -371,7 +369,6 @@ function EditTab({
       onSaved()
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'unknown'
-      setErr(`Save failed: ${msg}`)
       uiNotify.error(`Save failed: ${msg}`)
     } finally {
       setSaving(false)
@@ -382,8 +379,6 @@ function EditTab({
 
   return (
     <div className="flex flex-col h-full p-4 gap-3">
-      {err && <p className="text-sm text-red-400">Error: {err}</p>}
-
       <div className="flex items-center justify-between text-[10px] text-muted-foreground px-1">
         <span className="font-mono" />
         <span>{!ready ? 'Loading…' : hasSyntaxError ? '⚠ YAML syntax error' : dirty ? 'Unsaved changes' : 'Up to date'}</span>
@@ -494,6 +489,7 @@ function ShellTab({ namespace, name, container }: { namespace: string; name: str
     let cancelled = false
     void (async () => {
       try {
+        const { ensureLegacyTerminalAssets } = await import('./podLegacyAssets')
         await ensureLegacyTerminalAssets()
         if (cancelled || !shellRef.current) return
         const win = window as TerminalWindow
