@@ -7,7 +7,7 @@ info:
   description: "Kubernetes admin desktop client"
   copyright: "(c) 2026, Kubegui"
   comments: "Kubernetes admin desktop client"
-  version: "2.0.3"
+  version: ""
 dev_mode:
   root_path: .
   log_level: warn
