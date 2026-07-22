@@ -18,13 +18,13 @@ Official website - https://kubegui.net
 > - Automatic application updates, no manual installs  
 > - Portforwarding support  
 > - Network policy graph (native/cilium)
+> - Whoami/auth check view
+> - Whoami/auth check view
+> - Resource quota details visualisation
+> - RBAC roles/bindings graph/flow view
+> - Settings to change ui font/size
 
 # TODO:
-- Add cilium network policies react-flow view
-- Add whoami/auth check view
-- Adjust ns quota modal details view
-- Create roles/bindings react-flow view
-- Settings view
 - AI suggestions for issues/errors/warnings/etc
 
 ## Scope:
