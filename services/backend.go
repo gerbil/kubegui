@@ -14,6 +14,7 @@ import (
 	"time"
 
 	"kubegui/internal/app"
+	"kubegui/internal/cani"
 	"kubegui/internal/clusterconfigs"
 	"kubegui/internal/clusterruntime"
 	idb "kubegui/internal/db"
@@ -53,7 +54,14 @@ type CRDMenuResponse struct {
 type Backend struct{}
 
 // --- app ---
-func (s *Backend) AppServiceStartup() error           { return nil }
+func (s *Backend) AppServiceStartup() error { return nil }
+func (s *Backend) AppGetMyPermissions(ns string) ([]cani.CanIResourceRow, error) {
+	flat, err := cani.CollectPermissions(ns)
+	if err != nil {
+		return nil, err
+	}
+	return cani.AggregateCanIResults(flat), nil
+}
 func (s *Backend) AppGetVersion() (string, error)     { return app.ReadConfigFile() }
 func (s *Backend) AppGetStats() (app.AppStats, error) { return app.GetAppStats() }
 func (s *Backend) AppConfigGetCurrentContextUser() (string, error) {
