@@ -55,6 +55,7 @@ import {
   ResourceDelete,
 } from '../bindings/kubegui/services/backend'
 import { CRDResourcePage as CRDResourcePageComponent } from './features/crds/CRDResourcePage'
+import { MyPermissionsPage } from './features/permissions/MyPermissionsPage'
 import { wailsCall } from './lib/wailsQueue'
 import type { Clusterconfig } from '../bindings/kubegui/internal/db/models'
 import { Events, Window as WailsWindow } from '@wailsio/runtime'
@@ -1365,6 +1366,8 @@ function RootView() {
     pageContent = <CRDDefinitionsPage />
   } else if (currentPath === '/settings') {
     pageContent = <SettingsPage />
+  } else if (currentPath === '/my-permissions') {
+    pageContent = <MyPermissionsPage />
   } else {
     pageContent = (
       <DashboardPage
@@ -1844,11 +1847,13 @@ function DashboardPage({
               <div className="flex items-center gap-2 flex-wrap">
                 {/* Search */}
                 <div className="relative">
-                  <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                  <span className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-2.5 z-10">
+                    <Search size={13} className="text-foreground/70" />
+                  </span>
                   <input
                     type="search"
-                    className="lucid-control rounded pl-7 pr-3 py-0.5 text-[10px] w-40 focus:outline-none"
-                    placeholder="Search nodes…"
+                    className="lucid-control rounded pl-8 pr-3 py-0.5 text-[12px] placeholder:text-[12px] w-80 focus:outline-none"
+                    placeholder="Filter nodes"
                     value={nodeSearch}
                     onChange={(e) => setNodeSearch(e.target.value)}
                     autoComplete="off"
@@ -2297,8 +2302,8 @@ function NamespacesPage() {
               type="search"
               value={globalFilter}
               onChange={(e) => setGlobalFilter(e.target.value)}
-              placeholder="Filter namespaces..."
-              className="lucid-control rounded pl-7 pr-3 py-0.5 text-[10px] min-w-[180px] focus:outline-none font-label"
+              placeholder="Filter namespaces"
+              className="lucid-control rounded pl-8 pr-3 py-0.5 !text-[14px] placeholder:text-[14px] w-80 focus:outline-none"
               autoComplete="off"
               spellCheck={false}
             />
@@ -3034,8 +3039,8 @@ function PodsPage() {
               value={selectedNamespace}
               onChange={(value) => setSelectedNamespace(value ?? 'all')}
               data={namespaces.map((n) => ({ value: n, label: n === 'all' ? 'All namespaces' : n }))}
-              size="xs"
-              w={220}
+              size="sm"
+              w={320}
               searchable
               allowDeselect={false}
               spellCheck={false}
@@ -3046,13 +3051,13 @@ function PodsPage() {
           <div className="relative">
             <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             <input
-              type="search"
-              value={globalFilter}
-              onChange={(e) => setGlobalFilter(e.target.value)}
-              placeholder="Filter pods..."
-              className="lucid-control rounded pl-7 pr-3 py-1 text-[10px] min-w-[200px] focus:outline-none font-label"
-              autoComplete="off"
-              spellCheck={false}
+                type="search"
+                value={globalFilter}
+                onChange={(e) => setGlobalFilter(e.target.value)}
+                placeholder={`Filter pods`}
+                className="lucid-control rounded pl-6 pr-3 py-1 !text-[14px] placeholder:text-[14px] min-w-[200px] focus:outline-none font-label"
+                autoComplete="off"
+                spellCheck={false}
             />
           </div>
           {/* Status filter buttons – styled like the dashboard nodes sort buttons */}
@@ -3550,8 +3555,8 @@ function InformerResourcePage({ resource }: { resource: string }) {
                 value={selectedNamespace}
                 onChange={(value) => setSelectedNamespace(value ?? 'all')}
                 data={namespaces.map((n) => ({ value: n, label: n === 'all' ? 'All namespaces' : n }))}
-                size="xs"
-                w={220}
+                size="sm"
+                w={320}
                 searchable
                 allowDeselect={false}
                 spellCheck={false}
@@ -3566,8 +3571,8 @@ function InformerResourcePage({ resource }: { resource: string }) {
               type="search"
               value={globalFilter}
               onChange={(e) => setGlobalFilter(e.target.value)}
-              placeholder={`Filter ${label.toLowerCase()}...`}
-              className="lucid-control rounded pl-6 pr-3 py-1 text-[11px] min-w-[200px] focus:outline-none font-label"
+              placeholder={`Filter ${label.toLowerCase()}`}
+              className="lucid-control rounded pl-6 pr-3 py-1 !text-[14px] placeholder:text-[14px] min-w-[200px] focus:outline-none font-label"
               autoComplete="off"
               spellCheck={false}
             />

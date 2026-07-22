@@ -114,6 +114,85 @@ const SPEC_OMIT = [
   'configSource',           // Node dynamic config
 ]
 
+// ── Quota visualization helpers ────────────────────────────────────────────
+function parseQuantity(q: string | number): number {
+  if (typeof q === 'number') return q
+  if (!q) return 0
+  const str = String(q).trim()
+  if (!str) return 0
+
+  const units: Record<string, number> = {
+    Ki: 1024, Mi: 1024 ** 2, Gi: 1024 ** 3, Ti: 1024 ** 4, Pi: 1024 ** 5,
+    K: 1000, M: 1000 ** 2, G: 1000 ** 3, T: 1000 ** 4, P: 1000 ** 5,
+    m: 0.001,
+  }
+
+  const match = str.match(/^([0-9.]+)([a-zA-Z%]*)$/)
+  if (!match) return 0
+
+  const num = parseFloat(match[1])
+  const unit = match[2] || ''
+  if (unit === '%') return num / 100
+  if (unit === '') return num
+  const multiplier = units[unit] || 1
+  return num * multiplier
+}
+
+function formatQuantity(v: string | number): string {
+  if (!v) return '0'
+  return String(v)
+}
+
+function QuotaUsageBar({ label, hard, used }: { label: string; hard: string; used: string }) {
+  const hardVal = parseQuantity(hard)
+  const usedVal = parseQuantity(used)
+  const pct = hardVal > 0 ? Math.min((usedVal / hardVal) * 100, 100) : 0
+  const isHigh = pct >= 80
+  const isCritical = pct >= 95
+
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[11px] font-medium text-foreground truncate flex-1">{label}</span>
+        <span className="text-[10px] text-muted-foreground font-mono whitespace-nowrap">
+          {formatQuantity(used)} / {formatQuantity(hard)}
+        </span>
+      </div>
+      <div className="h-2 rounded-full bg-surface-container-high overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all ${
+            isCritical ? 'bg-red-500/80' : isHigh ? 'bg-amber-500/80' : 'bg-emerald-500/70'
+          }`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  )
+}
+
+function ResourceQuotaSection({ full }: { full: Record<string, unknown> }) {
+  const spec = full.spec as Record<string, unknown> | undefined
+  const status = full.status as Record<string, unknown> | undefined
+  const hard = spec?.hard ? (spec.hard as Record<string, string>) : {}
+  const used = status?.used ? (status.used as Record<string, string>) : {}
+
+  if (Object.keys(hard).length === 0) {
+    return null
+  }
+
+  return (
+    <div className="rounded-lg border border-border bg-accent/10 p-4 space-y-3">
+      <h3 className="text-sm font-semibold text-foreground">Resource Limits</h3>
+      <div className="space-y-2">
+        {Object.entries(hard).map(([key, hardVal]) => {
+          const usedVal = used[key] ?? '0'
+          return <QuotaUsageBar key={key} label={key} hard={hardVal} used={usedVal} />
+        })}
+      </div>
+    </div>
+  )
+}
+
 function OverviewTab({ full, resourceType, namespace, name }: { full: Record<string, unknown> | null; resourceType?: string; namespace?: string; name?: string }) {
   const [detailFilter, setDetailFilter] = useState('')
 
@@ -176,6 +255,7 @@ function OverviewTab({ full, resourceType, namespace, name }: { full: Record<str
       {containerPorts.length > 0 && namespace && name && (
         <PortForwardBadges namespace={namespace} podName={name} ports={containerPorts} />
       )}
+      {resourceType === 'resourcequotas' && <ResourceQuotaSection full={full} />}
       <DynamicResourceSection title="Details" data={extraTopLevel} query={detailFilter} />
       <TooltipResourceSection
         title="Spec"
@@ -297,7 +377,6 @@ function EditTab({
   const [ready,          setReady]          = useState(false)
   const [saving,         setSaving]         = useState(false)
   const [dirty,          setDirty]          = useState(false)
-  const [err,            setErr]            = useState<string | null>(null)
   const [hasSyntaxError, setHasSyntaxError] = useState(false)
 
   // Init Ace once full manifest arrives
@@ -348,7 +427,7 @@ function EditTab({
   const handleSave = async () => {
     if (!editorRef.current) return
     if (hasSyntaxError) {
-      setErr('YAML syntax error — fix before saving')
+      uiNotify.error('YAML syntax error — fix before saving')
       return
     }
     const yaml = editorRef.current.getValue()
@@ -357,11 +436,10 @@ function EditTab({
     try {
       obj = win.jsyaml?.load(yaml) ?? JSON.parse(yaml)
     } catch (e) {
-      setErr(`YAML parse error: ${e instanceof Error ? e.message : 'invalid'}`)
+      uiNotify.error(`YAML parse error: ${e instanceof Error ? e.message : 'invalid'}`)
       return
     }
     setSaving(true)
-    setErr(null)
     try {
       await ResourceEdit(resourceType, namespace, name, JSON.stringify(obj))
       uiNotify.success(`Saved ${resourceType}/${name}`)
@@ -371,7 +449,6 @@ function EditTab({
       onSaved()
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'unknown'
-      setErr(`Save failed: ${msg}`)
       uiNotify.error(`Save failed: ${msg}`)
     } finally {
       setSaving(false)
@@ -382,8 +459,6 @@ function EditTab({
 
   return (
     <div className="flex flex-col h-full p-4 gap-3">
-      {err && <p className="text-sm text-red-400">Error: {err}</p>}
-
       <div className="flex items-center justify-between text-[10px] text-muted-foreground px-1">
         <span className="font-mono" />
         <span>{!ready ? 'Loading…' : hasSyntaxError ? '⚠ YAML syntax error' : dirty ? 'Unsaved changes' : 'Up to date'}</span>

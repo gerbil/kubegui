@@ -17,6 +17,7 @@ import {
   Activity,
   Users,
   Puzzle,
+  ShieldCheck,
 } from 'lucide-react'
 export type MenuItem = {
   id: string
@@ -223,6 +224,12 @@ export const menuConfig: MenuSection[] = [
           informerItem('clusterroles', Shield),
           informerItem('clusterrolebindings', Shield),
         ],
+      },
+      {
+        id: 'my-permissions',
+        label: 'My Permissions',
+        icon: ShieldCheck,
+        href: '/my-permissions',
       },
     ],
   },

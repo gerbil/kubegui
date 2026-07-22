@@ -322,7 +322,6 @@ function CreateCRDResourceModal({
   const editorRef = useRef<any>(null)
   const [busy, setBusy] = useState(false)
   const [editorError, setEditorError] = useState<string | null>(null)
-  const [submitError, setSubmitError] = useState<string | null>(null)
   const [hasSyntaxError, setHasSyntaxError] = useState(false)
   const [visible, setVisible] = useState(false)
 
@@ -372,9 +371,8 @@ function CreateCRDResourceModal({
   }, [initialYaml])
 
   const handleCreate = async () => {
-    setSubmitError(null)
     if (hasSyntaxError) {
-      setSubmitError('YAML validation failed. Fix editor errors before creating.')
+      uiNotify.error('YAML validation failed. Fix editor errors before creating.')
       return
     }
     const win = window as JsYamlWindow
@@ -383,12 +381,12 @@ function CreateCRDResourceModal({
     try {
       obj = win.jsyaml ? win.jsyaml.load(yaml) : JSON.parse(yaml)
     } catch (e) {
-      setSubmitError(`Invalid YAML: ${e instanceof Error ? e.message : 'parse error'}`)
+      uiNotify.error(`Invalid YAML: ${e instanceof Error ? e.message : 'parse error'}`)
       return
     }
     const meta = (obj as Record<string, unknown>)?.metadata as Record<string, unknown> | undefined
     const name = String(meta?.name ?? '').trim()
-    if (!name) { setSubmitError('metadata.name is required'); return }
+    if (!name) { uiNotify.error('metadata.name is required'); return }
 
     setBusy(true)
     try {
@@ -397,7 +395,7 @@ function CreateCRDResourceModal({
       destroyEditor()
       onClose()
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'unknown error')
+      uiNotify.error(err instanceof Error ? err.message : 'unknown error')
     } finally {
       setBusy(false)
     }
@@ -425,17 +423,6 @@ function CreateCRDResourceModal({
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
           </button>
         </div>
-
-        {/* Submit error */}
-        {submitError && (
-          <div className="mx-4 mt-3 shrink-0 flex items-start gap-2 rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2.5 text-sm text-red-400">
-            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            <span className="break-all">{submitError}</span>
-            <button onClick={() => setSubmitError(null)} className="ml-auto shrink-0 hover:text-red-300">
-              <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-            </button>
-          </div>
-        )}
 
         {/* Editor */}
         <div className="flex-1 min-h-0 p-4 flex flex-col gap-3">
@@ -745,7 +732,7 @@ export function CRDResourcePage({ definition, namespace = '', onNavigateBack, ca
               type="search"
               value={globalFilter}
               onChange={(e) => setGlobalFilter(e.target.value)}
-              placeholder={`Filter ${label.toLowerCase()}...`}
+              placeholder={`Filter ${definition.kind.toLowerCase()}...`}
               className="lucid-control rounded pl-7 pr-3 py-1 text-[10px] min-w-[200px] focus:outline-none font-label"
               autoComplete="off"
               spellCheck={false}

@@ -10,7 +10,7 @@ info:
   description: "Kubernetes admin desktop client" # The application description
   copyright: "(c) 2026, Kubegui" # Copyright text
   comments: "Kubernetes admin desktop client" # Comments
-  version: "2.0.3" # The application version
+  version: "2.0.5" # The application version
 # Dev mode configuration
 dev_mode:
   root_path: .

@@ -211,11 +211,126 @@ async function fetchNamespacePodCount(name: string): Promise<number> {
   }
 }
 
+type QuotaUsage = {
+  name: string
+  hard: Record<string, string>
+  used: Record<string, string>
+}
+
+async function fetchNamespaceQuotas(name: string): Promise<QuotaUsage[]> {
+  try {
+    const list = await listResourcesViaBinding('resourcequotas', name)
+    return list
+      .filter((item) => item && typeof item === 'object')
+      .map((item) => {
+        const obj = item as Record<string, unknown>
+        const metadata = obj.metadata as Record<string, unknown> | undefined
+        const spec = obj.spec as Record<string, unknown> | undefined
+        const status = obj.status as Record<string, unknown> | undefined
+        return {
+          name: String(metadata?.name ?? 'unknown'),
+          hard: spec?.hard ? (spec.hard as Record<string, string>) : {},
+          used: status?.used ? (status.used as Record<string, string>) : {},
+        }
+      })
+  } catch {
+    return []
+  }
+}
+
+function parseQuantity(q: string | number): number {
+  if (typeof q === 'number') return q
+  if (!q) return 0
+  const str = String(q).trim()
+  if (!str) return 0
+
+  const units: Record<string, number> = {
+    Ki: 1024, Mi: 1024 ** 2, Gi: 1024 ** 3, Ti: 1024 ** 4, Pi: 1024 ** 5,
+    K: 1000, M: 1000 ** 2, G: 1000 ** 3, T: 1000 ** 4, P: 1000 ** 5,
+    m: 0.001,
+  }
+
+  let match = str.match(/^([0-9.]+)([a-zA-Z%]*)$/)
+  if (!match) return 0
+
+  const num = parseFloat(match[1])
+  const unit = match[2] || ''
+  if (unit === '%') return num / 100
+  if (unit === '') return num
+  const multiplier = units[unit] || 1
+  return num * multiplier
+}
+
+function formatQuantity(v: string | number): string {
+  if (!v) return '0'
+  return String(v)
+}
+
+function QuotaUsageBar({ label, hard, used }: { label: string; hard: string; used: string }) {
+  const hardVal = parseQuantity(hard)
+  const usedVal = parseQuantity(used)
+  const pct = hardVal > 0 ? Math.min((usedVal / hardVal) * 100, 100) : 0
+  const isHigh = pct >= 80
+  const isCritical = pct >= 95
+
+  return (
+    <div className="space-y-1">
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[11px] font-medium text-foreground truncate flex-1">{label}</span>
+        <span className="text-[10px] text-muted-foreground font-mono whitespace-nowrap">
+          {formatQuantity(used)} / {formatQuantity(hard)}
+        </span>
+      </div>
+      <div className="h-2 rounded-full bg-surface-container-high overflow-hidden">
+        <div
+          className={`h-full rounded-full transition-all ${
+            isCritical ? 'bg-red-500/80' : isHigh ? 'bg-amber-500/80' : 'bg-emerald-500/70'
+          }`}
+          style={{ width: `${pct}%` }}
+        />
+      </div>
+    </div>
+  )
+}
+
+function QuotasSection({ quotas }: { quotas: QuotaUsage[] }) {
+  if (quotas.length === 0) {
+    return null
+  }
+
+  return (
+    <div className="rounded-lg border border-border bg-accent/10 p-4 space-y-3">
+      <div className="flex items-center justify-between mb-2">
+        <h3 className="text-sm font-semibold text-foreground">Resource Quotas</h3>
+        <span className="text-xs px-2 py-1 rounded bg-primary/20 text-primary font-mono">{quotas.length} quota{quotas.length !== 1 ? 's' : ''}</span>
+      </div>
+
+      <div className="space-y-4">
+        {quotas.map((quota) => (
+          <div key={quota.name} className="space-y-2.5">
+            <p className="text-[10px] font-mono font-bold text-muted-foreground uppercase tracking-wider">{quota.name}</p>
+            <div className="space-y-2 pl-2">
+              {Object.entries(quota.hard).map(([key, hardVal]) => {
+                const usedVal = quota.used[key] ?? '0'
+                return <QuotaUsageBar key={`${quota.name}-${key}`} label={key} hard={hardVal} used={usedVal} />
+              })}
+              {Object.keys(quota.hard).length === 0 && (
+                <p className="text-[10px] text-muted-foreground/60 italic">No quota limits defined</p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
 function OverviewTab({ namespace }: { namespace: NamespaceActionTarget }) {
   const [details, setDetails] = useState<Record<string, unknown> | null>(null)
   const [loading, setLoading] = useState(true)
   const [err, setErr] = useState<string | null>(null)
   const [podCount, setPodCount] = useState<number>(0)
+  const [quotas, setQuotas] = useState<QuotaUsage[]>([])
 
   useEffect(() => {
     let cancelled = false
@@ -225,11 +340,13 @@ function OverviewTab({ namespace }: { namespace: NamespaceActionTarget }) {
     Promise.all([
       fetchNamespaceResource(namespace.name),
       fetchNamespacePodCount(namespace.name),
+      fetchNamespaceQuotas(namespace.name),
     ])
-      .then(([d, pods]) => {
+      .then(([d, pods, quotaList]) => {
         if (cancelled) return
         setDetails(d)
         setPodCount(pods)
+        setQuotas(quotaList)
       })
       .catch((e: unknown) => {
         if (cancelled) return
@@ -258,6 +375,7 @@ function OverviewTab({ namespace }: { namespace: NamespaceActionTarget }) {
         <MetricCard label="Pods" value={String(podCount)} color="#38bdf8" />
         <MetricCard label="Labels" value={String(labelCount)} color="#a78bfa" />
       </div>
+      {quotas.length > 0 && <QuotasSection quotas={quotas} />}
       <ResourceManifestOverview resource={details} fields={namespaceOverviewFields} />
       <LabelsSection resource={details} />
       <AnnotationsSection resource={details} />
@@ -280,7 +398,6 @@ function EditTab({ namespace, onSaved }: { namespace: NamespaceActionTarget; onS
   const baselineYamlRef = useRef('')
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
-  const [err, setErr] = useState<string | null>(null)
   const [dirty, setDirty] = useState(false)
   const [hasSyntaxError, setHasSyntaxError] = useState(false)
 
@@ -289,7 +406,6 @@ function EditTab({ namespace, onSaved }: { namespace: NamespaceActionTarget; onS
 
     const setup = async () => {
       setLoading(true)
-      setErr(null)
       setDirty(false)
 
       try {
@@ -326,7 +442,6 @@ function EditTab({ namespace, onSaved }: { namespace: NamespaceActionTarget; onS
       } catch (e) {
         if (cancelled) return
         const msg = e instanceof Error ? e.message : 'editor setup failed'
-        setErr(msg)
         uiNotify.error(`Failed to load namespace YAML editor: ${msg}`)
       } finally {
         if (!cancelled) setLoading(false)
@@ -348,12 +463,11 @@ function EditTab({ namespace, onSaved }: { namespace: NamespaceActionTarget; onS
     const editor = editorRef.current
     if (!editor) return
     if (hasSyntaxError) {
-      setErr('YAML validation failed. Fix editor errors before saving.')
+      uiNotify.error('YAML validation failed. Fix editor errors before saving.')
       return
     }
 
     setSaving(true)
-    setErr(null)
     try {
       const win = window as LegacyEditorWindow
       if (!win.jsyaml) throw new Error('YAML parser is not available')
@@ -385,7 +499,6 @@ function EditTab({ namespace, onSaved }: { namespace: NamespaceActionTarget; onS
       onSaved?.(namespace.name)
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'save failed'
-      setErr(msg)
       uiNotify.error(`YAML save failed: ${msg}`)
     } finally {
       setSaving(false)
@@ -402,7 +515,6 @@ function EditTab({ namespace, onSaved }: { namespace: NamespaceActionTarget; onS
 
   return (
     <div className="flex flex-col h-full p-4 gap-3">
-      {err && <p className="text-sm text-red-400">Error: {err}</p>}
 
       <div className="flex items-center justify-between text-[10px] text-muted-foreground px-1">
         <span className="font-mono"></span>

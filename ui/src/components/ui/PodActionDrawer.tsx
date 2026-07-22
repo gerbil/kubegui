@@ -712,7 +712,6 @@ function EditTab({ pod }: { pod: PodRow }) {
   const containerRef = useRef<HTMLDivElement | null>(null)
   const originalRef = useRef<string>('')
   const [loading, setLoading] = useState(true)
-  const [err, setErr] = useState<string | null>(null)
   const [dirty, setDirty] = useState(false)
   const [saving, setSaving] = useState(false)
   const [hasSyntaxError, setHasSyntaxError] = useState(false)
@@ -747,7 +746,7 @@ function EditTab({ pod }: { pod: PodRow }) {
         await new Promise<void>(r => requestAnimationFrame(() => r()))
         if (!destroyed) { editor.resize?.(); setLoading(false) }
       } catch (e) {
-        if (!destroyed) setErr(e instanceof Error ? e.message : 'fetch error')
+        if (!destroyed) uiNotify.error(e instanceof Error ? e.message : 'fetch error')
       }
     }
     void init()
@@ -771,9 +770,8 @@ function EditTab({ pod }: { pod: PodRow }) {
   const save = async () => {
     const editor = editorRef.current
     if (!editor) return
-    if (hasSyntaxError) { setErr('YAML syntax error — fix before saving'); return }
+    if (hasSyntaxError) { uiNotify.error('YAML syntax error — fix before saving'); return }
     setSaving(true)
-    setErr(null)
     try {
       const win = window as LegacyEditorWindow
       if (!win.jsyaml) throw new Error('YAML parser not available')
@@ -796,7 +794,6 @@ function EditTab({ pod }: { pod: PodRow }) {
       uiNotify.success(`Pod ${pod.name} updated successfully`)
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'save failed'
-      setErr(msg)
       uiNotify.error(`Save failed: ${msg}`)
     } finally {
       setSaving(false)
@@ -805,7 +802,6 @@ function EditTab({ pod }: { pod: PodRow }) {
 
   return (
     <div className="flex flex-col h-full p-4 gap-3">
-      {err && <p className="text-sm text-red-400">Error: {err}</p>}
 
       <div className="flex items-center justify-between text-[10px] text-muted-foreground px-1">
         <span className="font-mono" />

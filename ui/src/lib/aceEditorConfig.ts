@@ -1,6 +1,6 @@
 import { attachSimpleAceSearch } from './aceSearch'
 
-type AceAnnotation = { type?: string }
+type AceAnnotation = { row?: number; column?: number; text?: string; type?: string }
 
 type AceSessionLike = {
   setMode?: (mode: string) => void
@@ -8,6 +8,7 @@ type AceSessionLike = {
   setTabSize?: (size: number) => void
   setUseSoftTabs?: (enabled: boolean) => void
   getAnnotations?: () => AceAnnotation[]
+  setAnnotations?: (annotations: AceAnnotation[]) => void
   on?: (event: string, cb: () => void) => void
 }
 
@@ -16,6 +17,11 @@ type AceEditorLike = {
   setTheme?: (theme: string) => void
   setReadOnly?: (value: boolean) => void
   getSession?: () => AceSessionLike
+  getValue?: () => string
+}
+
+type JsYamlWindow = {
+  jsyaml?: { load: (s: string) => unknown }
 }
 
 type ConfigureAceYamlOptions = {
@@ -41,7 +47,7 @@ export function configureAceYamlEditor(editor: unknown, options: ConfigureAceYam
     showPrintMargin: false,
     tabSize: 2,
     useSoftTabs: true,
-    useWorker: true,
+    useWorker: false,   // worker unreliable in Wails — inline validation below
     readOnly,
     highlightActiveLine: true,
     highlightSelectedWord: true,
@@ -58,13 +64,30 @@ export function configureAceYamlEditor(editor: unknown, options: ConfigureAceYam
 
   attachSimpleAceSearch(editor)
 
-  if (options.onValidationChange) {
-    const syncValidation = () => {
-      const annotations = session?.getAnnotations?.() ?? []
-      options.onValidationChange?.(annotations.some((a) => a?.type === 'error'))
-    }
-    session?.on?.('changeAnnotation', syncValidation)
-    syncValidation()
+  // Inline YAML validation via js-yaml — works without WebWorkers (Wails compatible).
+  // Debounced 300ms; sets gutter annotations + fires onValidationChange.
+  let validateTimer: ReturnType<typeof setTimeout> | null = null
+  const validate = () => {
+    if (validateTimer !== null) clearTimeout(validateTimer)
+    validateTimer = setTimeout(() => {
+      validateTimer = null
+      const value = aceEditor.getValue?.() ?? ''
+      const jsyaml = (window as unknown as JsYamlWindow).jsyaml
+      if (!jsyaml || !session) return
+      try {
+        jsyaml.load(value)
+        session.setAnnotations?.([])
+        options.onValidationChange?.(false)
+      } catch (e) {
+        const err = e as { mark?: { line?: number; column?: number }; reason?: string; message?: string }
+        const row = err.mark?.line ?? 0
+        const col = err.mark?.column ?? 0
+        const text = err.reason ?? err.message ?? 'YAML syntax error'
+        session.setAnnotations?.([{ row, column: col, text, type: 'error' }])
+        options.onValidationChange?.(true)
+      }
+    }, 300)
   }
-}
 
+  session?.on?.('change', validate)
+}
