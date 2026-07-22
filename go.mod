@@ -5,7 +5,7 @@ go 1.26.0
 require (
 	github.com/Skarlso/crd-to-sample-yaml v1.2.2
 	github.com/cilium/cilium v1.19.6
-	github.com/go-logr/logr v1.4.3
+	github.com/go-logr/logr v1.4.4
 	github.com/golang-migrate/migrate/v4 v4.19.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 	github.com/matryer/runner v0.0.0-20211213160944-9f99df82ff29
