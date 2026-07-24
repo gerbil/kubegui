@@ -105,13 +105,13 @@ Standard resources (required informer list from `internal/resources/kube/resourc
 ## Release for MAC (winlinx versions are released via github actions):
 ```
 version=2.0.0 wails3 task release
-version=2.0.0 wails3 task release:mac:prod
+wails3 task release:mac:prod
 ```
 
 ## Release builds:
 ```
-version=2.0.0 wails3 task build:windows:prod
-version=2.0.0 wails3 task build:mac:prod
+wails3 task build:windows:prod
+wails3 task build:mac:prod
 ```
 
 ### Release sign (win): 
