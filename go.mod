@@ -11,7 +11,7 @@ require (
 	github.com/matryer/runner v0.0.0-20211213160944-9f99df82ff29
 	github.com/samber/slog-multi v1.8.0
 	github.com/stretchr/testify v1.11.1
-	github.com/wailsapp/wails/v3 v3.0.0-alpha2.117
+	github.com/wailsapp/wails/v3 v3.0.0-alpha2.118
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 	k8s.io/api v0.36.3
 	k8s.io/apiextensions-apiserver v0.36.3
