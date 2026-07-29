@@ -80,13 +80,24 @@ func main() {
           }
 
           // Pod shell exec WebSocket endpoint
-          // xterm-global.js connects to ws://wails.localhost:9245/resource/exec/{ns}/{name}/{cname}
-          if strings.HasPrefix(req.URL.Path, "/resource/exec/") {
-            services.PodExecHandler(rw, req)
-            return
-          }
+           // xterm-global.js connects to ws://wails.localhost:9245/resource/exec/{ns}/{name}/{cname}
+           if strings.HasPrefix(req.URL.Path, "/resource/exec/") {
+             services.PodExecHandler(rw, req)
+             return
+           }
 
-          next.ServeHTTP(rw, req)
+           // CVE scan endpoint
+           if req.URL.Path == "/api/v1/cve-scan" {
+             services.CVEScanHandler(rw, req)
+             return
+           }
+
+               if req.URL.Path == "/api/v1/cve-db/refresh" {
+                 services.CVEDBRefreshHandler(rw, req)
+                 return
+               }
+
+           next.ServeHTTP(rw, req)
         })
       },
     },

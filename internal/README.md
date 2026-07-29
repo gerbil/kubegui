@@ -1,0 +1,13 @@
+## Informers design
+- Informers run in the backend, watching Kubernetes resources
+- Informers emit events to the frontend via wails bridge
+- Frontend updates UI based on informer events
+- Each informer is responsible for a specific resource type (e.g., Pods, Deployments)
+- All informers should run in the background and keep the frontend updated with the latest cluster state
+- All informers should have sync state (health) endpoint that the frontend can call to verify they are running properly
+- All informers should have list endpoint that the frontend can call to get the current state of resources when needed (e.g., on page load)
+- Nodes informer should start first, as it is required for dashboard view
+- Informers should send only table (ui th) fields data as events.
+- Informers should have a small buffer loop to batch events and avoid overwhelming the frontend with too many updates in busy clusters.
+- Informers should handle errors gracefully and emit error events to the frontend if they encounter issues (e.g., lost connection to Kubernetes API).
+- Informers should have enpoints (exposed via wails bindings) for details/list of recent resource related events and logs. The frontend can call these endpoints when user clicks on a resource to show the details/events/logs view.

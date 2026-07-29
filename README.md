@@ -3,7 +3,6 @@ Official website - https://kubegui.net
 
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui.svg?type=shield&issueType=license)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui?ref=badge_shield&issueType=license) [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui.svg?type=shield&issueType=security)](https://app.fossa.com/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui?ref=badge_shield&issueType=security) [![Release](https://github.com/gerbil/kubegui/actions/workflows/release.yml/badge.svg)](https://github.com/gerbil/kubegui/actions/workflows/release.yml) [![CodeQL](https://github.com/gerbil/kubegui/actions/workflows/codeql.yml/badge.svg)](https://github.com/gerbil/kubegui/actions/workflows/codeql.yml)  
 
-
 ![kubegui](./web/images/kubegui.png)  
 
 # Features
@@ -23,9 +22,11 @@ Official website - https://kubegui.net
 > - Resource quota details visualisation
 > - RBAC roles/bindings graph/flow view
 > - Settings to change ui font/size
+> - Trivy cve scans (ondemand)
 
 # TODO:
 - AI suggestions for issues/errors/warnings/etc
+- Application auto update based on newer version from Github
 
 ## Scope:
 1. Application code
@@ -33,19 +34,7 @@ Official website - https://kubegui.net
 3. Website src
 4. Issues/Bugs/Discussions hub
 
-# DEV
-## Rebuild all & run app in dev mode
-wails3 task dev:all
-## Rebuild react frontend app only
-wails3 task install:frontend:deps
-# Regenerate backend wails service bindings
-wails3 task generate:bindings
-## Run dev frontend (vite+react)
-wails3 task dev:frontend
-## Run dev wails app (backend)
-wails3 task dev:backend
-
-# Architecture (backend)
+# GUI / Backend
 - Wails application serves as GUI and backend RPC server
 - Backend logic organized into services with wails bindings
 - Services can call each other and share internal logic
@@ -56,26 +45,9 @@ wails3 task dev:backend
 ## Wails bridge
 `internal/` - real backend implementations, not exposed to the frontend  
 `services/` - backend implementations exposed to the frontend, with wails bindings
-! services are thin bridge for real internal functions for the frontend  
+! services are thin bridge for real internal functions for the frontend
 
-## Informers design
-- Informers run in the backend, watching Kubernetes resources
-- Informers emit events to the frontend via wails bridge
-- Frontend updates UI based on informer events
-- Each informer is responsible for a specific resource type (e.g., Pods, Deployments)
-- All informers should run in the background and keep the frontend updated with the latest cluster state
-- All informers should have sync state (health) endpoint that the frontend can call to verify they are running properly
-- All informers should have list endpoint that the frontend can call to get the current state of resources when needed (e.g., on page load)
-- Nodes informer should start first, as it is required for dashboard view
-- Informers should send only table (ui th) fields data as events.
-- Informers should have a small buffer loop to batch events and avoid overwhelming the frontend with too many updates in busy clusters.
-- Informers should handle errors gracefully and emit error events to the frontend if they encounter issues (e.g., lost connection to Kubernetes API).
-- Informers should have enpoints (exposed via wails bindings) for details/list of recent resource related events and logs. The frontend can call these endpoints when user clicks on a resource to show the details/events/logs view.
-
-## Current resource inventory
-Standard resources (required informer list from `internal/resources/kube/resources.go`)
-
-# Architecture (frontend)
+# Frontend
 - React + TypeScript + Vite frontend
 - Mantine UI components for layout and styling
 - React Router for client-side routing
@@ -102,16 +74,36 @@ Standard resources (required informer list from `internal/resources/kube/resourc
 - Debounce High-Traffic Events: Use a small buffer loop in Go or debouncing in Zustand so React does not re-render 100 times a second.
 - Auto-Scroll to Bottom: If this list is a live Event stream or Log viewer, you can use rowVirtualizer.scrollToIndex(resources.length - 1) inside a useEffect to snap the view to the latest items.
 
-## Release for MAC (winlinx versions are released via github actions):
-```
-version=2.0.0 wails3 task release
-wails3 task release:mac:prod
-```
+# DEV
+## Rebuild all & run app in dev mode
+wails3 task dev:all
+## Rebuild react frontend app only
+wails3 task install:frontend:deps
+# Regenerate backend wails service bindings
+wails3 task generate:bindings
+## Run dev frontend (vite+react)
+wails3 task dev:frontend
+## Run dev wails app (backend)
+wails3 task dev:backend
+
+# Pre-release checks
+- All tests passed
+- Windows and Mac prod versions built and tested
+- All release notesand changelog updated
+- Version bump - `version=x.x.x wails3 task release`\
+
+# Post-release checks
+- Check and fix FOSSA license and security issues
 
 ## Release builds:
 ```
-wails3 task build:windows:prod
-wails3 task build:mac:prod
+version=2.0.0 wails3 task build:windows:prod
+version=2.0.0 wails3 task build:mac:prod
+```
+
+## Release for MAC (winlinx versions are released via GitHub actions):
+```
+version=2.0.0 wails3 task release:mac:prod
 ```
 
 ### Release sign (win): 

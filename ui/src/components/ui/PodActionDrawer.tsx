@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { X, Boxes, Radio, Terminal, Trash2, FileText, Pencil } from 'lucide-react'
+import { X, Boxes, Radio, Terminal, Trash2, FileText, Pencil, ShieldAlert, Loader2 } from 'lucide-react'
 import { UiTooltip } from './UiTooltip'
 import { uiNotify } from './UiNotify'
 import { configureAceYamlEditor } from '@/lib/aceEditorConfig'
@@ -13,6 +13,8 @@ import { PortForwardBadges } from './PortForwardBadges'
 import { BackendEventSource } from '../../lib/wailsBackendTransport'
 import { Events } from '@wailsio/runtime'
 import { EventsGetResource, ResourceGetDetails, ResourceDelete, ResourceEdit, PodGetMetricsByNameFromDB, StartPodShellSession, SendPodShellInput, ResizePodShellSession, StopPodShellSession } from '../../../bindings/kubegui/services/backend'
+import { usePersistentState } from '../../hooks/usePersistentState'
+import { CVE_SCANS_ENABLED_STORAGE_KEY, ENABLE_CVE_SCANS_TOOLTIP } from '../../lib/cveScanSettings'
 import hljs from 'highlight.js/lib/core'
 import hljsJson from 'highlight.js/lib/languages/json'
 import hljsBash from 'highlight.js/lib/languages/bash'
@@ -26,6 +28,26 @@ hljs.registerLanguage('yaml', hljsYaml)
 hljs.registerLanguage('accesslog', hljsAccesslog)
 
 type Tab = 'overview' | 'events' | 'logs' | 'shell' | 'edit'
+
+type CVESeverity = 'CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'UNKNOWN'
+
+type CVEFinding = {
+  id: string
+  pkgName: string
+  installed: string
+  fixed: string
+  severity: CVESeverity | string
+  title: string
+}
+
+type CVEScanReport = {
+  scanner: 'trivy' | string
+  image: string
+  container: string
+  summary: Partial<Record<CVESeverity, number>>
+  findings: CVEFinding[]
+  generatedAt: string
+}
 
 type AceAnnotation = { type?: string }
 
@@ -839,6 +861,125 @@ function EditTab({ pod }: { pod: PodRow }) {
 
 // ─── Action button ────────────────────────────────────────────────────────────
 
+function cveSeverityBadge(severity: string): string {
+  const s = String(severity || '').toUpperCase()
+  if (s === 'CRITICAL') return 'bg-red-500/15 border-red-500/35 text-red-300'
+  if (s === 'HIGH') return 'bg-orange-500/15 border-orange-500/35 text-orange-300'
+  if (s === 'MEDIUM') return 'bg-amber-500/15 border-amber-500/35 text-amber-300'
+  if (s === 'LOW') return 'bg-blue-500/15 border-blue-500/35 text-blue-300'
+  return 'bg-slate-500/15 border-slate-500/35 text-slate-300'
+}
+
+function CVEScanModal({
+  open,
+  loading,
+  report,
+  error,
+  onRescan,
+  onClose,
+}: {
+  open: boolean
+  loading: boolean
+  report: CVEScanReport | null
+  error: string | null
+  onRescan: () => void
+  onClose: () => void
+}) {
+  if (!open) return null
+
+  const summary = report?.summary ?? {}
+  const findings = report?.findings ?? []
+
+  return (
+    <>
+      <div className="fixed inset-0 bg-black/50 z-[220]" onClick={onClose} />
+      <div className="fixed left-1/2 top-1/2 z-[221] w-[920px] max-w-[96vw] max-h-[88vh] -translate-x-1/2 -translate-y-1/2 rounded-xl border border-border bg-card shadow-2xl overflow-hidden flex flex-col">
+        <div className="px-5 py-4 border-b border-border bg-accent/20 flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <p className="font-modal text-[14px] font-bold text-foreground">Image CVE Scan</p>
+            <p className="font-mono text-[10px] text-muted-foreground truncate">
+              {report?.image || 'Scan not started'}
+            </p>
+          </div>
+          <button onClick={onClose} className="text-muted-foreground hover:text-foreground" aria-label="Close CVE modal">
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="px-5 py-3 border-b border-border bg-accent/10 flex items-center gap-2">
+          <span className="inline-flex h-8 items-center rounded border border-border bg-accent/30 px-3 text-[11px] font-semibold text-foreground">
+            Embedded Trivy
+          </span>
+          <button
+            onClick={onRescan}
+            disabled={loading}
+            className="h-8 px-3 rounded border border-border text-[11px] font-semibold text-muted-foreground hover:text-foreground hover:bg-accent/40 disabled:opacity-50 flex items-center gap-1.5"
+          >
+            {loading ? <Loader2 size={12} className="animate-spin" /> : <ShieldAlert size={12} />}
+            {loading ? 'Scanning…' : 'Rescan'}
+          </button>
+          <div className="ml-auto flex items-center gap-1.5 text-[10px] font-mono">
+            {(['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'] as const).map((sev) => (
+              <span key={sev} className={`inline-flex items-center gap-1 rounded border px-2 py-0.5 ${cveSeverityBadge(sev)}`}>
+                <span>{sev}</span>
+                <span className="font-semibold">{summary[sev] ?? 0}</span>
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-auto">
+          {error && (
+            <div className="m-4 rounded border border-red-500/30 bg-red-500/10 px-3 py-2 text-[11px] text-red-300">{error}</div>
+          )}
+
+          {!error && !loading && report && findings.length === 0 && (
+            <div className="m-4 rounded border border-emerald-500/30 bg-emerald-500/10 px-3 py-2 text-[11px] text-emerald-300">
+              No vulnerabilities reported by embedded Trivy.
+            </div>
+          )}
+
+          {!error && findings.length > 0 && (
+            <table className="w-full text-left text-[11px] font-modal">
+              <thead className="sticky top-0 bg-card border-b border-border/60">
+                <tr>
+                  <th className="px-4 py-2 font-semibold text-muted-foreground">Severity</th>
+                  <th className="px-4 py-2 font-semibold text-muted-foreground">CVE</th>
+                  <th className="px-4 py-2 font-semibold text-muted-foreground">Package</th>
+                  <th className="px-4 py-2 font-semibold text-muted-foreground">Installed</th>
+                  <th className="px-4 py-2 font-semibold text-muted-foreground">Fixed</th>
+                  <th className="px-4 py-2 font-semibold text-muted-foreground">Title</th>
+                </tr>
+              </thead>
+              <tbody>
+                {findings.map((f, i) => (
+                  <tr key={`${f.id}:${i}`} className="border-b border-border/30 hover:bg-accent/20">
+                    <td className="px-4 py-2">
+                      <span className={`inline-flex rounded border px-2 py-0.5 text-[10px] font-semibold ${cveSeverityBadge(f.severity)}`}>{String(f.severity || 'UNKNOWN').toUpperCase()}</span>
+                    </td>
+                    <td className="px-4 py-2 font-mono text-cyan-300">{f.id || '—'}</td>
+                    <td className="px-4 py-2">{f.pkgName || '—'}</td>
+                    <td className="px-4 py-2 font-mono text-muted-foreground">{f.installed || '—'}</td>
+                    <td className="px-4 py-2 font-mono text-emerald-300">{f.fixed || '—'}</td>
+                    <td className="px-4 py-2 text-muted-foreground">{f.title || '—'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+        </div>
+
+        <div className="px-5 py-3 border-t border-border bg-accent/10 flex items-center justify-between text-[10px] text-muted-foreground font-mono">
+          <span>{report ? `${findings.length} findings shown · first scan may download Trivy DB` : 'ready'}</span>
+          <span>{report?.generatedAt || ''}</span>
+        </div>
+      </div>
+    </>
+  )
+}
+
+// ─── Action button ────────────────────────────────────────────────────────────
+
 function ActionBtn({ icon, label, onClick, disabled = false, danger = false }: {
   icon: React.ReactNode; label: string; onClick: () => void; disabled?: boolean; danger?: boolean
 }) {
@@ -862,9 +1003,23 @@ export function PodActionDrawer({ pod, initialTab = 'overview', onClose }: Props
   const [activeTab, setActiveTab] = useState<Tab>(initialTab)
   const [busy, setBusy] = useState(false)
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
+  const [scanOpen, setScanOpen] = useState(false)
+  const [scanLoading, setScanLoading] = useState(false)
+  const [scanError, setScanError] = useState<string | null>(null)
+  const [scanReport, setScanReport] = useState<CVEScanReport | null>(null)
+  const [cveScansEnabled] = usePersistentState<boolean>(CVE_SCANS_ENABLED_STORAGE_KEY, false)
 
   useEffect(() => { if (pod) setActiveTab(initialTab) }, [pod?.name, initialTab])
-  useEffect(() => { if (!pod) { setConfirmDeleteOpen(false); setBusy(false) } }, [pod])
+  useEffect(() => {
+    if (!pod) {
+      setConfirmDeleteOpen(false)
+      setBusy(false)
+      setScanOpen(false)
+      setScanLoading(false)
+      setScanError(null)
+      setScanReport(null)
+    }
+  }, [pod])
 
   const deletePod = async () => {
     if (!pod) return
@@ -877,6 +1032,42 @@ export function PodActionDrawer({ pod, initialTab = 'overview', onClose }: Props
       uiNotify.error(`Delete failed: ${err instanceof Error ? err.message : 'unknown'}`)
       setBusy(false)
     }
+  }
+
+  const runCveScan = async () => {
+    if (!pod) return
+    setScanLoading(true)
+    setScanError(null)
+    try {
+      const response = await fetch('/api/v1/cve-scan', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          namespace: pod.namespace,
+          podName: pod.name,
+          containerName: pod.primaryContainer,
+          scanner: 'trivy',
+        }),
+      })
+
+      const payload = await response.json() as CVEScanReport | { error?: string }
+      if (!response.ok) {
+        throw new Error((payload as { error?: string })?.error || 'CVE scan failed')
+      }
+      setScanReport(payload as CVEScanReport)
+    } catch (err) {
+      setScanError(err instanceof Error ? err.message : 'CVE scan failed')
+      setScanReport(null)
+    } finally {
+      setScanLoading(false)
+    }
+  }
+
+  const openCveScan = () => {
+    setScanOpen(true)
+    setScanReport(null)
+    setScanError(null)
+    void runCveScan()
   }
 
   const tabs: { id: Tab; label: string; icon: React.ReactNode }[] = [
@@ -936,6 +1127,11 @@ export function PodActionDrawer({ pod, initialTab = 'overview', onClose }: Props
           ))}
           <div className="flex-1" />
           <div className="flex items-center gap-2 py-2">
+            <UiTooltip content={ENABLE_CVE_SCANS_TOOLTIP} disabled={cveScansEnabled} side="bottom">
+              <span className="inline-flex">
+                <ActionBtn icon={<ShieldAlert size={13} />} label="Scan CVE" onClick={openCveScan} disabled={busy || scanLoading || !cveScansEnabled} />
+              </span>
+            </UiTooltip>
             <ActionBtn icon={<Trash2 size={13} />} label="Delete" onClick={() => setConfirmDeleteOpen(true)} disabled={busy} danger />
           </div>
         </div>
@@ -956,6 +1152,15 @@ export function PodActionDrawer({ pod, initialTab = 'overview', onClose }: Props
         confirmLabel="Delete pod"
         onConfirm={() => { setConfirmDeleteOpen(false); window.setTimeout(() => { void deletePod() }, 0) }}
         onCancel={() => setConfirmDeleteOpen(false)}
+      />
+
+      <CVEScanModal
+        open={scanOpen}
+        loading={scanLoading}
+        report={scanReport}
+        error={scanError}
+        onRescan={() => { void runCveScan() }}
+        onClose={() => setScanOpen(false)}
       />
     </>
   )

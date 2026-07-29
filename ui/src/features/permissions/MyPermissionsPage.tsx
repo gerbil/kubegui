@@ -1,8 +1,8 @@
 import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
-import { Search, ShieldCheck } from 'lucide-react'
 import { Select as MantineSelect } from '@mantine/core'
+import { Search } from 'lucide-react'
 import { AppGetMyPermissions } from '../../../bindings/kubegui/services/backend'
 import type { CanIResourceRow } from '../../../bindings/kubegui/internal/cani/models'
 import { DataTable } from '@/components/table/DataTable'
@@ -129,22 +129,6 @@ export function MyPermissionsPage() {
       {/* Toolbar */}
       <div className="lucid-surface rounded-lg p-3 flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-1.5">
-            <ShieldCheck size={12} className="text-muted-foreground shrink-0" />
-            <div className="relative">
-              <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-              <input
-                type="search"
-                value={globalFilter}
-                onChange={(e) => setGlobalFilter(e.target.value)}
-                placeholder="Search permissions…"
-                className="lucid-control rounded pl-7 pr-3 py-1 text-[10px] min-w-[200px] focus:outline-none font-label"
-                autoComplete="off"
-                spellCheck={false}
-              />
-            </div>
-          </div>
-
           <div className="flex items-center gap-2">
             <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-label shrink-0" htmlFor="permissions-namespace">Namespace</label>
             <MantineSelect
@@ -152,14 +136,28 @@ export function MyPermissionsPage() {
               value={ns}
               onChange={(value) => setNs(value ?? 'kube-system')}
               data={namespaceOptions.filter(o => o.value !== 'all')}
-              size="xs"
-              w={220}
+              size="sm"
+              w={320}
               searchable
               allowDeselect={false}
               spellCheck={false}
               classNames={{ input: 'pods-glass-control' }}
               styles={{ input: { fontFamily: 'Space Grotesk, sans-serif', fontSize: '0.75rem' } }}
             />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="relative">
+              <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              <input
+                  type="search"
+                  value={globalFilter}
+                  onChange={(e) => setGlobalFilter(e.target.value)}
+                  placeholder="Search permissions"
+                  className="lucid-control rounded pl-7 pr-3 py-1 text-[10px] min-w-[200px] focus:outline-none font-label"
+                  autoComplete="off"
+                  spellCheck={false}
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-1 text-[10px]">
