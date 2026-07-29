@@ -37,6 +37,7 @@ tasks:
           yq e ".info.version = \"{{.version}}\"" -i build/mac-dev.yml
           node -e "const fs=require('fs');let c=fs.readFileSync('build/Info.plist','utf8');['CFBundleVersion','CFBundleShortVersionString'].forEach(k=>{c=c.replace(new RegExp('(<key>'+k+'</key>[^<]*<string>)[^<]*(</string>)'),(_,p1,p2)=>p1+'{{.version}}'+p2);});fs.writeFileSync('build/Info.plist',c);"
           node -e "const fs=require('fs');let c=fs.readFileSync('build/Info.dev.plist','utf8');['CFBundleVersion','CFBundleShortVersionString'].forEach(k=>{c=c.replace(new RegExp('(<key>'+k+'</key>[^<]*<string>)[^<]*(</string>)'),(_,p1,p2)=>p1+'{{.version}}'+p2);});fs.writeFileSync('build/Info.dev.plist',c);"
+          python3 -c "import re; from pathlib import Path; p=Path('./web/index.html'); p.write_text(re.sub(r'(<span class=\"text-xs release-version\">)[^<]*(</span>)', r'\1(v{{.version}})\2', p.read_text()))"
 
   # Windows
   build:windows:dev:
