@@ -5,6 +5,7 @@ import (
 	"kubegui/internal/db"
 	"kubegui/internal/logger"
 	"path/filepath"
+	"strings"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"k8s.io/client-go/tools/clientcmd"
