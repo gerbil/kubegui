@@ -27,6 +27,8 @@ Official website - https://kubegui.net
 # TODO:
 - AI suggestions for issues/errors/warnings/etc
 - Application auto update based on newer version from Github
+- Helm respos+charts and releases (views)
+- ArgoCD rollout/apps flow view
 
 ## Scope:
 1. Application code
