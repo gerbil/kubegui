@@ -16,6 +16,7 @@ import { AnnotationsSection, DynamicResourceSection, EventsTimeline, LabelsSecti
 import { uiNotify } from './UiNotify'
 import { UiTooltip } from './UiTooltip'
 import { NetworkPolicyFlowTab } from '../../features/resources/NetworkPolicyFlowTab'
+import { RbacFlowTab } from '../../features/resources/RbacFlowTab'
 /** Minimal info needed to open the drawer — satisfied by both K8sResource and ResourceRow */
 export interface ResourceRef {
   uid?: string
@@ -25,7 +26,7 @@ export interface ResourceRef {
   apiVersion?: string
 }
 
-type Tab = 'overview' | 'events' | 'edit' | 'logs' | 'shell' | 'netflow'
+type Tab = 'overview' | 'events' | 'edit' | 'logs' | 'shell' | 'netflow' | 'rbacflow'
 
 // ── Ace / jsyaml types ────────────────────────────────────────────────────────
 
@@ -65,6 +66,13 @@ function isPod(resourceType: string) {
 
 function isNetworkPolicy(resourceType: string) {
   return resourceType === 'networkpolicies'
+}
+
+function isRbacResource(resourceType: string) {
+  return resourceType === 'roles'
+    || resourceType === 'clusterroles'
+    || resourceType === 'rolebindings'
+    || resourceType === 'clusterrolebindings'
 }
 
 function TabBtn({ id, label, icon, active, onClick }: {
@@ -112,6 +120,8 @@ const SPEC_OMIT = [
   'behavior',               // HPA scale behavior
   'defaultBackend',         // Ingress default backend object
   'configSource',           // Node dynamic config
+  'rules',                  // Role/ClusterRole rules (verbose, not needed in overview)
+  'subjects',               // RoleBinding/ClusterRoleBinding subjects (shown in RBAC Flow tab)
 ]
 
 // ── Quota visualization helpers ────────────────────────────────────────────
@@ -674,6 +684,7 @@ export function ResourceDrawer({ resource, resourceType, onClose, extraHeaderAct
     { id: 'shell',    label: 'Shell',     icon: <Terminal size={13} />, hidden: !isPod(resourceType) },
     { id: 'edit',     label: 'Edit YAML', icon: <Pencil   size={13} /> },
     { id: 'netflow',  label: 'Netflow',   icon: <GitBranch size={13} />, hidden: !isNetworkPolicy(resourceType) },
+    { id: 'rbacflow', label: 'RBAC Flow', icon: <GitBranch size={13} />, hidden: !isRbacResource(resourceType) },
   ]
 
   const subtitleParts = [
@@ -754,6 +765,12 @@ export function ResourceDrawer({ resource, resourceType, onClose, extraHeaderAct
           {resource && activeTab === 'events'   && <EventsTab kind={resource.kind ?? resourceType} namespace={namespace} name={name} />}
           {resource && activeTab === 'netflow'  && isNetworkPolicy(resourceType) && (
             <NetworkPolicyFlowTab full={full} />
+          )}
+          {resource && activeTab === 'rbacflow' && isRbacResource(resourceType) && (
+            <RbacFlowTab
+              full={full}
+              resourceType={resourceType as 'roles' | 'clusterroles' | 'rolebindings' | 'clusterrolebindings'}
+            />
           )}
           {resource && activeTab === 'logs'     && isPod(resourceType) && (
             <LogsTab namespace={namespace} name={name} containers={containers.length ? containers : [name]} />

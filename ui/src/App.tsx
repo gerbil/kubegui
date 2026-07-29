@@ -76,6 +76,7 @@ import { useNamespaceOptions } from './hooks/useNamespaceOptions'
 import { useK8sResourceStore, type ResourceRow } from './store/useK8sResourceStore'
 import { configureAceYamlEditor } from './lib/aceEditorConfig'
 import { uiNotify } from './components/ui/UiNotify'
+import { CVE_SCANS_ENABLED_STORAGE_KEY, refreshCveDatabases } from './lib/cveScanSettings'
 import { RESOURCE_YAML_TEMPLATES } from './lib/yamlTemplates'
 
 /** Stable empty array – prevents Zustand getSnapshot from returning new ref every call */
@@ -113,6 +114,7 @@ type DrawerTab = 'overview' | 'events' | 'shell' | 'edit'
 
 let legacyChoicesAssetsPromise: Promise<void> | null = null
 const loadedLegacyScripts = new Set<string>()
+let hasQueuedStartupCveRefresh = false
 
 type NetworkActivityDetail = {
   phase: 'start' | 'end'
@@ -127,6 +129,7 @@ const CLUSTER_CONNECTION_LOST_EVENT = 'kubegui:cluster-connection-lost'
 const INIT_SESSION_KEY = 'kubegui:init-complete'
 const INIT_CONTEXT_SESSION_KEY = 'kubegui:init-context'
 const DEFAULT_FETCH_TIMEOUT_MS = 90000
+const LONG_RUNNING_FETCH_TIMEOUT_MS = 20 * 60 * 1000
 
 function openExternalUrl(url: string) {
   try {
@@ -170,6 +173,19 @@ function fetchWithTimeout(
       window.clearTimeout(timer)
       externalSignal?.removeEventListener('abort', onExternalAbort)
     })
+}
+
+function resolveFetchTimeoutMs(input: RequestInfo | URL, fallback = DEFAULT_FETCH_TIMEOUT_MS) {
+  const raw = typeof input === 'string'
+    ? input
+    : input instanceof URL
+      ? input.toString()
+      : input.url
+  const path = pathFromUrlLike(raw).toLowerCase()
+  if (path.includes('/api/v1/cve-scan') || path.includes('/api/v1/cve-db/refresh')) {
+    return LONG_RUNNING_FETCH_TIMEOUT_MS
+  }
+  return fallback
 }
 
 function emitNetworkActivity(detail: NetworkActivityDetail) {
@@ -709,7 +725,7 @@ function AppChrome({
   )
 }
 
-function ClusterRail({ currentContext, onDisconnected }: { currentContext: string; onDisconnected?: () => void }) {
+function ClusterRail({ currentContext, onDisconnected, onConnectStart, onConnectFailed }: { currentContext: string; onDisconnected?: () => void; onConnectStart?: () => void; onConnectFailed?: () => void }) {
   const [clusterRailItems, setClusterRailItems] = useState<ClusterRailItem[]>([])
   const [iconRefreshVersions, setIconRefreshVersions] = useState<Record<string, number>>({})
   const [menuState, setMenuState] = useState<ClusterRailMenuState | null>(null)
@@ -788,8 +804,6 @@ function ClusterRail({ currentContext, onDisconnected }: { currentContext: strin
   }, [menuState])
 
   // Listen for informer progress errors and mark active config as errored.
-  // Also update informerStatus immediately on started/synced/error so the
-  // dashboard gate (informerReady) flips without waiting for the next poll.
   useEffect(() => {
     const off = Events.On('informerProgress', async (ev: unknown) => {
       const payload = (ev as { data?: { stage?: string; message?: string } })?.data
@@ -820,13 +834,15 @@ function ClusterRail({ currentContext, onDisconnected }: { currentContext: strin
 
   const onConnect = useCallback(async (item: ClusterRailItem) => {
     try {
+      onConnectStart?.()
       await DBMakeClusterConfigActive(item.context, item.fileName)
       await loadClusterRailItems()
       uiNotify.success(`Connected: ${item.label}`)
     } catch (err) {
+      onConnectFailed?.()
       uiNotify.error(`Connect failed: ${err instanceof Error ? err.message : 'unknown error'}`)
     }
-  }, [loadClusterRailItems])
+  }, [loadClusterRailItems, onConnectFailed, onConnectStart])
 
   const onDisconnect = useCallback(async () => {
     // Signal the frontend that the cluster is no longer initialized BEFORE
@@ -1136,19 +1152,242 @@ function ClusterRail({ currentContext, onDisconnected }: { currentContext: strin
   )
 }
 
+// ── Font / appearance settings ───────────────────────────────────────────────
+
+type FontSettings = {
+  family: 'Space Grotesk' | 'Inter' | 'Poppins' | 'IBM Plex Mono'
+  size: 'small' | 'medium' | 'large'
+}
+
+const FONT_FAMILIES: Record<string, { label: string; fallback: string }> = {
+  'Space Grotesk': { label: 'Space Grotesk (Default)', fallback: 'system-ui, sans-serif' },
+  'Inter':         { label: 'Inter', fallback: 'system-ui, sans-serif' },
+  'Poppins':       { label: 'Poppins', fallback: 'system-ui, sans-serif' },
+  'IBM Plex Mono': { label: 'IBM Plex Mono', fallback: 'monospace' },
+}
+
+const FONT_SIZES: Record<string, { label: string; htmlFontSize: string; bodyFontSize: string }> = {
+  small:  { label: 'Small',            htmlFontSize: '12px', bodyFontSize: '10px' },
+  medium: { label: 'Medium (Default)', htmlFontSize: '14px', bodyFontSize: '11px' },
+  large:  { label: 'Large',            htmlFontSize: '16px', bodyFontSize: '12px' },
+}
+
+function applyFontSettings(settings: FontSettings) {
+  const fontFamily = FONT_FAMILIES[settings.family]
+  const fontSize   = FONT_SIZES[settings.size]
+  if (!fontFamily || !fontSize || typeof window === 'undefined') return
+
+  if (settings.family !== 'Space Grotesk') {
+    const fontUrlName = settings.family.replace(/\s+/g, '+')
+    const fontHref = `https://fonts.googleapis.com/css2?family=${fontUrlName}&display=swap`
+    let link = document.querySelector('link[data-font-custom]') as HTMLLinkElement | null
+    if (!link) {
+      link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.dataset.fontCustom = 'true'
+      document.head.appendChild(link)
+    }
+    link.href = fontHref
+  }
+
+  document.documentElement.style.fontSize   = fontSize.htmlFontSize
+  document.body.style.fontSize              = fontSize.bodyFontSize
+  document.documentElement.style.fontFamily = `'${settings.family}', ${fontFamily.fallback}`
+  document.body.style.fontFamily            = `'${settings.family}', ${fontFamily.fallback}`
+}
+
+type SettingsTab = 'appearance' | 'security'
+
+function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const [tab, setTab] = useState<SettingsTab>('appearance')
+  const [fontSettings, setFontSettings] = usePersistentState<FontSettings>('ui:font-settings', {
+    family: 'Space Grotesk',
+    size:   'medium',
+  })
+  const [cveScansEnabled, setCveScansEnabled] = usePersistentState<boolean>(CVE_SCANS_ENABLED_STORAGE_KEY, false)
+
+  useEffect(() => { applyFontSettings(fontSettings) }, [fontSettings])
+
+  useEffect(() => {
+    if (!open) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [open, onClose])
+
+  if (!open) return null
+
+  const TABS: { id: SettingsTab; label: string }[] = [
+    { id: 'appearance', label: 'Appearance' },
+    { id: 'security', label: 'Security' },
+  ]
+
+  return createPortal(
+    <>
+      <div className="fixed inset-0 bg-black/60 z-[1200]" onClick={onClose} />
+      <div
+        className="fixed z-[1201] left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl rounded-xl border border-border bg-card shadow-2xl flex overflow-hidden"
+        style={{ height: '520px' }}
+        role="dialog"
+        aria-modal="true"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Left tab rail */}
+        <div className="w-44 shrink-0 border-r border-border/60 bg-accent/20 flex flex-col py-4 gap-0.5 px-2">
+          <p className="text-[10px] uppercase tracking-wider text-muted-foreground font-semibold px-2 pb-2">Settings</p>
+          {TABS.map((t) => (
+            <button
+              key={t.id}
+              type="button"
+              onClick={() => setTab(t.id)}
+              className={`w-full text-left px-3 py-2 rounded text-sm transition-colors ${
+                tab === t.id
+                  ? 'bg-primary/20 text-primary font-medium'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-accent/60'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+          <div className="mt-auto pt-4 px-2">
+            <button
+              type="button"
+              onClick={onClose}
+              className="w-full px-3 py-1.5 rounded text-sm border border-border text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+
+        {/* Right content */}
+        <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
+          <div className="px-6 pt-5 pb-4 border-b border-border/60">
+            <p className="text-sm font-semibold text-foreground">
+              {tab === 'appearance' ? 'Appearance' : tab === 'security' ? 'Security' : tab}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              {tab === 'appearance' ? 'Customize fonts and visual style.' : tab === 'security' ? 'Control CVE scanning behavior.' : ''}
+            </p>
+          </div>
+
+          <div className="flex-1 overflow-y-auto px-6 py-4 space-y-6">
+            {tab === 'appearance' && (
+              <>
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Font Family</p>
+                  <div className="space-y-1">
+                    {Object.entries(FONT_FAMILIES).map(([key, value]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => setFontSettings({ ...fontSettings, family: key as FontSettings['family'] })}
+                        style={{ fontFamily: `'${key}', system-ui, sans-serif` }}
+                        className={`w-full text-left px-3 py-2 rounded text-sm transition-colors border ${
+                          fontSettings.family === key
+                            ? 'bg-primary/20 text-primary border-primary/30'
+                            : 'border-transparent hover:bg-accent/60 text-foreground'
+                        }`}
+                      >
+                        {value.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Font Size</p>
+                  <div className="space-y-1">
+                    {Object.entries(FONT_SIZES).map(([key, value]) => (
+                      <button
+                        key={key}
+                        type="button"
+                        onClick={() => setFontSettings({ ...fontSettings, size: key as FontSettings['size'] })}
+                        className={`w-full text-left px-3 py-2 rounded text-sm transition-colors border ${
+                          fontSettings.size === key
+                            ? 'bg-primary/20 text-primary border-primary/30'
+                            : 'border-transparent hover:bg-accent/60 text-foreground'
+                        }`}
+                      >
+                        {value.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Preview</p>
+                  <div
+                    className="p-3 rounded border border-border/40 bg-surface-container-high/20"
+                    style={{
+                      fontFamily: `'${fontSettings.family}', system-ui, sans-serif`,
+                      fontSize: FONT_SIZES[fontSettings.size]?.bodyFontSize,
+                    }}
+                  >
+                    <p className="font-semibold">The quick brown fox jumps over the lazy dog</p>
+                    <p className="mt-1 text-muted-foreground">ABCDEFGabcdefg 0123456789</p>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {tab === 'security' && (
+              <div className="rounded-lg border border-border/60 bg-accent/20 p-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground">CVE scans</p>
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Disabled by default. When enabled, Trivy vulnerability databases download immediately and refresh again on app startup.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={cveScansEnabled}
+                    onClick={() => setCveScansEnabled((prev) => !prev)}
+                    className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border transition-colors ${
+                      cveScansEnabled
+                        ? 'border-emerald-400/40 bg-emerald-500/30'
+                        : 'border-border bg-accent/40'
+                    }`}
+                  >
+                    <span
+                      className={`absolute left-0.5 top-0.5 h-[18px] w-[18px] rounded-full bg-white shadow transition-transform ${
+                        cveScansEnabled ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </>,
+    document.body,
+  )
+}
+
+// ── RootView ─────────────────────────────────────────────────────────────────
+
 function RootView() {
   const [currentPath, setCurrentPath] = useState(() => normalizePath(window.location.pathname || '/'))
   const [isInitialized, setIsInitialized] = useState(() => readInitSessionState())
   const [userRole] = useState<'admin' | 'user' | 'viewer'>('admin')
   const [informerStatus, setInformerStatus] = useState<{ started: boolean; synced: boolean; lastError?: string } | null>(null)
+  const [isClusterSwitching, setIsClusterSwitching] = useState(false)
   const informerReady = informerStatus?.started === true && informerStatus?.synced === true
-  const shouldShowInitPage = !isInitialized || currentPath === '/init' || !informerReady
+  const shouldShowInitPage = !isInitialized || currentPath === '/init' || (!informerReady && !isClusterSwitching)
   const { context } = useKubernetesContext()
   const { info: clusterInfo, appStats } = useClusterInfo(!shouldShowInitPage)
   const { stats: podStats, error: podStatsError, isLoading: podStatsLoading } = usePodStats(!shouldShowInitPage)
   const [pendingActionLabel] = useState<string | null>(null)
   const [pendingRequests, setPendingRequests] = useState(0)
   const [pendingRequestLabels, setPendingRequestLabels] = useState<string[]>([])
+  const [showSettingsModal, setShowSettingsModal] = useState(false)
+  const [cveScansEnabled] = usePersistentState<boolean>(CVE_SCANS_ENABLED_STORAGE_KEY, false)
+  const previousCveScansEnabled = useRef<boolean | null>(null)
 
   useEffect(() => {
     // Avoid concurrent legacy script prewarm races (xterm globals can redeclare).
@@ -1179,7 +1418,8 @@ function RootView() {
     window.addEventListener(NETWORK_ACTIVITY_EVENT, onNetworkActivity as EventListener)
 
     window.fetch = (async (...args: Parameters<typeof fetch>) => {
-      const fetchTask = () => fetchWithTimeout(originalFetch, args[0], args[1], DEFAULT_FETCH_TIMEOUT_MS)
+      const timeoutMs = resolveFetchTimeoutMs(args[0], DEFAULT_FETCH_TIMEOUT_MS)
+      const fetchTask = () => fetchWithTimeout(originalFetch, args[0], args[1], timeoutMs)
       if (!shouldTrackPendingFetch(args[0], args[1])) {
         return await fetchTask()
       }
@@ -1209,6 +1449,31 @@ function RootView() {
   }, [])
 
   useEffect(() => {
+    const previous = previousCveScansEnabled.current
+
+    if (previous === null) {
+      previousCveScansEnabled.current = cveScansEnabled
+      if (cveScansEnabled && !hasQueuedStartupCveRefresh) {
+        hasQueuedStartupCveRefresh = true
+        void refreshCveDatabases('startup').catch(() => {})
+      }
+      return
+    }
+
+    if (!previous && cveScansEnabled) {
+      void refreshCveDatabases('enable').catch(() => {})
+    }
+
+    previousCveScansEnabled.current = cveScansEnabled
+  }, [cveScansEnabled])
+
+  useEffect(() => {
+    if (currentPath === '/settings') {
+      setShowSettingsModal(true)
+    }
+  }, [currentPath])
+
+  useEffect(() => {
     try {
       window.sessionStorage.setItem(INIT_SESSION_KEY, JSON.stringify(isInitialized))
     } catch {
@@ -1217,7 +1482,41 @@ function RootView() {
   }, [isInitialized])
 
   useEffect(() => {
+    const off = Events.On('informerProgress', (ev: unknown) => {
+      const payload = (ev as { data?: { stage?: string; message?: string } })?.data
+      if (!payload?.stage) return
+
+      if (payload.stage === 'discovering' || payload.stage === 'discovered') {
+        setInformerStatus((prev) => ({
+          started: false,
+          synced: false,
+          lastError: prev?.lastError ?? '',
+        }))
+        return
+      }
+
+      if (payload.stage === 'started') {
+        setInformerStatus({ started: true, synced: false, lastError: '' })
+        return
+      }
+
+      if (payload.stage === 'synced') {
+        setIsClusterSwitching(false)
+        setInformerStatus({ started: true, synced: true, lastError: '' })
+        return
+      }
+
+      if (payload.stage === 'error') {
+        setIsClusterSwitching(false)
+        setInformerStatus({ started: false, synced: false, lastError: payload.message ?? 'informer error' })
+      }
+    })
+    return () => { off?.() }
+  }, [])
+
+  useEffect(() => {
     if (!isInitialized) {
+      setIsClusterSwitching(false)
       setInformerStatus(null)
       return
     }
@@ -1364,8 +1663,6 @@ function RootView() {
     )
   } else if (currentPath === '/crd-definitions') {
     pageContent = <CRDDefinitionsPage />
-  } else if (currentPath === '/settings') {
-    pageContent = <SettingsPage />
   } else if (currentPath === '/my-permissions') {
     pageContent = <MyPermissionsPage />
   } else {
@@ -1403,10 +1700,14 @@ function RootView() {
         try { window.sessionStorage.removeItem(INIT_CONTEXT_SESSION_KEY) } catch { /* ignore */ }
         window.history.pushState({}, '', '/init')
         setCurrentPath(normalizePath('/init'))
+      }} onConnectStart={() => {
+        setIsClusterSwitching(true)
+      }} onConnectFailed={() => {
+        setIsClusterSwitching(false)
       }} />
       <Sidebar userRole={userRole} health={sidebarHealth} currentPath={currentPath} onNavigate={(href) => navigateTo(href)} isClusterConnected={isInitialized} />
       <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
-        <AppChrome pageTitle={pageTitle} context={context} onSettings={() => navigateTo('/settings')} />
+        <AppChrome pageTitle={pageTitle} context={context} onSettings={() => setShowSettingsModal(true)} />
         {pageContent}
         <footer className="lucid-footer h-10 flex items-center justify-between px-6 text-[10px] text-muted-foreground font-mono overflow-hidden">
           <div className="flex items-center">
@@ -1441,6 +1742,12 @@ function RootView() {
           </div>
         </footer>
       </main>
+      <SettingsModal open={showSettingsModal} onClose={() => {
+        setShowSettingsModal(false)
+        if (currentPath === '/settings') {
+          navigateTo('/')
+        }
+      }} />
     </div>
   )
 }
@@ -1852,7 +2159,7 @@ function DashboardPage({
                   </span>
                   <input
                     type="search"
-                    className="lucid-control rounded pl-8 pr-3 py-0.5 text-[12px] placeholder:text-[12px] w-80 focus:outline-none"
+                    className="lucid-control rounded pl-8 pr-3 py-1 text-[12px] placeholder:text-[12px] w-80 focus:outline-none"
                     placeholder="Filter nodes"
                     value={nodeSearch}
                     onChange={(e) => setNodeSearch(e.target.value)}
@@ -2043,14 +2350,6 @@ function DashboardPage({
   )
 }
 
-function SettingsPage() {
-  return (
-    <div className="flex-1 overflow-y-auto p-8">
-      <h3 className="text-3xl font-bold tracking-tight font-headline">Settings</h3>
-      <p className="text-sm text-muted-foreground mt-2">Settings coming soon.</p>
-    </div>
-  )
-}
 
 function NamespacesPage() {
   type NamespaceRow = {
@@ -2281,7 +2580,7 @@ function NamespacesPage() {
           <h3 className="text-3xl font-bold tracking-tight font-headline">Namespaces</h3>
           <p className="text-sm text-muted-foreground">Manage namespace scope and lifecycle.</p>
         </div>
-        <button type="button" onClick={() => setShowCreateModal(true)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold text-primary bg-primary/10 border border-primary/25 hover:bg-primary/20 transition-all duration-150 active:scale-[0.97]">
+        <button type="button" onClick={() => setShowCreateModal(true)} className="flex items-center gap-2 px-3 py-2 rounded-lg !text-base font-semibold text-primary bg-primary/10 border border-primary/25 hover:bg-primary/20 transition-all duration-150 active:scale-[0.97]">
           <span className="flex items-center justify-center w-4 h-4 rounded bg-primary text-primary-foreground shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </span>
@@ -2303,7 +2602,7 @@ function NamespacesPage() {
               value={globalFilter}
               onChange={(e) => setGlobalFilter(e.target.value)}
               placeholder="Filter namespaces"
-              className="lucid-control rounded pl-8 pr-3 py-0.5 !text-[14px] placeholder:text-[14px] w-80 focus:outline-none"
+              className="lucid-control rounded pl-8 pr-3 py-1 !text-[13px] !placeholder:text-[13px] w-80 focus:outline-none"
               autoComplete="off"
               spellCheck={false}
             />
@@ -3020,7 +3319,7 @@ function PodsPage() {
           <h3 className="text-3xl font-bold tracking-tight font-headline">Pods</h3>
           <p className="text-sm text-muted-foreground">Manage running workloads and containers.</p>
         </div>
-        <button type="button" onClick={() => setShowCreatePodModal(true)} className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold text-primary bg-primary/10 border border-primary/25 hover:bg-primary/20 transition-all duration-150 active:scale-[0.97]">
+        <button type="button" onClick={() => setShowCreatePodModal(true)} className="flex items-center gap-2 px-3 py-2 rounded-lg !text-base font-semibold text-primary bg-primary/10 border border-primary/25 hover:bg-primary/20 transition-all duration-150 active:scale-[0.97]">
           <span className="flex items-center justify-center w-4 h-4 rounded bg-primary text-primary-foreground shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </span>
@@ -3055,7 +3354,7 @@ function PodsPage() {
                 value={globalFilter}
                 onChange={(e) => setGlobalFilter(e.target.value)}
                 placeholder={`Filter pods`}
-                className="lucid-control rounded pl-6 pr-3 py-1 !text-[14px] placeholder:text-[14px] min-w-[200px] focus:outline-none font-label"
+                className="lucid-control rounded pl-6 pr-3 py-1 !text-[13px] !placeholder:text-[13px] min-w-[200px] focus:outline-none font-label"
                 autoComplete="off"
                 spellCheck={false}
             />
@@ -3530,7 +3829,7 @@ function InformerResourcePage({ resource }: { resource: string }) {
           <button
             type="button"
             onClick={() => setShowCreateModal(true)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-semibold text-primary bg-primary/10 border border-primary/25 hover:bg-primary/20 transition-all duration-150 active:scale-[0.97]"
+            className="flex items-center gap-2 px-3 py-2 rounded-lg !text-base font-semibold text-primary bg-primary/10 border border-primary/25 hover:bg-primary/20 transition-all duration-150 active:scale-[0.97]"
           >
             <span className="flex items-center justify-center w-4 h-4 rounded bg-primary text-primary-foreground shrink-0">
               <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
@@ -3572,7 +3871,7 @@ function InformerResourcePage({ resource }: { resource: string }) {
               value={globalFilter}
               onChange={(e) => setGlobalFilter(e.target.value)}
               placeholder={`Filter ${label.toLowerCase()}`}
-              className="lucid-control rounded pl-6 pr-3 py-1 !text-[14px] placeholder:text-[14px] min-w-[200px] focus:outline-none font-label"
+              className="lucid-control rounded pl-6 pr-3 py-1 !text-[13px] !placeholder:text-[13px] min-w-[200px] focus:outline-none font-label"
               autoComplete="off"
               spellCheck={false}
             />

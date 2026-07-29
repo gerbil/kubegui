@@ -12,7 +12,8 @@
       body { height: 100%; margin: 0; }
       #root { display: flex; align-items: center; justify-content: center; height: 100%; }
       #splash { display: flex; align-items: center; justify-content: center; }
-      #splash img { width: 64px; height: 64px; opacity: 0.6; animation: pulse 1.5s ease-in-out infinite; }
+      /* Keep icon at 64px wide, preserve original 510x486 ratio */
+      #splash img { width: 64px; height: auto; opacity: 0.6; animation: pulse 1.5s ease-in-out infinite; }
       @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.8; } }
     </style>
   </head>
