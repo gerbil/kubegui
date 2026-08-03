@@ -4,8 +4,8 @@ go 1.26.0
 
 require (
 	github.com/Skarlso/crd-to-sample-yaml v1.2.2
-	github.com/aquasecurity/trivy v0.56.0
-	github.com/aquasecurity/trivy-db v0.0.0-20260713131703-4be526083c54
+	github.com/aquasecurity/trivy v0.71.0
+	github.com/aquasecurity/trivy-db v0.0.0-20240910133327-7e0f4d2ed4c1
 	github.com/cilium/cilium v1.19.6
 	github.com/go-logr/logr v1.4.4
 	github.com/golang-migrate/migrate/v4 v4.19.1
@@ -119,6 +119,7 @@ require (
 	github.com/containerd/containerd/api v1.7.19 // indirect
 	github.com/containerd/continuity v0.4.3 // indirect
 	github.com/containerd/errdefs v1.0.0 // indirect
+	github.com/containerd/errdefs/pkg v0.3.0 // indirect
 	github.com/containerd/fifo v1.1.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/containerd/platforms v0.2.1 // indirect
@@ -448,7 +449,7 @@ require (
 )
 
 replace (
-	github.com/containerd/errdefs => github.com/containerd/errdefs v0.3.0
-	github.com/docker/cli => github.com/docker/cli v25.0.7+incompatible
-	github.com/docker/docker => github.com/docker/docker v25.0.16+incompatible
+	github.com/containerd/errdefs => github.com/containerd/errdefs v1.0.0
+	github.com/docker/cli => github.com/docker/cli v29.6.2+incompatible
+	github.com/docker/docker => github.com/docker/docker v28.5.2+incompatible
 )
