@@ -4,7 +4,7 @@ go 1.26.0
 
 require (
 	github.com/Skarlso/crd-to-sample-yaml v1.2.2
-	github.com/aquasecurity/trivy v0.56.0
+	github.com/aquasecurity/trivy v0.71.0
 	github.com/aquasecurity/trivy-db v0.0.0-20240910133327-7e0f4d2ed4c1
 	github.com/cilium/cilium v1.19.6
 	github.com/go-logr/logr v1.4.3
