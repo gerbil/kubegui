@@ -119,6 +119,7 @@ require (
 	github.com/containerd/containerd/api v1.7.19 // indirect
 	github.com/containerd/continuity v0.4.3 // indirect
 	github.com/containerd/errdefs v1.0.0 // indirect
+	github.com/containerd/errdefs/pkg v0.3.0 // indirect
 	github.com/containerd/fifo v1.1.0 // indirect
 	github.com/containerd/log v0.1.0 // indirect
 	github.com/containerd/platforms v0.2.1 // indirect
@@ -448,7 +449,7 @@ require (
 )
 
 replace (
-	github.com/containerd/errdefs => github.com/containerd/errdefs v0.1.0
-	github.com/docker/cli => github.com/docker/cli v25.0.1+incompatible
-	github.com/docker/docker => github.com/docker/docker v25.0.1+incompatible
+	github.com/containerd/errdefs => github.com/containerd/errdefs v1.0.0
+	github.com/docker/cli => github.com/docker/cli v29.6.2+incompatible
+	github.com/docker/docker => github.com/docker/docker v28.5.2+incompatible
 )
