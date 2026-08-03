@@ -1,7 +1,7 @@
 # KubeGUI - Kubernetes UI / admin desktop application
 Official website - https://kubegui.net  
 
-(https://app.fossa.com/projects/git%2Bgithub.com%2Fgerbil%2Fkubegui?ref=badge_shield&issueType=security) [![Release](https://github.com/gerbil/kubegui/actions/workflows/release.yml/badge.svg)](https://github.com/gerbil/kubegui/actions/workflows/release.yml) [![CodeQL](https://github.com/gerbil/kubegui/actions/workflows/codeql.yml/badge.svg)](https://github.com/gerbil/kubegui/actions/workflows/codeql.yml)  
+[![Release](https://github.com/gerbil/kubegui/actions/workflows/release.yml/badge.svg)](https://github.com/gerbil/kubegui/actions/workflows/release.yml) [![CodeQL](https://github.com/gerbil/kubegui/actions/workflows/codeql.yml/badge.svg)](https://github.com/gerbil/kubegui/actions/workflows/codeql.yml)  
 
 ![kubegui](./web/images/kubegui.png)  
 
