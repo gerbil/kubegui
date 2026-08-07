@@ -549,7 +549,7 @@ function LogsTab({ pod }: { pod: PodRow }) {
             <div key={i} className={`log-line ${line.lineClass} log-tone-${tone}`}>
               <span
                 className="code hljs"
-                // eslint-disable-next-line react/no-danger
+                 
                 dangerouslySetInnerHTML={{ __html: applySearchHighlight(highlightLogLine(line.message), search) }}
               />
             </div>

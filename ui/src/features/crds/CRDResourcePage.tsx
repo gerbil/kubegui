@@ -11,6 +11,8 @@ import { ConfirmDialog } from '@/components/ui/Button'
 import { configureAceYamlEditor } from '@/lib/aceEditorConfig'
 import { useNamespaceOptions } from '@/hooks/useNamespaceOptions'
 import { ResourceDrawer, type ResourceRef } from '@/components/ui/ResourceDrawer'
+import { NamespaceLink } from '@/components/ui/NamespaceLink'
+import { HIERARCHY_NAVIGATE_EVENT } from '@/lib/uiEvents'
 
 type LegacyAce = {
   edit: (el: HTMLElement) => any
@@ -79,6 +81,15 @@ function isInteractiveTarget(target: EventTarget | null): boolean {
 
 function hasWailsBridge(): boolean {
   return typeof window !== 'undefined' && ('__wails' in window || '_wails' in window)
+}
+
+function readNavigationFilterFromUrl() {
+  if (typeof window === 'undefined') return { namespace: '', query: '' }
+  const params = new URLSearchParams(window.location.search)
+  return {
+    namespace: (params.get('namespace') || '').trim(),
+    query: (params.get('q') || '').trim(),
+  }
 }
 
 /**
@@ -153,7 +164,7 @@ function readJSONPath(obj: Record<string, any>, path?: string): unknown[] {
       return
     }
 
-    const filter = raw.match(/^\?\(@\.([\w.\-]+)\s*(==|!=)\s*['"]?([^'"]+)['"]?\)$/)
+    const filter = raw.match(/^\?\(@\.([\w.-]+)\s*(==|!=)\s*['"]?([^'"]+)['"]?\)$/)
     if (filter) {
       const [, fieldPath, op, expected] = filter
       current = current.flatMap((entry: any) => {
@@ -457,11 +468,12 @@ interface Props {
 }
 
 export function CRDResourcePage({ definition, namespace = '', onNavigateBack, canGenerateTemplate = true }: Props) {
+  const navigationFilter = useMemo(() => readNavigationFilterFromUrl(), [])
   const [items, setItems] = useState<Record<string, any>[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selectedNamespace, setSelectedNamespace] = useState(namespace || 'all')
-  const [globalFilter, setGlobalFilter] = useState('')
+  const [selectedNamespace, setSelectedNamespace] = useState(navigationFilter.namespace || namespace || 'all')
+  const [globalFilter, setGlobalFilter] = useState(navigationFilter.query)
   const [createModalYaml, setCreateModalYaml] = useState<string | null>(null)
   const [templateLoading, setTemplateLoading] = useState(false)
   const [selectedKeys, setSelectedKeys] = useState<Set<string>>(() => new Set())
@@ -475,6 +487,33 @@ export function CRDResourcePage({ definition, namespace = '', onNavigateBack, ca
 
   const columns = useMemo(() => resolveCRDColumns(definition), [definition])
   const isNamespaced = definition.scope === 'Namespaced'
+
+  useEffect(() => {
+    const onHierarchyNavigate = (event: Event) => {
+      const href = (event as CustomEvent<string>).detail
+      if (typeof href !== 'string' || href.trim() === '') return
+      let targetUrl: URL
+      try {
+        targetUrl = new URL(href, window.location.origin)
+      } catch {
+        return
+      }
+
+      const match = /^\/crds\/([^/]+)\/([^/]+)$/.exec(targetUrl.pathname)
+      if (!match?.[1] || !match[2]) return
+      const targetGroup = decodeURIComponent(match[1]).toLowerCase()
+      const targetPlural = decodeURIComponent(match[2]).toLowerCase()
+      if (targetGroup !== definition.group.toLowerCase() || targetPlural !== definition.plural.toLowerCase()) return
+
+      const nextQuery = (targetUrl.searchParams.get('q') || '').trim()
+      const nextNamespace = (targetUrl.searchParams.get('namespace') || '').trim()
+      setGlobalFilter(nextQuery)
+      if (isNamespaced && nextNamespace) setSelectedNamespace(nextNamespace)
+    }
+
+    window.addEventListener(HIERARCHY_NAVIGATE_EVENT, onHierarchyNavigate as EventListener)
+    return () => window.removeEventListener(HIERARCHY_NAVIGATE_EVENT, onHierarchyNavigate as EventListener)
+  }, [definition.group, definition.plural, isNamespaced])
 
   const load = useCallback(() => {
     if (!hasWailsBridge()) { setLoading(false); return }
@@ -852,14 +891,33 @@ export function CRDResourcePage({ definition, namespace = '', onNavigateBack, ca
                         onClick={(e) => e.stopPropagation()}
                       />
                     </td>
-                    {allColumns.map((col) => (
-                      <td key={col.key} className="px-3 py-2 text-sm text-foreground/80 whitespace-nowrap overflow-hidden text-ellipsis max-w-0">
-                        {col.key === 'name'
-                          ? <span className="block min-w-0 overflow-hidden text-ellipsis whitespace-nowrap font-medium text-foreground">{getCellValue(item, col)}</span>
-                          : getCellValue(item, col)
-                        }
-                      </td>
-                    ))}
+                    {allColumns.map((col) => {
+                      const cellValue = getCellValue(item, col)
+                      if (col.key === 'name') {
+                        return (
+                          <td key={col.key} className="px-3 py-2 text-sm text-foreground/80 whitespace-nowrap overflow-hidden text-ellipsis max-w-0">
+                            <span className="block min-w-0 overflow-hidden text-ellipsis whitespace-nowrap font-medium text-foreground">{cellValue}</span>
+                          </td>
+                        )
+                      }
+
+                      if (col.key === 'namespace') {
+                        const namespace = getResourceNamespace(item)
+                        return (
+                          <td key={col.key} className="px-3 py-2 text-sm text-foreground/80 whitespace-nowrap overflow-hidden text-ellipsis max-w-0">
+                            {namespace
+                              ? <NamespaceLink namespace={namespace} className="text-foreground/80" onSelectNamespace={(value) => setSelectedNamespace(value)} />
+                              : cellValue}
+                          </td>
+                        )
+                      }
+
+                      return (
+                        <td key={col.key} className="px-3 py-2 text-sm text-foreground/80 whitespace-nowrap overflow-hidden text-ellipsis max-w-0">
+                          {cellValue}
+                        </td>
+                      )
+                    })}
                   </tr>
                 )
               })}

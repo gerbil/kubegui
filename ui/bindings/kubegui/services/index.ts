@@ -9,5 +9,10 @@ export {
 export {
     CRDMenuResponse,
     ClusterInfo,
+    HelmAppInfo,
+    HelmChartInfo,
+    HelmChartVersionInfo,
+    HelmRepoInfo,
+    HierarchyNode,
     PortForwardSession
 } from "./models.js";

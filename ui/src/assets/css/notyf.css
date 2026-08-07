@@ -103,7 +103,7 @@
   color: #fff;
   z-index: 1000005;
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   align-items: flex-end;
   justify-content: flex-end;
   pointer-events: none;
@@ -491,7 +491,7 @@
   color: #fff;
 }
 /* ── qty-picker ──────────────────────────────────────────────────────────── */
-.qty-picker {
+ qty-picker {
   display: inline-flex;
   align-items: center;
   gap: 0;
@@ -500,7 +500,7 @@
   overflow: hidden;
   background: rgba(0,0,0,0.2);
 }
-.qty-btn {
+ qty-btn {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -517,17 +517,17 @@
   padding: 0;
   flex-shrink: 0;
 }
-.qty-btn:hover:not(:disabled) {
+ qty-btn:hover:not(:disabled) {
   background: rgba(255,255,255,0.18);
 }
-.qty-btn:active:not(:disabled) {
+ qty-btn:active:not(:disabled) {
   background: rgba(255,255,255,0.28);
 }
-.qty-btn:disabled {
+ qty-btn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
 }
-.qty-input {
+ qty-input {
   width: 60px;
   height: 36px;
   border: none;
@@ -543,8 +543,8 @@
   box-sizing: border-box;
   -moz-appearance: textfield;
 }
-.qty-input::-webkit-outer-spin-button,
-.qty-input::-webkit-inner-spin-button {
+ qty-input::-webkit-outer-spin-button,
+ qty-input::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
 }

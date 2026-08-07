@@ -264,11 +264,11 @@ export function DataTable<T extends RowData>({
         <thead className="sticky top-0 z-10 bg-surface-container-high/60 backdrop-blur-md">
           {table.getHeaderGroups().map((hg) => (
             <tr key={hg.id}>
-              {hg.headers.map((header, headerIndex) => {
+              {hg.headers.map((header) => {
                 const canSort = header.column.getCanSort()
                 const sorted = header.column.getIsSorted()
                 const meta = (header.column.columnDef.meta ?? {}) as ColumnMetaClass
-                const isFirstColumn = headerIndex === 0
+                const isSelectColumn = header.id === 'select'
                 const fixedWidthStyle = meta.fixedWidth
                   ? {
                       width: meta.fixedWidth,
@@ -279,10 +279,13 @@ export function DataTable<T extends RowData>({
                       textOverflow: 'ellipsis' as const,
                     }
                   : null
+                const headerOverflowStyle = meta.disableOverflowTooltip
+                  ? { whiteSpace: 'nowrap' as const, overflow: 'hidden' as const, textOverflow: 'ellipsis' as const }
+                  : { whiteSpace: 'nowrap' as const, overflow: 'hidden' as const, textOverflow: 'ellipsis' as const }
                 return (
                   <th
                     key={header.id}
-                    style={isFirstColumn
+                    style={isSelectColumn
                       ? {
                           width: FIRST_COLUMN_STRICT_WIDTH,
                           minWidth: FIRST_COLUMN_STRICT_WIDTH,
@@ -291,9 +294,9 @@ export function DataTable<T extends RowData>({
                           overflow: 'hidden',
                           textOverflow: 'ellipsis',
                         }
-                      : fixedWidthStyle ?? { whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                        : fixedWidthStyle ?? headerOverflowStyle}
                     className={cn(
-                      'px-3 py-2.5 text-left text-sm font-semibold text-muted-foreground uppercase tracking-wider border-b border-outline-variant/40 select-none',
+                      'px-3 py-2.5 text-left text-sm font-semibold text-muted-foreground uppercase tracking-wider border-b border-outline-variant/40 select-none align-middle',
                       canSort && 'cursor-pointer hover:text-foreground transition-colors',
                       meta.thClassName,
                     )}
@@ -302,7 +305,7 @@ export function DataTable<T extends RowData>({
                     {header.id === 'select' || header.id === 'phase' ? (
                       <input
                         type="checkbox"
-                        className="w-4 h-4 rounded cursor-pointer align-bottom appearance-none bg-[#354065] checked:bg-[#6a7fc9] checked:border-[#6a7fc9]"
+                        className="w-4 h-4 rounded cursor-pointer align-middle appearance-none bg-[#354065] checked:bg-[#6a7fc9] checked:border-[#6a7fc9]"
                         checked={table.getIsAllRowsSelected()}
                         onChange={table.getToggleAllRowsSelectedHandler()}
                         onClick={(e) => e.stopPropagation()}
@@ -353,9 +356,9 @@ export function DataTable<T extends RowData>({
                 } : undefined}
                 tabIndex={isClickable ? 0 : undefined}
               >
-                {row.getVisibleCells().map((cell, cellIndex) => {
+                {row.getVisibleCells().map((cell) => {
                   const meta = (cell.column.columnDef.meta ?? {}) as ColumnMetaClass
-                  const isFirstColumn = cellIndex === 0
+                  const isSelectColumn = cell.column.id === 'select'
                   const shouldUseOverflowTooltip = !meta.disableOverflowTooltip && !meta.allowWrap
                   const fixedWidthStyle = meta.fixedWidth
                     ? {
@@ -370,7 +373,7 @@ export function DataTable<T extends RowData>({
                   return (
                     <td
                       key={cell.id}
-                      style={isFirstColumn
+                       style={isSelectColumn
                         ? {
                             width: FIRST_COLUMN_STRICT_WIDTH,
                             minWidth: FIRST_COLUMN_STRICT_WIDTH,

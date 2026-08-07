@@ -80,6 +80,182 @@ export class ClusterInfo {
 }
 
 /**
+ * HelmAppInfo represents one installed Helm release in cluster.
+ */
+export class HelmAppInfo {
+    "name": string;
+    "namespace": string;
+    "revision": number;
+    "chart": string;
+    "appVersion": string;
+    "status": string;
+    "updatedAt": string;
+
+    /** Creates a new HelmAppInfo instance. */
+    constructor($$source: Partial<HelmAppInfo> = {}) {
+        if (!("name" in $$source)) {
+            this["name"] = "";
+        }
+        if (!("namespace" in $$source)) {
+            this["namespace"] = "";
+        }
+        if (!("revision" in $$source)) {
+            this["revision"] = 0;
+        }
+        if (!("chart" in $$source)) {
+            this["chart"] = "";
+        }
+        if (!("appVersion" in $$source)) {
+            this["appVersion"] = "";
+        }
+        if (!("status" in $$source)) {
+            this["status"] = "";
+        }
+        if (!("updatedAt" in $$source)) {
+            this["updatedAt"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new HelmAppInfo instance from a string or object.
+     */
+    static createFrom($$source: any = {}): HelmAppInfo {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new HelmAppInfo($$parsedSource as Partial<HelmAppInfo>);
+    }
+}
+
+export class HelmChartInfo {
+    "name": string;
+    "version": string;
+    "appVersion": string;
+
+    /** Creates a new HelmChartInfo instance. */
+    constructor($$source: Partial<HelmChartInfo> = {}) {
+        if (!("name" in $$source)) {
+            this["name"] = "";
+        }
+        if (!("version" in $$source)) {
+            this["version"] = "";
+        }
+        if (!("appVersion" in $$source)) {
+            this["appVersion"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new HelmChartInfo instance from a string or object.
+     */
+    static createFrom($$source: any = {}): HelmChartInfo {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new HelmChartInfo($$parsedSource as Partial<HelmChartInfo>);
+    }
+}
+
+export class HelmChartVersionInfo {
+    "version": string;
+    "appVersion": string;
+
+    /** Creates a new HelmChartVersionInfo instance. */
+    constructor($$source: Partial<HelmChartVersionInfo> = {}) {
+        if (!("version" in $$source)) {
+            this["version"] = "";
+        }
+        if (!("appVersion" in $$source)) {
+            this["appVersion"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new HelmChartVersionInfo instance from a string or object.
+     */
+    static createFrom($$source: any = {}): HelmChartVersionInfo {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new HelmChartVersionInfo($$parsedSource as Partial<HelmChartVersionInfo>);
+    }
+}
+
+/**
+ * HelmRepoInfo represents one configured Helm repository on local machine.
+ */
+export class HelmRepoInfo {
+    "name": string;
+    "url": string;
+    "chartCount": number;
+    "error"?: string;
+
+    /** Creates a new HelmRepoInfo instance. */
+    constructor($$source: Partial<HelmRepoInfo> = {}) {
+        if (!("name" in $$source)) {
+            this["name"] = "";
+        }
+        if (!("url" in $$source)) {
+            this["url"] = "";
+        }
+        if (!("chartCount" in $$source)) {
+            this["chartCount"] = 0;
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new HelmRepoInfo instance from a string or object.
+     */
+    static createFrom($$source: any = {}): HelmRepoInfo {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new HelmRepoInfo($$parsedSource as Partial<HelmRepoInfo>);
+    }
+}
+
+/**
+ * HierarchyNode describes owner/child relationships for a Kubernetes resource.
+ */
+export class HierarchyNode {
+    "uid"?: string;
+    "kind": string;
+    "resource": string;
+    "name": string;
+    "namespace"?: string;
+    "apiVersion"?: string;
+    "phase"?: string;
+    "children"?: (HierarchyNode | null)[];
+
+    /** Creates a new HierarchyNode instance. */
+    constructor($$source: Partial<HierarchyNode> = {}) {
+        if (!("kind" in $$source)) {
+            this["kind"] = "";
+        }
+        if (!("resource" in $$source)) {
+            this["resource"] = "";
+        }
+        if (!("name" in $$source)) {
+            this["name"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new HierarchyNode instance from a string or object.
+     */
+    static createFrom($$source: any = {}): HierarchyNode {
+        const $$createField7_0 = $$createType5;
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        if ("children" in $$parsedSource) {
+            $$parsedSource["children"] = $$createField7_0($$parsedSource["children"]);
+        }
+        return new HierarchyNode($$parsedSource as Partial<HierarchyNode>);
+    }
+}
+
+/**
  * PortForwardSession holds the state for a single port-forward tunnel.
  */
 export class PortForwardSession {
@@ -136,3 +312,6 @@ export class PortForwardSession {
 const $$createType0 = crd$0.CategoryGroup.createFrom;
 const $$createType1 = $Create.Array($$createType0);
 const $$createType2 = $Create.Map($Create.Any, $Create.Any);
+const $$createType3 = HierarchyNode.createFrom;
+const $$createType4 = $Create.Nullable($$createType3);
+const $$createType5 = $Create.Array($$createType4);

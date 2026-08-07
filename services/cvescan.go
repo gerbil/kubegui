@@ -23,10 +23,10 @@ import (
 	trivyimage "github.com/aquasecurity/trivy/pkg/fanal/image"
 	trivyfanaltypes "github.com/aquasecurity/trivy/pkg/fanal/types"
 	trivyjavadb "github.com/aquasecurity/trivy/pkg/javadb"
-	trivyscanner "github.com/aquasecurity/trivy/pkg/scanner"
-	trivylangpkg "github.com/aquasecurity/trivy/pkg/scanner/langpkg"
-	trivylocal "github.com/aquasecurity/trivy/pkg/scanner/local"
-	trivyospkg "github.com/aquasecurity/trivy/pkg/scanner/ospkg"
+	trivyscanner "github.com/aquasecurity/trivy/pkg/scan"
+	trivylangpkg "github.com/aquasecurity/trivy/pkg/scan/langpkg"
+	trivylocal "github.com/aquasecurity/trivy/pkg/scan/local"
+	trivyospkg "github.com/aquasecurity/trivy/pkg/scan/ospkg"
 	trivytypes "github.com/aquasecurity/trivy/pkg/types"
 	trivyvuln "github.com/aquasecurity/trivy/pkg/vulnerability"
 	"github.com/google/go-containerregistry/pkg/name"
@@ -358,14 +358,14 @@ func ensureTrivyDB(ctx context.Context, cacheDir string) error {
 	return nil
 }
 
-func newEmbeddedTrivyScanner(ctx context.Context, imageRef, cacheDir string) (trivyscanner.Scanner, func(), error) {
+func newEmbeddedTrivyScanner(ctx context.Context, imageRef, cacheDir string) (trivyscanner.Service, func(), error) {
 	// Use an in-memory artifact cache so every scan gets a fresh layer
 	// analysis. A persistent fs cache can return stale results (pkg_num=0)
 	// when a prior scan wrote an incomplete entry for an image layer.
 	// The vulnerability DB itself stays on disk via prepareTrivyDatabases.
 	cacheClient, cacheCleanup, err := cache.New(cache.Options{Backend: "memory"})
 	if err != nil {
-		return trivyscanner.Scanner{}, nil, fmt.Errorf("init trivy cache: %w", err)
+		return trivyscanner.Service{}, nil, fmt.Errorf("init trivy cache: %w", err)
 	}
 
 	imageOptions := trivyfanaltypes.ImageOptions{
@@ -381,7 +381,7 @@ func newEmbeddedTrivyScanner(ctx context.Context, imageRef, cacheDir string) (tr
 	containerImage, imageCleanup, err := trivyimage.NewContainerImage(ctx, imageRef, imageOptions)
 	if err != nil {
 		cacheCleanup()
-		return trivyscanner.Scanner{}, nil, fmt.Errorf("load image %q: %w", imageRef, err)
+		return trivyscanner.Service{}, nil, fmt.Errorf("load image %q: %w", imageRef, err)
 	}
 
 	artifactOptions := trivyartifact.Option{
@@ -399,18 +399,18 @@ func newEmbeddedTrivyScanner(ctx context.Context, imageRef, cacheDir string) (tr
 	if err != nil {
 		imageCleanup()
 		cacheCleanup()
-		return trivyscanner.Scanner{}, nil, fmt.Errorf("create trivy image artifact: %w", err)
+		return trivyscanner.Service{}, nil, fmt.Errorf("create trivy image artifact: %w", err)
 	}
 
 	vulnClient := trivyvuln.NewClient(trivyvdb.Config{})
-	localScanner := trivylocal.NewScanner(
+	localScanner := trivylocal.NewService(
 		trivyapplier.NewApplier(cacheClient),
 		trivyospkg.NewScanner(),
 		trivylangpkg.NewScanner(),
 		vulnClient,
 	)
 
-	return trivyscanner.NewScanner(localScanner, imageArtifact), func() {
+	return trivyscanner.NewService(localScanner, imageArtifact), func() {
 		imageCleanup()
 		cacheCleanup()
 	}, nil

@@ -15,19 +15,34 @@ import '@xyflow/react/dist/style.css'
 
 interface NPSpec {
   podSelector?: { matchLabels?: Record<string, string>; matchExpressions?: Array<{ key: string; operator: string }> }
+  endpointSelector?: { matchLabels?: Record<string, string>; matchExpressions?: Array<{ key: string; operator: string }> }
   policyTypes?: string[]
   ingress?: IngressRule[]
   egress?: EgressRule[]
+  ingressRules?: IngressRule[]
+  egressRules?: EgressRule[]
 }
 
 interface IngressRule {
   from?: NetworkPolicyPeer[]
   ports?: PolicyPort[]
+  fromEndpoints?: Array<Record<string, unknown>>
+  fromEntities?: string[]
+  fromCIDR?: string[]
+  fromCIDRSet?: Array<{ cidr: string; except?: string[] }>
+  toPorts?: Array<{ ports?: PolicyPort[] }>
 }
 
 interface EgressRule {
   to?: NetworkPolicyPeer[]
   ports?: PolicyPort[]
+  toEndpoints?: Array<Record<string, unknown>>
+  toEntities?: string[]
+  toCIDR?: string[]
+  toCIDRSet?: Array<{ cidr: string; except?: string[] }>
+  toFQDNs?: Array<{ matchName?: string; matchPattern?: string }>
+  toServices?: Array<{ k8sService?: { serviceName?: string; namespace?: string }; k8sServiceSelector?: { selector?: Record<string, unknown>; namespace?: string } }>
+  toPorts?: Array<{ ports?: PolicyPort[] }>
 }
 
 interface NetworkPolicyPeer {
@@ -57,6 +72,11 @@ function labelSelectorStr(sel: Record<string, unknown> | undefined): string {
   return parts.join(', ')
 }
 
+function formatSelectorForNode(label: string): string {
+  // Prefer wrapping at selector separators instead of inside label values.
+  return label.replace(/,\s+/g, ',\n')
+}
+
 function portsStr(ports?: PolicyPort[]): string {
   if (!ports?.length) return ''
   return ports
@@ -68,20 +88,76 @@ function portsStr(ports?: PolicyPort[]): string {
     .join(', ')
 }
 
+function rulePorts(rule: IngressRule | EgressRule): PolicyPort[] {
+  if (rule.ports?.length) return rule.ports
+  const ciliumPorts = (rule.toPorts ?? []).flatMap((entry) => entry.ports ?? [])
+  return ciliumPorts
+}
+
 function peerLabel(peer: NetworkPolicyPeer): { label: string; type: string } {
   if (peer.podSelector !== undefined) {
     const sel = labelSelectorStr(peer.podSelector)
-    return { label: sel ? `Pods: ${sel}` : 'All Pods', type: 'pod' }
+    return { label: sel ? `Pods: ${formatSelectorForNode(sel)}` : 'All Pods', type: 'pod' }
   }
   if (peer.namespaceSelector !== undefined) {
     const sel = labelSelectorStr(peer.namespaceSelector)
-    return { label: sel ? `NS: ${sel}` : 'All Namespaces', type: 'namespace' }
+    return { label: sel ? `NS: ${formatSelectorForNode(sel)}` : 'All Namespaces', type: 'namespace' }
   }
   if (peer.ipBlock) {
     const exc = peer.ipBlock.except?.length ? ` (excl. ${peer.ipBlock.except.length})` : ''
     return { label: `${peer.ipBlock.cidr}${exc}`, type: 'ipblock' }
   }
   return { label: 'Peer', type: 'pod' }
+}
+
+function ciliumSelectorLabel(sel: Record<string, unknown>): { label: string; type: string } {
+  const selectorText = labelSelectorStr(sel)
+  return { label: selectorText ? `Endpoints: ${formatSelectorForNode(selectorText)}` : 'All Endpoints', type: 'pod' }
+}
+
+function ingressPeerLabels(rule: IngressRule): Array<{ label: string; type: string }> {
+  const labels: Array<{ label: string; type: string }> = []
+  ;(rule.from ?? []).forEach((peer) => labels.push(peerLabel(peer)))
+  ;(rule.fromEndpoints ?? []).forEach((sel) => labels.push(ciliumSelectorLabel(sel)))
+  ;(rule.fromEntities ?? []).forEach((entity) => labels.push({ label: `Entity: ${entity}`, type: 'entity' }))
+  ;(rule.fromCIDR ?? []).forEach((cidr) => labels.push({ label: cidr, type: 'ipblock' }))
+  ;(rule.fromCIDRSet ?? []).forEach((item) => {
+    const exc = item.except?.length ? ` (excl. ${item.except.length})` : ''
+    labels.push({ label: `${item.cidr}${exc}`, type: 'ipblock' })
+  })
+  return labels
+}
+
+function egressPeerLabels(rule: EgressRule): Array<{ label: string; type: string }> {
+  const labels: Array<{ label: string; type: string }> = []
+  ;(rule.to ?? []).forEach((peer) => labels.push(peerLabel(peer)))
+  ;(rule.toEndpoints ?? []).forEach((sel) => labels.push(ciliumSelectorLabel(sel)))
+  ;(rule.toEntities ?? []).forEach((entity) => labels.push({ label: `Entity: ${entity}`, type: 'entity' }))
+  ;(rule.toCIDR ?? []).forEach((cidr) => labels.push({ label: cidr, type: 'ipblock' }))
+  ;(rule.toCIDRSet ?? []).forEach((item) => {
+    const exc = item.except?.length ? ` (excl. ${item.except.length})` : ''
+    labels.push({ label: `${item.cidr}${exc}`, type: 'ipblock' })
+  })
+  ;(rule.toFQDNs ?? []).forEach((fqdn) => {
+    const value = fqdn.matchName ?? fqdn.matchPattern
+    if (value) labels.push({ label: `FQDN: ${value}`, type: 'fqdn' })
+  })
+  ;(rule.toServices ?? []).forEach((svc, idx) => {
+    const serviceName = svc.k8sService?.serviceName
+    const serviceNamespace = svc.k8sService?.namespace
+    if (serviceName) {
+      labels.push({ label: `Service: ${serviceNamespace ? `${serviceNamespace}/` : ''}${serviceName}`, type: 'service' })
+      return
+    }
+    const selectorText = labelSelectorStr(svc.k8sServiceSelector?.selector)
+    const selectorNamespace = svc.k8sServiceSelector?.namespace
+    if (selectorText || selectorNamespace) {
+      labels.push({ label: `Service Selector: ${selectorNamespace ? `${selectorNamespace} ` : ''}${selectorText}`.trim(), type: 'service' })
+      return
+    }
+    labels.push({ label: `Service Target ${idx + 1}`, type: 'service' })
+  })
+  return labels
 }
 
 // ── Node colour by type ───────────────────────────────────────────────────────
@@ -91,6 +167,9 @@ const NODE_COLORS: Record<string, { bg: string; border: string; text: string }> 
   pod:       { bg: '#1a3328', border: '#34d399', text: '#6ee7b7' },
   namespace: { bg: '#2d1e4a', border: '#a78bfa', text: '#c4b5fd' },
   ipblock:   { bg: '#3b2a15', border: '#f59e0b', text: '#fcd34d' },
+  entity:    { bg: '#103045', border: '#38bdf8', text: '#7dd3fc' },
+  fqdn:      { bg: '#2e2a4e', border: '#818cf8', text: '#c7d2fe' },
+  service:   { bg: '#3b1f2e', border: '#fb7185', text: '#fda4af' },
   all:       { bg: '#2a2a3a', border: '#64748b', text: '#94a3b8' },
 }
 
@@ -106,6 +185,8 @@ function nodeStyle(type: string): React.CSSProperties {
     fontFamily: 'var(--font-modal, monospace)',
     maxWidth: 200,
     whiteSpace: 'pre-wrap' as const,
+    wordBreak: 'normal',
+    overflowWrap: 'anywhere',
     lineHeight: 1.4,
     textAlign: 'center' as const,
   }
@@ -122,9 +203,10 @@ function buildFlowGraph(full: Record<string, unknown>): { nodes: Node[]; edges: 
   const edges: Edge[] = []
 
   let policyLabel = name
-  if (spec?.podSelector) {
-    const sel = labelSelectorStr(spec.podSelector as Record<string, unknown>)
-    if (sel) policyLabel = `${name}\n${sel}`
+  const policySelector = (spec?.podSelector ?? spec?.endpointSelector) as Record<string, unknown> | undefined
+  if (policySelector) {
+    const sel = labelSelectorStr(policySelector)
+    if (sel) policyLabel = `${name}\n${formatSelectorForNode(sel)}`
   }
 
   nodes.push({
@@ -169,12 +251,12 @@ function buildFlowGraph(full: Record<string, unknown>): { nodes: Node[]; edges: 
   }
 
   // ── Ingress (left column) ────────────────────────────────────────────────
-  const ingress = spec?.ingress ?? []
+  const ingress = spec?.ingress ?? spec?.ingressRules ?? []
   let ingressIdx = 0
 
   ingress.forEach((rule, ri) => {
-    const portLbl = portsStr(rule.ports)
-    const froms = rule.from
+    const portLbl = portsStr(rulePorts(rule))
+    const froms = ingressPeerLabels(rule)
     if (!froms?.length) {
       const id = `ingress-all-${ri}`
       const y = 60 + ingressIdx * 110
@@ -184,7 +266,7 @@ function buildFlowGraph(full: Record<string, unknown>): { nodes: Node[]; edges: 
       return
     }
     froms.forEach((peer, pi) => {
-      const { label, type } = peerLabel(peer)
+      const { label, type } = peer
       const id = `ingress-${ri}-${pi}`
       const y = 60 + ingressIdx * 110
       addNode(id, label, type, 50, y)
@@ -194,12 +276,12 @@ function buildFlowGraph(full: Record<string, unknown>): { nodes: Node[]; edges: 
   })
 
   // ── Egress (right column) ────────────────────────────────────────────────
-  const egress = spec?.egress ?? []
+  const egress = spec?.egress ?? spec?.egressRules ?? []
   let egressIdx = 0
 
   egress.forEach((rule, ri) => {
-    const portLbl = portsStr(rule.ports)
-    const tos = rule.to
+    const portLbl = portsStr(rulePorts(rule))
+    const tos = egressPeerLabels(rule)
     if (!tos?.length) {
       const id = `egress-all-${ri}`
       const y = 60 + egressIdx * 110
@@ -209,7 +291,7 @@ function buildFlowGraph(full: Record<string, unknown>): { nodes: Node[]; edges: 
       return
     }
     tos.forEach((peer, pi) => {
-      const { label, type } = peerLabel(peer)
+      const { label, type } = peer
       const id = `egress-${ri}-${pi}`
       const y = 60 + egressIdx * 110
       addNode(id, label, type, 760, y)
@@ -238,8 +320,13 @@ export function NetworkPolicyFlowTab({ full }: { full: Record<string, unknown> |
   }
 
   const policyTypes = ((full.spec as Record<string, unknown> | undefined)?.policyTypes as string[] | undefined) ?? []
-  const hasIngress = policyTypes.includes('Ingress') || ((full.spec as Record<string, unknown> | undefined)?.ingress as unknown[])?.length > 0
-  const hasEgress  = policyTypes.includes('Egress')  || ((full.spec as Record<string, unknown> | undefined)?.egress  as unknown[])?.length > 0
+  const spec = full.spec as Record<string, unknown> | undefined
+  const hasIngress = policyTypes.includes('Ingress')
+    || (spec?.ingress as unknown[])?.length > 0
+    || (spec?.ingressRules as unknown[])?.length > 0
+  const hasEgress  = policyTypes.includes('Egress')
+    || (spec?.egress as unknown[])?.length > 0
+    || (spec?.egressRules as unknown[])?.length > 0
 
   return (
     <div className="flex-1 min-h-0 flex flex-col overflow-hidden" data-testid="netpol-flow-tab">

@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
 import { Text } from '@mantine/core'
@@ -16,6 +16,7 @@ import { ResourceList } from '../../../bindings/kubegui/services/backend'
 import { Events } from '@wailsio/runtime'
 import { ResourceDrawer, type ResourceRef } from '@/components/ui/ResourceDrawer'
 import { FixedTooltip } from '@/components/ui/FixedTooltip'
+import { NamespaceLink } from '@/components/ui/NamespaceLink'
 import cronstrue from 'cronstrue'
 
 const col = createColumnHelper<K8sResource>()
@@ -157,10 +158,10 @@ export function ResourcesView() {
         cell: (info) => <span className="font-medium text-foreground truncate max-w-[280px] block" title={info.getValue<string>()}>{info.getValue<string>()}</span>,
       })
 
-      const nsCol = col.accessor((r) => r.metadata.namespace ?? 'cluster', {
-        id: 'namespace', header: 'Namespace', size: 160,
-        cell: (info) => <span className={xs}>{info.getValue<string>()}</span>,
-      })
+       const nsCol = col.accessor((r) => r.metadata.namespace ?? 'cluster', {
+         id: 'namespace', header: 'Namespace', size: 160,
+         cell: (info) => <NamespaceLink namespace={info.getValue<string>()} className={xs} />,
+       })
 
       const statusCol = col.accessor(getK8sStatus, {
         id: 'status', header: 'Status', size: 120,
