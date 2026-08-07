@@ -18,6 +18,8 @@ import {
   Users,
   Puzzle,
   ShieldCheck,
+  Package,
+  PackageSearch,
 } from 'lucide-react'
 export type MenuItem = {
   id: string
@@ -249,6 +251,31 @@ export const menuConfig: MenuSection[] = [
     ],
   },
   {
+    id: 'helm',
+    label: 'Helm',
+    items: [
+      {
+        id: 'helm-group',
+        label: 'Helm',
+        icon: Package,
+        subsections: [
+          {
+            id: 'helm-repositories',
+            label: 'Repositories',
+            icon: PackageSearch,
+            href: '/helm/repos',
+          },
+          {
+            id: 'helm-apps',
+            label: 'Installed Apps',
+            icon: Package,
+            href: '/helm/apps',
+          },
+        ],
+      },
+    ],
+  },
+  {
     id: 'crd-definitions-section',
     label: 'Custom Resources',
     items: [
@@ -276,6 +303,7 @@ export const sidebarConfig = {
     status: 'healthy' as const,
   },
 }
-export function getMenuConfigForUser(_userRole: 'admin' | 'user' | 'viewer'): MenuSection[] {
+export function getMenuConfigForUser(userRole: 'admin' | 'user' | 'viewer'): MenuSection[] {
+  void userRole
   return menuConfig
 }

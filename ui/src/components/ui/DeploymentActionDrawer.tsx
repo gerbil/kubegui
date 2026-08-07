@@ -193,7 +193,7 @@ const LOG_LEVEL_COLORS: Record<string, string> = {
 }
 
 function decodeHtmlEntities(s: string): string {
-  let decoded = s
+  const decoded = s
     .replace(/&amp;/gi, '&')
     .replace(/&lt;/gi, '<')
     .replace(/&gt;/gi, '>')
@@ -397,7 +397,7 @@ function LogsTab({ deployment }: { deployment: DeploymentRow }) {
             <div key={i} className={`log-line log-tone-${tone}`}>
               <span
                 className="code hljs"
-                // eslint-disable-next-line react/no-danger
+                 
                 dangerouslySetInnerHTML={{ __html: applySearchHighlight(highlightLogLine(line.message), search) }}
               />
             </div>
