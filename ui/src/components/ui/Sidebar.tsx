@@ -71,7 +71,7 @@ export function Sidebar({ userRole = 'admin', health: runtimeHealth, currentPath
   }, [currentPath, activeMenuConfig, updateActiveItem])
 
   return (
-    <aside className="w-72 shrink-0 bg-background/80 backdrop-blur-xl rounded-xl z-50 flex flex-col overflow-hidden">
+    <aside className="w-[338px] shrink-0 bg-background/80 backdrop-blur-xl rounded-xl z-50 flex flex-col overflow-hidden">
       {/* Logo Header */}
       <div className="h-16 flex items-center px-6 mb-6">
         <div className="flex items-center gap-2">

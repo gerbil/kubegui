@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
@@ -250,7 +250,7 @@ function parseQuantity(q: string | number): number {
     m: 0.001,
   }
 
-  let match = str.match(/^([0-9.]+)([a-zA-Z%]*)$/)
+  const match = str.match(/^([0-9.]+)([a-zA-Z%]*)$/)
   if (!match) return 0
 
   const num = parseFloat(match[1])

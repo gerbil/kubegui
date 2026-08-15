@@ -56,6 +56,16 @@ createRoot(document.getElementById('root')!).render(
           fontFamily: 'Space Grotesk, system-ui, sans-serif',
           fontFamilyMonospace: 'Space Grotesk, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
           headings: { fontFamily: 'Space Grotesk, system-ui, sans-serif' },
+          components: {
+            Select: {
+              defaultProps: {
+                comboboxProps: {
+                  withinPortal: true,
+                  zIndex: 1400,
+                },
+              },
+            },
+          },
         }}
       >
         <App />

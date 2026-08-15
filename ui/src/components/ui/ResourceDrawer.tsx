@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { configureAceYamlEditor } from '@/lib/aceEditorConfig'
-import { Boxes, FileText, GitBranch, Pencil, Radio, RefreshCw, Search, Terminal, Trash2, X } from 'lucide-react'
+import { Boxes, Database, FileText, GitBranch, Globe, HardDrive, Network, Pencil, Radio, RefreshCw, Search, Shield, Terminal, Trash2, X } from 'lucide-react'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
@@ -8,8 +8,10 @@ import {
   ResourceDelete,
   ResourceEdit,
   ResourceGetDetails,
+  ResourceGetHierarchy,
 } from '../../../bindings/kubegui/services/backend'
 import { BackendEventSource } from '../../lib/wailsBackendTransport'
+import { INFORMER_RESOURCE_NAMES } from '../../lib/menu.config'
 import { ConfirmDialog } from './Button'
 import { PortForwardBadges } from './PortForwardBadges'
 import { AnnotationsSection, DynamicResourceSection, EventsTimeline, LabelsSection, TooltipResourceSection } from './ResourceManifestOverview'
@@ -17,6 +19,7 @@ import { uiNotify } from './UiNotify'
 import { UiTooltip } from './UiTooltip'
 import { NetworkPolicyFlowTab } from '../../features/resources/NetworkPolicyFlowTab'
 import { RbacFlowTab } from '../../features/resources/RbacFlowTab'
+import { HIERARCHY_NAVIGATE_EVENT } from '../../lib/uiEvents'
 /** Minimal info needed to open the drawer — satisfied by both K8sResource and ResourceRow */
 export interface ResourceRef {
   uid?: string
@@ -26,7 +29,7 @@ export interface ResourceRef {
   apiVersion?: string
 }
 
-type Tab = 'overview' | 'events' | 'edit' | 'logs' | 'shell' | 'netflow' | 'rbacflow'
+type Tab = 'overview' | 'events' | 'edit' | 'logs' | 'shell' | 'netflow' | 'rbacflow' | 'hierarchy'
 
 // ── Ace / jsyaml types ────────────────────────────────────────────────────────
 
@@ -66,6 +69,8 @@ function isPod(resourceType: string) {
 
 function isNetworkPolicy(resourceType: string) {
   return resourceType === 'networkpolicies'
+    || resourceType === 'ciliumnetworkpolicies'
+    || resourceType === 'ciliumclusterwidenetworkpolicies'
 }
 
 function isRbacResource(resourceType: string) {
@@ -73,6 +78,10 @@ function isRbacResource(resourceType: string) {
     || resourceType === 'clusterroles'
     || resourceType === 'rolebindings'
     || resourceType === 'clusterrolebindings'
+}
+
+function isCRDResource(resourceType: string) {
+  return !(INFORMER_RESOURCE_NAMES as readonly string[]).includes(resourceType)
 }
 
 function TabBtn({ id, label, icon, active, onClick }: {
@@ -354,6 +363,191 @@ function EventsTab({ kind, namespace, name }: { kind: string; namespace: string;
         </button>
       </div>
       <EventsTimeline events={events} loading={loading} error={error} />
+    </div>
+  )
+}
+
+/** Dispatch a navigate event handled by App.tsx */
+function emitHierarchyNavigate(resource: string, namespace: string, name: string, apiVersion = '') {
+  const normalizedResource = resource.trim().toLowerCase()
+  const isInformerResource = (INFORMER_RESOURCE_NAMES as readonly string[]).includes(normalizedResource)
+  const apiGroup = apiVersion.includes('/') ? apiVersion.split('/')[0] : ''
+
+  const path = isInformerResource
+    ? (normalizedResource === 'pods' ? '/pods' : `/resources/${encodeURIComponent(normalizedResource)}`)
+    : apiGroup
+      ? `/crds/${encodeURIComponent(apiGroup)}/${encodeURIComponent(normalizedResource)}`
+      : `/resources/${encodeURIComponent(normalizedResource)}`
+
+  const params = new URLSearchParams()
+  if (namespace && namespace !== '_') params.set('namespace', namespace)
+  if (name) params.set('q', name)
+  const qs = params.toString()
+  const href = qs ? `${path}?${qs}` : path
+  window.dispatchEvent(new CustomEvent(HIERARCHY_NAVIGATE_EVENT, { detail: href }))
+}
+
+interface HierarchyNodeViewProps {
+  node: Record<string, unknown>
+  parentHasNext?: boolean[]
+  isRoot?: boolean
+  isLast?: boolean
+}
+
+function hierarchyNodeIcon(resource: string, kind: string) {
+  const id = (resource || kind).toLowerCase()
+  if (id.includes('pod') || id.includes('job') || id.includes('deployment') || id.includes('replicaset') || id.includes('statefulset') || id.includes('daemonset')) {
+    return <Boxes size={12} className="text-emerald-300/85 shrink-0" />
+  }
+  if (id.includes('service') || id.includes('endpoint') || id.includes('ingress') || id.includes('networkpolicy')) {
+    return <Network size={12} className="text-sky-300/85 shrink-0" />
+  }
+  if (id.includes('secret') || id.includes('role') || id.includes('binding') || id.includes('account')) {
+    return <Shield size={12} className="text-violet-300/85 shrink-0" />
+  }
+  if (id.includes('configmap') || id.includes('storage') || id.includes('volume') || id.includes('pvc') || id.includes('pv')) {
+    return <HardDrive size={12} className="text-amber-300/85 shrink-0" />
+  }
+  if (id.includes('node') || id.includes('namespace') || id.includes('cluster')) {
+    return <Database size={12} className="text-cyan-300/85 shrink-0" />
+  }
+  if (id.includes('gateway') || id.includes('route') || id.includes('host')) {
+    return <Globe size={12} className="text-blue-300/85 shrink-0" />
+  }
+  return <GitBranch size={12} className="text-muted-foreground/70 shrink-0" />
+}
+
+function HierarchyNodeView({ node, parentHasNext = [], isRoot = false, isLast = true }: HierarchyNodeViewProps) {
+  const children = Array.isArray(node.children) ? (node.children as Record<string, unknown>[]) : []
+  const kind      = String(node.kind      ?? 'Unknown')
+  const name      = String(node.name      ?? '')
+  const namespace = String(node.namespace ?? '')
+  const phase     = String(node.phase     ?? '')
+  const apiVersion = String(node.apiVersion ?? '')
+  const resource  = String(node.resource  ?? kind.toLowerCase())
+  const icon = hierarchyNodeIcon(resource, kind)
+
+  const childParentHasNext = isRoot ? parentHasNext : [...parentHasNext, !isLast]
+
+  const handleClick = () => {
+    if (resource && name) emitHierarchyNavigate(resource, namespace, name, apiVersion)
+  }
+
+  const phaseColor =
+    phase === 'Running'   ? 'text-emerald-400/80' :
+    phase === 'Failed'    ? 'text-red-400/80'     :
+    phase === 'Pending'   ? 'text-yellow-400/80'  :
+    phase === 'Succeeded' ? 'text-sky-400/80'     : 'text-muted-foreground/70'
+
+  return (
+    <div>
+      {/* Row */}
+      <button
+        onClick={handleClick}
+        title={`Go to ${kind}/${name}${namespace ? ` (${namespace})` : ''}`}
+        className="group flex items-baseline gap-0 w-full text-left hover:bg-white/5 rounded transition-colors py-px"
+      >
+        {/* Connected tree guides */}
+        <span className="inline-flex items-center shrink-0 font-mono text-[11px] text-muted-foreground/40 select-none">
+          {parentHasNext.map((hasNext, idx) => (
+            <span key={`${idx}-${hasNext ? '1' : '0'}`} className="w-3 text-center">
+              {hasNext ? String.fromCharCode(9474) : String.fromCharCode(160)}
+            </span>
+          ))}
+          {!isRoot && (
+            <>
+              <span className="w-3 text-center text-muted-foreground/55">{isLast ? String.fromCharCode(9492) : String.fromCharCode(9500)}</span>
+              <span className="w-3 text-center text-muted-foreground/55">{String.fromCharCode(9472)}</span>
+            </>
+          )}
+        </span>
+        {/* Resource icon */}
+        <span className="mx-1.5 inline-flex items-center justify-center">{icon}</span>
+        {/* Kind badge */}
+        <span className="text-[9px] uppercase tracking-wider text-muted-foreground/60 shrink-0 mr-1.5 leading-none self-center">
+          {kind}
+        </span>
+        {/* Name — highlighted on hover */}
+        <span className="text-[12px] text-foreground/90 font-medium group-hover:text-primary truncate leading-none" title={name}>
+          {name || '—'}
+        </span>
+        {namespace && (
+          <span className="ml-2 text-[10px] text-cyan-400/70 shrink-0 leading-none self-center">{namespace}</span>
+        )}
+        {phase && (
+          <span className={`ml-1.5 text-[10px] shrink-0 leading-none self-center ${phaseColor}`}>[{phase}]</span>
+        )}
+      </button>
+
+      {/* Children */}
+      {children.map((child, idx) => {
+        const last = idx === children.length - 1
+        return (
+          <HierarchyNodeView
+            key={`${String(child.uid ?? '')}-${idx}`}
+            node={child}
+            parentHasNext={childParentHasNext}
+            isRoot={false}
+            isLast={last}
+          />
+        )
+      })}
+    </div>
+  )
+}
+
+function HierarchyTab({ resourceType, namespace, name }: { resourceType: string; namespace: string; name: string }) {
+  const [tree, setTree] = useState<Record<string, unknown> | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const load = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    try {
+      const data = await ResourceGetHierarchy(resourceType, namespace, name)
+      setTree((data as unknown as Record<string, unknown> | null) ?? null)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Failed to load hierarchy')
+    } finally {
+      setLoading(false)
+    }
+  }, [name, namespace, resourceType])
+
+  useEffect(() => {
+    void load()
+  }, [load])
+
+  if (loading) {
+    return <div className="flex-1 flex items-center justify-center"><p className="text-[11px] text-muted-foreground">Loading hierarchy…</p></div>
+  }
+
+  if (error) {
+    return (
+      <div className="flex-1 overflow-y-auto p-5">
+        <div className="rounded border border-red-500/40 bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</div>
+      </div>
+    )
+  }
+
+  if (!tree) {
+    return <div className="flex-1 flex items-center justify-center"><p className="text-[11px] text-muted-foreground">No hierarchy data.</p></div>
+  }
+
+  return (
+    <div className="flex-1 overflow-y-auto p-5 space-y-3">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-semibold text-foreground">Hierarchy</h3>
+        <button
+          onClick={() => { void load() }}
+          className="flex items-center gap-1 text-[10px] text-muted-foreground hover:text-foreground"
+        >
+          <RefreshCw size={11} /> Refresh
+        </button>
+      </div>
+      <div className="font-mono text-[11px] leading-[1.6]">
+        <HierarchyNodeView node={tree} isRoot={true} />
+      </div>
     </div>
   )
 }
@@ -680,10 +874,11 @@ export function ResourceDrawer({ resource, resourceType, onClose, extraHeaderAct
   const tabs: { id: Tab; label: string; icon: React.ReactNode; hidden?: boolean }[] = [
     { id: 'overview', label: 'Overview',  icon: <Boxes    size={13} /> },
     { id: 'events',   label: 'Events',    icon: <Radio    size={13} /> },
+    { id: 'hierarchy', label: 'Hierarchy', icon: <GitBranch size={13} />, hidden: !isCRDResource(resourceType) },
     { id: 'logs',     label: 'Logs',      icon: <FileText size={13} />, hidden: !isPod(resourceType) },
     { id: 'shell',    label: 'Shell',     icon: <Terminal size={13} />, hidden: !isPod(resourceType) },
-    { id: 'edit',     label: 'Edit YAML', icon: <Pencil   size={13} /> },
     { id: 'netflow',  label: 'Netflow',   icon: <GitBranch size={13} />, hidden: !isNetworkPolicy(resourceType) },
+    { id: 'edit',     label: 'Edit YAML', icon: <Pencil   size={13} /> },
     { id: 'rbacflow', label: 'RBAC Flow', icon: <GitBranch size={13} />, hidden: !isRbacResource(resourceType) },
   ]
 
@@ -763,6 +958,9 @@ export function ResourceDrawer({ resource, resourceType, onClose, extraHeaderAct
         <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
           {resource && activeTab === 'overview' && <OverviewTab full={full} resourceType={resourceType} namespace={namespace} name={name} />}
           {resource && activeTab === 'events'   && <EventsTab kind={resource.kind ?? resourceType} namespace={namespace} name={name} />}
+          {resource && activeTab === 'hierarchy' && isCRDResource(resourceType) && (
+            <HierarchyTab resourceType={resourceType} namespace={namespace} name={name} />
+          )}
           {resource && activeTab === 'netflow'  && isNetworkPolicy(resourceType) && (
             <NetworkPolicyFlowTab full={full} />
           )}

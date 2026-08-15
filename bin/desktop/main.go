@@ -92,6 +92,16 @@ func main() {
              return
            }
 
+           if strings.HasPrefix(req.URL.Path, "/api/v1/helm/repos") {
+             services.HelmReposHandler(rw, req)
+             return
+           }
+
+           if strings.HasPrefix(req.URL.Path, "/api/v1/helm/apps") {
+             services.HelmAppsHandler(rw, req)
+             return
+           }
+
                if req.URL.Path == "/api/v1/cve-db/refresh" {
                  services.CVEDBRefreshHandler(rw, req)
                  return

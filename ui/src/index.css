@@ -436,8 +436,8 @@
 
 .pods-glass-control {
   background: #0f172a57 !important;
+  border: 1px solid rgba(148, 163, 184, 0.2) !important;
   box-shadow: inset 0 1px 0 #ffffff0a;
-  border-color: rgba(148, 163, 184, 0.2) !important;
   color: var(--on-surface, #e2e8f0) !important;
   font-size: 12px !important;
 }

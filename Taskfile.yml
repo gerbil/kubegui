@@ -6,6 +6,9 @@ vars:
   VITE_PORT: '{{.WAILS_VITE_PORT | default 9245}}'
   LOG_LEVEL: '{{.LOG_LEVEL | default "info"}}'
 
+env:
+  GOEXPERIMENT: jsonv2
+
 tasks:
   build:
     summary: Builds the application

@@ -71,13 +71,17 @@ import { DataTable } from './components/table/DataTable'
 import { formatAge } from './lib/utils'
 import { INFORMER_RESOURCE_NAMES, getInformerResourceLabel } from './lib/menu.config'
 import { CRDDefinitionsPage } from './features/crds/CRDDefinitionsPage'
+import { HelmReposPage } from './features/helm/HelmReposPage'
+import { HelmAppsPage } from './features/helm/HelmAppsPage'
 import { Select as MantineSelect } from '@mantine/core'
 import { useNamespaceOptions } from './hooks/useNamespaceOptions'
 import { useK8sResourceStore, type ResourceRow } from './store/useK8sResourceStore'
 import { configureAceYamlEditor } from './lib/aceEditorConfig'
 import { uiNotify } from './components/ui/UiNotify'
+import { NamespaceLink } from './components/ui/NamespaceLink'
 import { CVE_SCANS_ENABLED_STORAGE_KEY, refreshCveDatabases } from './lib/cveScanSettings'
 import { RESOURCE_YAML_TEMPLATES } from './lib/yamlTemplates'
+import { HIERARCHY_NAVIGATE_EVENT } from './lib/uiEvents'
 
 /** Stable empty array – prevents Zustand getSnapshot from returning new ref every call */
 const EMPTY_ROWS: ResourceRow[] = []
@@ -1559,7 +1563,7 @@ function RootView() {
     }
   }, [isInitialized])
 
-  const navigateTo = (href: string) => {
+  const navigateTo = useCallback((href: string) => {
     const nextUrl = new URL(href, window.location.origin)
     const nextPath = normalizePath(nextUrl.pathname)
     const nextSearch = nextUrl.search
@@ -1568,7 +1572,7 @@ function RootView() {
     if (nextPath === currentNormalizedPath && nextSearch === currentSearch) return
     window.history.pushState({}, '', `${nextPath}${nextSearch}`)
     setCurrentPath(nextPath)
-  }
+  }, [])
 
   const navigateToResourceTarget = useCallback((target: AllocationNavigationTarget) => {
     const path = target.resource === 'pods' ? '/pods' : `/resources/${target.resource}`
@@ -1578,6 +1582,19 @@ function RootView() {
     if (target.statusFilter) params.set('filter', target.statusFilter)
     const query = params.toString()
     navigateTo(query ? `${path}?${query}` : path)
+  }, [navigateTo])
+
+  useEffect(() => {
+    const onHierarchyNavigate = (event: Event) => {
+      const href = (event as CustomEvent<string>).detail
+      if (typeof href !== 'string' || href.trim() === '') return
+      navigateTo(href)
+    }
+
+    window.addEventListener(HIERARCHY_NAVIGATE_EVENT, onHierarchyNavigate as EventListener)
+    return () => {
+      window.removeEventListener(HIERARCHY_NAVIGATE_EVENT, onHierarchyNavigate as EventListener)
+    }
   }, [navigateTo])
 
   useEffect(() => {
@@ -1636,6 +1653,8 @@ function RootView() {
   if (currentPath === '/pods') pageTitle = 'Cluster / Pods'
   if (currentPath === '/deployments') pageTitle = 'Cluster / Deployments'
   if (informerResourceFromPath) pageTitle = `Cluster / ${getInformerResourceLabel(informerResourceFromPath)}`
+  if (currentPath === '/helm/repos') pageTitle = 'Cluster / Helm Repositories'
+  if (currentPath === '/helm/apps') pageTitle = 'Cluster / Helm Apps'
   if (currentPath === '/settings') pageTitle = 'Settings'
 
   let pageContent: ReactNode = (
@@ -1665,6 +1684,10 @@ function RootView() {
     pageContent = <CRDDefinitionsPage />
   } else if (currentPath === '/my-permissions') {
     pageContent = <MyPermissionsPage />
+  } else if (currentPath === '/helm/repos') {
+    pageContent = <HelmReposPage />
+  } else if (currentPath === '/helm/apps') {
+    pageContent = <HelmAppsPage />
   } else {
     pageContent = (
       <DashboardPage
@@ -2602,14 +2625,14 @@ function NamespacesPage() {
               value={globalFilter}
               onChange={(e) => setGlobalFilter(e.target.value)}
               placeholder="Filter namespaces"
-              className="lucid-control rounded pl-8 pr-3 py-1 !text-[13px] !placeholder:text-[13px] w-80 focus:outline-none"
+              className="lucid-control rounded pl-6 pr-3 py-1 !text-[13px] !placeholder:text-[13px] min-w-[200px] focus:outline-none font-label"
               autoComplete="off"
               spellCheck={false}
             />
           </div>
           {selectedNamespaceRows.length > 0 && (
             <div className="lucid-control flex items-center gap-1.5 rounded text-sm focus:outline-none px-2 py-1.5 bg-[#0f172a80]">
-              <span className="text-[10px] tracking-wider text-muted-foreground max-w-[460px] truncate" title={selectedNamespaceNames}>
+              <span className="text-[10px] tracking-wider text-muted-foreground max-w-[360px] truncate" title={selectedNamespaceNames}>
                 Selected namespaces: {selectedNamespaceNames}
               </span>
               <button
@@ -2727,14 +2750,15 @@ function CreateResourceModal({ resource, label, onClose, onCreated }: { resource
       }
     }
     void initEditor()
+    const container = containerRef.current
     return () => {
       destroyed = true
       const editor = editorRef.current
       editorRef.current = null
       if (editor) { try { editor.destroy() } catch { /* ignore */ } }
-      if (containerRef.current) containerRef.current.innerHTML = ''
+      if (container) container.innerHTML = ''
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+   
   }, [])
   const handleCreate = async () => {
     setSubmitError(null)
@@ -3263,7 +3287,7 @@ function PodsPage() {
                     : `${c.name}: running`
                 return (
                   <UiTooltip key={i} content={<span className="whitespace-pre">{tip}</span>}>
-                    <span className={`w-2.5 h-2.5 rounded-full inline-block shrink-0 cursor-default ${dotCls}`} />
+                    <span className={`w-2.5 h-2.5 rounded-full inline-block shrink-0 ${dotCls}`} />
                   </UiTooltip>
                 )
               })}
@@ -3276,7 +3300,13 @@ function PodsPage() {
         id: 'namespace',
         header: 'Namespace',
         accessorKey: 'namespace',
-        cell: (info) => <span className="text-sm text-foreground">{String(info.getValue())}</span>,
+        cell: (info) => (
+          <NamespaceLink
+            namespace={String(info.getValue())}
+            className="text-sm text-foreground"
+            onSelectNamespace={(namespace) => setSelectedNamespace(namespace)}
+          />
+        ),
       },
       { id: 'node', header: 'Node', accessorKey: 'node', cell: (info) => <span className="text-sm text-muted-foreground">{String(info.getValue())}</span> },
       {
@@ -3302,7 +3332,7 @@ function PodsPage() {
         cell: (info) => <span className="text-sm text-muted-foreground whitespace-nowrap">{humanAge(String(info.getValue() ?? ''))}</span>,
       },
     ],
-    [],
+    [setSelectedNamespace],
   )
 
   return (
@@ -3644,7 +3674,18 @@ function InformerResourcePage({ resource }: { resource: string }) {
 
     const selectCol: ColumnDef<Row> = { id: 'select', header: 'select', accessorKey: 'name', enableSorting: false, enableGlobalFilter: false, size: 44, meta: { thClassName: 'pl-3', tdClassName: 'pl-3' }, cell: (info) => (<input type="checkbox" className="w-4 h-4 rounded cursor-pointer align-bottom appearance-none bg-[#354065] checked:bg-[#6a7fc9] checked:border-[#6a7fc9]" checked={info.row.getIsSelected()} onChange={info.row.getToggleSelectedHandler()} onClick={(e) => e.stopPropagation()} />) }
     const nameCol: ColumnDef<Row> = { id: 'name', header: 'Name', accessorKey: 'name', cell: (info) => <span className="font-label text-sm text-foreground font-semibold">{String(info.getValue())}</span> }
-    const nsCol: ColumnDef<Row> = { id: 'namespace', header: 'Namespace', accessorKey: 'namespace', cell: (info) => xs(info.getValue()) }
+    const nsCol: ColumnDef<Row> = {
+      id: 'namespace',
+      header: 'Namespace',
+      accessorKey: 'namespace',
+      cell: (info) => (
+        <NamespaceLink
+          namespace={String(info.getValue())}
+          className="text-sm text-muted-foreground"
+          onSelectNamespace={(namespace) => setSelectedNamespace(namespace)}
+        />
+      ),
+    }
     const ageCol: ColumnDef<Row> = { id: 'age', header: 'Age', accessorFn: (row) => row.createdAt, sortingFn: 'datetime', meta: { shrink: true }, cell: (info) => <span className="text-sm text-muted-foreground whitespace-nowrap">{humanAge(String(info.getValue() ?? ''))}</span> }
     const statusCol: ColumnDef<Row> = {
       id: 'status',
@@ -3767,8 +3808,7 @@ function InformerResourcePage({ resource }: { resource: string }) {
     cols.push(ageCol)
     return cols
 
-  }, [isNamespaced, resource])
-
+  }, [isNamespaced, resource, setSelectedNamespace])
   const extraOrderMap: Record<string, string[]> = {
     pods: ['phase', 'ready', 'node'],
     cronjobs: ['schedule', 'active', 'suspend'],

@@ -49,7 +49,7 @@ export function usePersistentState<T>(key: string, initialValue: T) {
       window.removeEventListener('storage', onStorage)
       window.removeEventListener(PERSISTENT_STATE_EVENT, onPersistentState)
     }
-  }, [key])
+  }, [initialValue, key])
 
   return [value, setValue] as const
 }

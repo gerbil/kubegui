@@ -76,11 +76,13 @@ export function ratioBadge(readyOrStr: number | string, desired?: number): Retur
 /**
  * Count display – plain colored text. Green for 0, amber for low, red for high.
  */
-export function countBadge(value: number, _warnAt = 1, errorAt = 5): ReturnType<typeof createElement> {
+export function countBadge(value: number, warnAt = 1, errorAt = 5): ReturnType<typeof createElement> {
   const cls =
     value === 0
       ? 'text-emerald-400'
-      : value < errorAt
+      : value < warnAt
+        ? 'text-emerald-400'
+        : value < errorAt
         ? 'text-amber-400'
         : 'text-red-400'
   return createElement(
