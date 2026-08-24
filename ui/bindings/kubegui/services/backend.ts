@@ -34,9 +34,27 @@ import * as pods$0 from "../internal/resources/pods/models.js";
 // @ts-ignore: Unused imports
 import * as $models from "./models.js";
 
+export function AIAssist(input: $models.AIAssistRequest): $CancellablePromise<$models.AIAssistResponse> {
+    return $Call.ByID(1411274949, input).then(($result: any) => {
+        return $$createType0($result);
+    });
+}
+
+export function AISettingsGet(): $CancellablePromise<$models.AISettings> {
+    return $Call.ByID(2982504137).then(($result: any) => {
+        return $$createType1($result);
+    });
+}
+
+export function AISettingsUpdate(input: $models.AISettings): $CancellablePromise<$models.AISettings> {
+    return $Call.ByID(1916813182, input).then(($result: any) => {
+        return $$createType1($result);
+    });
+}
+
 export function AppConfigGetActiveClusterInfo(): $CancellablePromise<$models.ClusterInfo> {
     return $Call.ByID(415845449).then(($result: any) => {
-        return $$createType0($result);
+        return $$createType2($result);
     });
 }
 
@@ -54,25 +72,18 @@ export function AppConfigPickClusterIcon(context: string, filename: string): $Ca
 
 export function AppGetMyPermissions(ns: string): $CancellablePromise<cani$0.CanIResourceRow[]> {
     return $Call.ByID(1238686409, ns).then(($result: any) => {
-        return $$createType2($result);
+        return $$createType4($result);
     });
 }
 
 export function AppGetStats(): $CancellablePromise<app$0.AppStats> {
     return $Call.ByID(972830168).then(($result: any) => {
-        return $$createType3($result);
+        return $$createType5($result);
     });
 }
 
 export function AppGetVersion(): $CancellablePromise<string> {
     return $Call.ByID(3886070275);
-}
-
-/**
- * --- app ---
- */
-export function AppServiceStartup(): $CancellablePromise<void> {
-    return $Call.ByID(126709751);
 }
 
 /**
@@ -88,7 +99,7 @@ export function CRDGenerateTemplate(group: string, plural: string): $Cancellable
  */
 export function CRDGetMenuList(): $CancellablePromise<$models.CRDMenuResponse> {
     return $Call.ByID(344254838).then(($result: any) => {
-        return $$createType4($result);
+        return $$createType6($result);
     });
 }
 
@@ -114,13 +125,13 @@ export function DBDisconnectClusterConfig(): $CancellablePromise<void> {
 
 export function DBGetActiveClusterConfig(): $CancellablePromise<db$0.Clusterconfig> {
     return $Call.ByID(289754128).then(($result: any) => {
-        return $$createType5($result);
+        return $$createType7($result);
     });
 }
 
 export function DBGetClusterConfigByContext(context: string, fileName: string): $CancellablePromise<db$0.Clusterconfig> {
     return $Call.ByID(2626808650, context, fileName).then(($result: any) => {
-        return $$createType5($result);
+        return $$createType7($result);
     });
 }
 
@@ -129,13 +140,13 @@ export function DBGetClusterConfigByContext(context: string, fileName: string): 
  */
 export function DBGetClusterConfigs(): $CancellablePromise<db$0.Clusterconfig[]> {
     return $Call.ByID(1824939179).then(($result: any) => {
-        return $$createType6($result);
+        return $$createType8($result);
     });
 }
 
 export function DBGetPodPortForwardingsConfigs(): $CancellablePromise<db$0.PodPortforwardingsConfig[]> {
     return $Call.ByID(3520078549).then(($result: any) => {
-        return $$createType8($result);
+        return $$createType10($result);
     });
 }
 
@@ -173,13 +184,13 @@ export function DBUpdatePodPortForwardingsConfig(name: string, $namespace: strin
 
 export function DeploymentRestart($namespace: string, name: string): $CancellablePromise<{ [_ in string]?: any }> {
     return $Call.ByID(1074739546, $namespace, name).then(($result: any) => {
-        return $$createType9($result);
+        return $$createType11($result);
     });
 }
 
 export function DeploymentScale($namespace: string, name: string, replicas: number): $CancellablePromise<{ [_ in string]?: any }> {
     return $Call.ByID(73162315, $namespace, name, replicas).then(($result: any) => {
-        return $$createType9($result);
+        return $$createType11($result);
     });
 }
 
@@ -212,13 +223,13 @@ export function HelmAddRepo(repoName: string, repoURL: string): $CancellableProm
 
 export function HelmGetChartVersions(repoName: string, chartName: string): $CancellablePromise<$models.HelmChartVersionInfo[]> {
     return $Call.ByID(3249777497, repoName, chartName).then(($result: any) => {
-        return $$createType11($result);
+        return $$createType13($result);
     });
 }
 
 export function HelmGetRepoCharts(repoName: string): $CancellablePromise<$models.HelmChartInfo[]> {
     return $Call.ByID(2623070497, repoName).then(($result: any) => {
-        return $$createType13($result);
+        return $$createType15($result);
     });
 }
 
@@ -228,13 +239,13 @@ export function HelmInstallApp(releaseName: string, repoName: string, chartName:
 
 export function HelmListApps($namespace: string): $CancellablePromise<$models.HelmAppInfo[]> {
     return $Call.ByID(101833752, $namespace).then(($result: any) => {
-        return $$createType15($result);
+        return $$createType17($result);
     });
 }
 
 export function HelmListRepos(): $CancellablePromise<$models.HelmRepoInfo[]> {
     return $Call.ByID(2456991405).then(($result: any) => {
-        return $$createType17($result);
+        return $$createType19($result);
     });
 }
 
@@ -252,13 +263,13 @@ export function InformerEnableCRD(): $CancellablePromise<void> {
 
 export function InformerGetCRDDefinitions(): $CancellablePromise<informers$0.CRDDefinition[]> {
     return $Call.ByID(497432381).then(($result: any) => {
-        return $$createType19($result);
+        return $$createType21($result);
     });
 }
 
 export function InformerGetHealth(): $CancellablePromise<informers$0.GlobalStatus> {
     return $Call.ByID(3234372260).then(($result: any) => {
-        return $$createType20($result);
+        return $$createType22($result);
     });
 }
 
@@ -269,19 +280,19 @@ export function InformerGetHealth(): $CancellablePromise<informers$0.GlobalStatu
  */
 export function InformerGetStatus(): $CancellablePromise<informers$0.GlobalStatus> {
     return $Call.ByID(2153328344).then(($result: any) => {
-        return $$createType20($result);
+        return $$createType22($result);
     });
 }
 
 export function InformerGetSubscriptions(): $CancellablePromise<string[]> {
     return $Call.ByID(3503196616).then(($result: any) => {
-        return $$createType21($result);
+        return $$createType23($result);
     });
 }
 
 export function InformerGetTrackedResources(): $CancellablePromise<informers$0.ResourceInfo[]> {
     return $Call.ByID(2586110265).then(($result: any) => {
-        return $$createType23($result);
+        return $$createType25($result);
     });
 }
 
@@ -310,7 +321,7 @@ export function LogsGetCluster(limit: number): $CancellablePromise<any> {
 
 export function LogsGetDeployment($namespace: string, name: string): $CancellablePromise<string[]> {
     return $Call.ByID(4024218938, $namespace, name).then(($result: any) => {
-        return $$createType21($result);
+        return $$createType23($result);
     });
 }
 
@@ -319,7 +330,7 @@ export function LogsGetDeployment($namespace: string, name: string): $Cancellabl
  */
 export function LogsGetPod($namespace: string, name: string, container: string): $CancellablePromise<string[]> {
     return $Call.ByID(2519412096, $namespace, name, container).then(($result: any) => {
-        return $$createType21($result);
+        return $$createType23($result);
     });
 }
 
@@ -328,31 +339,31 @@ export function LogsGetPod($namespace: string, name: string, container: string):
  */
 export function NetworkPolicyGetGraph($namespace: string, name: string): $CancellablePromise<networkpolicies$0.Graph> {
     return $Call.ByID(3613427860, $namespace, name).then(($result: any) => {
-        return $$createType24($result);
+        return $$createType26($result);
     });
 }
 
 export function NodeCordon(name: string): $CancellablePromise<{ [_ in string]?: any }> {
     return $Call.ByID(1978895021, name).then(($result: any) => {
-        return $$createType9($result);
+        return $$createType11($result);
     });
 }
 
 export function NodeGetAllocation(): $CancellablePromise<nodes$0.NodeAllocation[]> {
     return $Call.ByID(3502056818).then(($result: any) => {
-        return $$createType26($result);
+        return $$createType28($result);
     });
 }
 
 export function NodeGetMetrics(): $CancellablePromise<nodes$0.NodeMetricRow[]> {
     return $Call.ByID(1632746153).then(($result: any) => {
-        return $$createType28($result);
+        return $$createType30($result);
     });
 }
 
 export function NodeGetMetricsByNameFromDB(name: string): $CancellablePromise<metricsscraper$0.NodeMetrics[]> {
     return $Call.ByID(2397378193, name).then(($result: any) => {
-        return $$createType30($result);
+        return $$createType32($result);
     });
 }
 
@@ -362,43 +373,43 @@ export function NodeSetupShell(name: string): $CancellablePromise<void> {
 
 export function NodeUncordon(name: string): $CancellablePromise<{ [_ in string]?: any }> {
     return $Call.ByID(2442329246, name).then(($result: any) => {
-        return $$createType9($result);
+        return $$createType11($result);
     });
 }
 
 export function NodesGetMetrics(): $CancellablePromise<nodes$0.NodeMetricRow[]> {
     return $Call.ByID(3393351316).then(($result: any) => {
-        return $$createType28($result);
+        return $$createType30($result);
     });
 }
 
 export function PodGetMetrics($namespace: string, name: string): $CancellablePromise<{ [_ in string]?: any }> {
     return $Call.ByID(1278193994, $namespace, name).then(($result: any) => {
-        return $$createType9($result);
+        return $$createType11($result);
     });
 }
 
 export function PodGetMetricsByNameFromDB(name: string, $namespace: string): $CancellablePromise<metricsscraper$0.PodMetrics[]> {
     return $Call.ByID(262545522, name, $namespace).then(($result: any) => {
-        return $$createType32($result);
+        return $$createType34($result);
     });
 }
 
 export function PodGetStatsEndpoint(): $CancellablePromise<pods$0.Stats> {
     return $Call.ByID(1135899641).then(($result: any) => {
-        return $$createType33($result);
+        return $$createType35($result);
     });
 }
 
 export function PodsGetStats(): $CancellablePromise<pods$0.Stats> {
     return $Call.ByID(2323628195).then(($result: any) => {
-        return $$createType33($result);
+        return $$createType35($result);
     });
 }
 
 export function PortForwardList(): $CancellablePromise<$models.PortForwardSession[]> {
     return $Call.ByID(4265405356).then(($result: any) => {
-        return $$createType35($result);
+        return $$createType37($result);
     });
 }
 
@@ -407,7 +418,7 @@ export function PortForwardList(): $CancellablePromise<$models.PortForwardSessio
  */
 export function PortForwardStart($namespace: string, podName: string, remotePort: string, localPort: string): $CancellablePromise<$models.PortForwardSession> {
     return $Call.ByID(2528271496, $namespace, podName, remotePort, localPort).then(($result: any) => {
-        return $$createType34($result);
+        return $$createType36($result);
     });
 }
 
@@ -425,7 +436,7 @@ export function ResizePodShellSession(sessionID: string, rows: number, cols: num
 
 export function ResourceAdd(resource: string, objectJSON: string): $CancellablePromise<{ [_ in string]?: any }> {
     return $Call.ByID(2570461955, resource, objectJSON).then(($result: any) => {
-        return $$createType9($result);
+        return $$createType11($result);
     });
 }
 
@@ -435,19 +446,19 @@ export function ResourceDelete(resource: string, $namespace: string, name: strin
 
 export function ResourceEdit(resource: string, $namespace: string, name: string, patchJSON: string): $CancellablePromise<{ [_ in string]?: any }> {
     return $Call.ByID(2777293668, resource, $namespace, name, patchJSON).then(($result: any) => {
-        return $$createType9($result);
+        return $$createType11($result);
     });
 }
 
 export function ResourceGetDetails(resource: string, $namespace: string, name: string): $CancellablePromise<{ [_ in string]?: any }> {
     return $Call.ByID(3170424314, resource, $namespace, name).then(($result: any) => {
-        return $$createType9($result);
+        return $$createType11($result);
     });
 }
 
 export function ResourceGetHierarchy(resource: string, $namespace: string, name: string): $CancellablePromise<$models.HierarchyNode | null> {
     return $Call.ByID(452266335, resource, $namespace, name).then(($result: any) => {
-        return $$createType37($result);
+        return $$createType39($result);
     });
 }
 
@@ -456,7 +467,7 @@ export function ResourceGetHierarchy(resource: string, $namespace: string, name:
  */
 export function ResourceList(resource: string, $namespace: string): $CancellablePromise<{ [_ in string]?: any }[]> {
     return $Call.ByID(176858504, resource, $namespace).then(($result: any) => {
-        return $$createType38($result);
+        return $$createType40($result);
     });
 }
 
@@ -526,42 +537,44 @@ export function StopPodShellSession(sessionID: string): $CancellablePromise<void
 }
 
 // Private type creation functions
-const $$createType0 = $models.ClusterInfo.createFrom;
-const $$createType1 = cani$0.CanIResourceRow.createFrom;
-const $$createType2 = $Create.Array($$createType1);
-const $$createType3 = app$0.AppStats.createFrom;
-const $$createType4 = $models.CRDMenuResponse.createFrom;
-const $$createType5 = db$0.Clusterconfig.createFrom;
-const $$createType6 = $Create.Array($$createType5);
-const $$createType7 = db$0.PodPortforwardingsConfig.createFrom;
+const $$createType0 = $models.AIAssistResponse.createFrom;
+const $$createType1 = $models.AISettings.createFrom;
+const $$createType2 = $models.ClusterInfo.createFrom;
+const $$createType3 = cani$0.CanIResourceRow.createFrom;
+const $$createType4 = $Create.Array($$createType3);
+const $$createType5 = app$0.AppStats.createFrom;
+const $$createType6 = $models.CRDMenuResponse.createFrom;
+const $$createType7 = db$0.Clusterconfig.createFrom;
 const $$createType8 = $Create.Array($$createType7);
-const $$createType9 = $Create.Map($Create.Any, $Create.Any);
-const $$createType10 = $models.HelmChartVersionInfo.createFrom;
-const $$createType11 = $Create.Array($$createType10);
-const $$createType12 = $models.HelmChartInfo.createFrom;
+const $$createType9 = db$0.PodPortforwardingsConfig.createFrom;
+const $$createType10 = $Create.Array($$createType9);
+const $$createType11 = $Create.Map($Create.Any, $Create.Any);
+const $$createType12 = $models.HelmChartVersionInfo.createFrom;
 const $$createType13 = $Create.Array($$createType12);
-const $$createType14 = $models.HelmAppInfo.createFrom;
+const $$createType14 = $models.HelmChartInfo.createFrom;
 const $$createType15 = $Create.Array($$createType14);
-const $$createType16 = $models.HelmRepoInfo.createFrom;
+const $$createType16 = $models.HelmAppInfo.createFrom;
 const $$createType17 = $Create.Array($$createType16);
-const $$createType18 = informers$0.CRDDefinition.createFrom;
+const $$createType18 = $models.HelmRepoInfo.createFrom;
 const $$createType19 = $Create.Array($$createType18);
-const $$createType20 = informers$0.GlobalStatus.createFrom;
-const $$createType21 = $Create.Array($Create.Any);
-const $$createType22 = informers$0.ResourceInfo.createFrom;
-const $$createType23 = $Create.Array($$createType22);
-const $$createType24 = networkpolicies$0.Graph.createFrom;
-const $$createType25 = nodes$0.NodeAllocation.createFrom;
-const $$createType26 = $Create.Array($$createType25);
-const $$createType27 = nodes$0.NodeMetricRow.createFrom;
+const $$createType20 = informers$0.CRDDefinition.createFrom;
+const $$createType21 = $Create.Array($$createType20);
+const $$createType22 = informers$0.GlobalStatus.createFrom;
+const $$createType23 = $Create.Array($Create.Any);
+const $$createType24 = informers$0.ResourceInfo.createFrom;
+const $$createType25 = $Create.Array($$createType24);
+const $$createType26 = networkpolicies$0.Graph.createFrom;
+const $$createType27 = nodes$0.NodeAllocation.createFrom;
 const $$createType28 = $Create.Array($$createType27);
-const $$createType29 = metricsscraper$0.NodeMetrics.createFrom;
+const $$createType29 = nodes$0.NodeMetricRow.createFrom;
 const $$createType30 = $Create.Array($$createType29);
-const $$createType31 = metricsscraper$0.PodMetrics.createFrom;
+const $$createType31 = metricsscraper$0.NodeMetrics.createFrom;
 const $$createType32 = $Create.Array($$createType31);
-const $$createType33 = pods$0.Stats.createFrom;
-const $$createType34 = $models.PortForwardSession.createFrom;
-const $$createType35 = $Create.Array($$createType34);
-const $$createType36 = $models.HierarchyNode.createFrom;
-const $$createType37 = $Create.Nullable($$createType36);
-const $$createType38 = $Create.Array($$createType9);
+const $$createType33 = metricsscraper$0.PodMetrics.createFrom;
+const $$createType34 = $Create.Array($$createType33);
+const $$createType35 = pods$0.Stats.createFrom;
+const $$createType36 = $models.PortForwardSession.createFrom;
+const $$createType37 = $Create.Array($$createType36);
+const $$createType38 = $models.HierarchyNode.createFrom;
+const $$createType39 = $Create.Nullable($$createType38);
+const $$createType40 = $Create.Array($$createType11);

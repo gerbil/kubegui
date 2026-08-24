@@ -273,6 +273,12 @@ tasks:
       - npm install
       - npm run build
 
+  dev:bootstrap:
+    summary: Prepare generated bindings and frontend assets for dev
+    cmds:
+      - task: generate:bindings
+      - task: install:frontend:deps
+
   build:frontend:
     summary: Builds the frontend for production
     dir: ui

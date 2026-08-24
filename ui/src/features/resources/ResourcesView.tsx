@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
 import { Text } from '@mantine/core'
-import { RefreshCw, Search } from 'lucide-react'
+import { RefreshCw, Search, Sparkles } from 'lucide-react'
 import { NamespaceSelect } from '@/components/ui/NamespaceSelect'
 import { useQuery } from '@tanstack/react-query'
 import { useResourcesStore } from '@/store/useResourcesStore'
@@ -17,6 +17,8 @@ import { Events } from '@wailsio/runtime'
 import { ResourceDrawer, type ResourceRef } from '@/components/ui/ResourceDrawer'
 import { FixedTooltip } from '@/components/ui/FixedTooltip'
 import { NamespaceLink } from '@/components/ui/NamespaceLink'
+import { AiAssistModal } from '@/components/ui/AiAssistModal'
+import type { AIAssistRequest } from '@/lib/aiAssistant'
 import cronstrue from 'cronstrue'
 
 const col = createColumnHelper<K8sResource>()
@@ -99,6 +101,7 @@ export function ResourcesView() {
   } = useResourcesStore()
 
   const [drawerResource, setDrawerResource] = useState<ResourceRef | null>(null)
+  const [aiAssistRequest, setAiAssistRequest] = useState<AIAssistRequest | null>(null)
 
   const { options: namespaceOptions } = useNamespaceOptions()
 
@@ -136,14 +139,17 @@ export function ResourcesView() {
       const xs = 'text-muted-foreground text-sm'
       const xsTrunc = (w: number) => `text-muted-foreground text-sm truncate max-w-[${w}px] block`
 
-      const selectCol = col.display({
-        id: 'select', size: 40, enableSorting: false, header: '',
-        cell: ({ row }) => (
-          <input type="checkbox"
-            className="w-4 h-4 rounded cursor-pointer align-bottom appearance-none bg-[#354065] checked:bg-[#6a7fc9] checked:border-[#6a7fc9]"
-            checked={row.getIsSelected()} onChange={row.getToggleSelectedHandler()} onClick={(e) => e.stopPropagation()} />
-        ),
-      })
+       const selectCol = col.display({
+         id: 'select', size: 40, enableSorting: false, header: '',
+         meta: { fixedWidth: 40, thClassName: 'px-2', tdClassName: 'px-2' },
+         cell: ({ row }) => (
+           <div className="flex items-center justify-center">
+             <input type="checkbox"
+               className="w-4 h-4 rounded cursor-pointer align-bottom appearance-none bg-[#354065] checked:bg-[#6a7fc9] checked:border-[#6a7fc9]"
+               checked={row.getIsSelected()} onChange={row.getToggleSelectedHandler()} onClick={(e) => e.stopPropagation()} />
+           </div>
+         ),
+       })
 
       const ageCol = col.accessor((r) => r.metadata.creationTimestamp, {
         id: 'age', header: 'Age', size: 90,
@@ -214,7 +220,38 @@ export function ResourcesView() {
           }),
           col.accessor((r) => (r as any).reason ?? '—', {
             id: 'reason', header: 'Reason', size: 160,
-            cell: (info) => <span className="text-sm text-muted-foreground">{info.getValue<string>()}</span>,
+            cell: (info) => {
+              const reason = info.getValue<string>()
+              const row = info.row.original as any
+              const kind = String(row.type ?? '')
+              const isProblem = ['warning', 'error'].includes(kind.toLowerCase())
+              return (
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="text-sm text-muted-foreground truncate" title={reason}>{reason}</span>
+                  {isProblem && (
+                    <button
+                      type="button"
+                      title="Explain this event"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        setAiAssistRequest({
+                          task: 'auto_detect',
+                          resource: String(row.involvedObject?.kind ?? 'event'),
+                          namespace: String(row.metadata?.namespace ?? ''),
+                          name: String(row.involvedObject?.name ?? row.metadata?.name ?? ''),
+                          message: String(row.message ?? reason),
+                          details: `reason=${reason}; type=${kind}`,
+                        })
+                      }}
+                      className="inline-flex items-center gap-1 rounded border border-violet-500/30 px-1.5 py-0.5 text-[10px] font-medium text-violet-300 hover:text-violet-100 hover:bg-violet-500/20 shrink-0"
+                    >
+                      <Sparkles size={11} />
+                      Ask AI
+                    </button>
+                  )}
+                </div>
+              )
+            },
           }),
           col.accessor((r) => (r as any).message ?? '—', {
             id: 'message', header: 'Message', size: 400,
@@ -263,7 +300,34 @@ export function ResourcesView() {
                       : sk === 'waiting' ? 'bg-amber-400' : 'bg-red-500'
                     const tip = sk === 'waiting' ? `${cs.name}: waiting (${cs.state?.waiting?.reason ?? ''}), restarts: ${cs.restartCount ?? 0}`
                       : sk === 'terminated' ? `${cs.name}: ${cs.state?.terminated?.reason ?? 'terminated'}` : `${cs.name}: running`
-                    return <span key={i} title={tip} className={`w-2.5 h-2.5 rounded-full inline-block shrink-0 ${dot}`} />
+                    const waitingReason = String(cs.state?.waiting?.reason ?? '')
+                    const showAI = sk === 'waiting' || (sk === 'terminated' && cs.state?.terminated?.reason !== 'Completed')
+                    return (
+                      <span key={i} className="inline-flex items-center gap-1">
+                        <span title={tip} className={`w-2.5 h-2.5 rounded-full inline-block shrink-0 ${dot}`} />
+                        {showAI && (
+                          <button
+                            type="button"
+                            title="Suggest fix"
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setAiAssistRequest({
+                                task: 'auto_detect',
+                                resource: 'pod',
+                                namespace: String(info.row.original.metadata?.namespace ?? ''),
+                                name: String(info.row.original.metadata?.name ?? ''),
+                                message: tip,
+                                details: waitingReason,
+                              })
+                            }}
+                            className="inline-flex items-center gap-1 rounded border border-violet-500/30 px-1.5 py-0.5 text-[10px] font-medium text-violet-300 hover:text-violet-100 hover:bg-violet-500/20"
+                          >
+                            <Sparkles size={11} />
+                            Ask AI
+                          </button>
+                        )}
+                      </span>
+                    )
                   })}
                 </div>
               )
@@ -767,6 +831,11 @@ export function ResourcesView() {
         resource={drawerResource}
         resourceType={selectedResource}
         onClose={() => setDrawerResource(null)}
+      />
+      <AiAssistModal
+        open={aiAssistRequest !== null}
+        request={aiAssistRequest}
+        onClose={() => setAiAssistRequest(null)}
       />
     </div>
   )

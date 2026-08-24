@@ -49,7 +49,7 @@ func main() {
     LogLevel: slog.LevelDebug,
     Services: []application.Service{
       application.NewService(&services.Backend{}),
-      application.NewService(&services.CleanUp{}),
+      application.NewService(&services.Helper{}),
     },
     Assets: application.AssetOptions{
       Handler: application.BundledAssetFileServer(kubegui.Assets),
@@ -89,6 +89,16 @@ func main() {
            // CVE scan endpoint
            if req.URL.Path == "/api/v1/cve-scan" {
              services.CVEScanHandler(rw, req)
+             return
+           }
+
+           if req.URL.Path == "/api/v1/ai/settings" {
+             services.AISettingsHandler(rw, req)
+             return
+           }
+
+           if req.URL.Path == "/api/v1/ai/assist" {
+             services.AIAssistHandler(rw, req)
              return
            }
 
@@ -160,9 +170,6 @@ func main() {
 
   // Initialize config handling and wire window-based events before the run loop.
   clusterconfigs.Init(window)
-
-  // Window is visible immediately so WebView2 initialises correctly on Windows.
-  // The React app should render a splash/loading screen while booting.
 
   // Runs the application (blocks until exit).
   if err := wails.Run(); err != nil {

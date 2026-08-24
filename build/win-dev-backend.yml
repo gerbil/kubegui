@@ -7,7 +7,7 @@ info:
   description: "Kubernetes admin desktop client"
   copyright: "(c) 2026, Kubegui"
   comments: "Kubernetes admin desktop client"
-  version: "2.0.7"
+  version: "2.1.0"
 dev_mode:
   root_path: .
   log_level: warn
@@ -26,6 +26,8 @@ dev_mode:
       - "*.go"
     git_ignore: true
   executes:
+    - cmd: wails3 task generate:bindings
+      type: once
     - cmd: wails3 task build:windows:dev
       type: blocking
     - cmd: wails3 task run

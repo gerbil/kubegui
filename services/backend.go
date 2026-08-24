@@ -53,8 +53,6 @@ type CRDMenuResponse struct {
 
 type Backend struct{}
 
-// --- app ---
-func (s *Backend) AppServiceStartup() error { return nil }
 func (s *Backend) AppGetMyPermissions(ns string) ([]cani.CanIResourceRow, error) {
 	flat, err := cani.CollectPermissions(ns)
 	if err != nil {
