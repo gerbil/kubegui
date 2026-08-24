@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { configureAceYamlEditor } from '@/lib/aceEditorConfig'
-import { Boxes, Database, FileText, GitBranch, Globe, HardDrive, Network, Pencil, Radio, RefreshCw, Search, Shield, Terminal, Trash2, X } from 'lucide-react'
+import { Boxes, Database, FileText, GitBranch, Globe, HardDrive, Network, Pencil, Radio, RefreshCw, Search, Shield, Sparkles, Terminal, Trash2, X } from 'lucide-react'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
@@ -20,6 +20,8 @@ import { UiTooltip } from './UiTooltip'
 import { NetworkPolicyFlowTab } from '../../features/resources/NetworkPolicyFlowTab'
 import { RbacFlowTab } from '../../features/resources/RbacFlowTab'
 import { HIERARCHY_NAVIGATE_EVENT } from '../../lib/uiEvents'
+import { AiAssistModal } from './AiAssistModal'
+import type { AIAssistRequest } from '@/lib/aiAssistant'
 /** Minimal info needed to open the drawer — satisfied by both K8sResource and ResourceRow */
 export interface ResourceRef {
   uid?: string
@@ -59,6 +61,21 @@ type EditorWindow = Window & typeof globalThis & {
 type TerminalWindow = Window & typeof globalThis & {
   getTerminal?: (ns: string, name: string, cname: string) => void
   disposeTerminal?: (id: string) => void
+}
+
+function summarizeResourceForAI(resourceType: string, namespace: string, name: string, full: Record<string, unknown> | null): string {
+  const payload = {
+    resourceType,
+    namespace,
+    name,
+    kind: String(full?.kind ?? resourceType),
+    apiVersion: String(full?.apiVersion ?? ''),
+    metadata: full?.metadata,
+    status: full?.status,
+  }
+  const raw = JSON.stringify(payload, null, 2)
+  if (!raw) return `${resourceType} ${namespace}/${name}`
+  return raw.length > 8000 ? `${raw.slice(0, 8000)}\n...truncated...` : raw
 }
 
 // ── helpers ───────────────────────────────────────────────────────────────────
@@ -706,6 +723,7 @@ function LogsTab({ namespace, name, containers }: { namespace: string; name: str
   const [search, setSearch] = useState('')
   const [follow, setFollow] = useState(true)
   const [container, setContainer] = useState(containers[0] ?? '')
+  const [aiAssistRequest, setAiAssistRequest] = useState<AIAssistRequest | null>(null)
   const bottomRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -749,6 +767,27 @@ function LogsTab({ namespace, name, containers }: { namespace: string; name: str
         <label className="flex items-center gap-1 text-[10px] text-muted-foreground cursor-pointer ml-auto select-none">
           <input type="checkbox" checked={follow} onChange={e => setFollow(e.target.checked)} className="w-3 h-3 accent-emerald-500" />Follow
         </label>
+            <button
+              type="button"
+              onClick={() => {
+                const snippet = lines.slice(-120).join('\n')
+                if (!snippet.trim()) {
+                  uiNotify.info('No log lines yet')
+                  return
+                }
+                setAiAssistRequest({
+                  task: 'auto_detect',
+                  resource: 'pod',
+                  namespace,
+                  name,
+                  message: snippet,
+                  details: `container=${container}`,
+                })
+              }}
+                      className="text-[10px] font-medium text-violet-300 hover:text-violet-100 px-1.5 py-0.5 rounded border border-violet-500/30 hover:bg-violet-500/20 inline-flex items-center gap-1"
+            >
+                      <Sparkles size={10} />Ask AI
+            </button>
         <button onClick={() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' })}
           className="text-[10px] text-muted-foreground hover:text-slate-300 px-1.5 py-0.5 rounded border border-border/30">↓</button>
         {error && <span className="text-[10px] text-red-400">{error}</span>}
@@ -758,6 +797,11 @@ function LogsTab({ namespace, name, containers }: { namespace: string; name: str
         {filtered.map((html, i) => <div key={i} dangerouslySetInnerHTML={{ __html: html }} />)}
         <div ref={bottomRef} />
       </div>
+          <AiAssistModal
+            open={aiAssistRequest !== null}
+            request={aiAssistRequest}
+            onClose={() => setAiAssistRequest(null)}
+          />
     </div>
   )
 }
@@ -817,6 +861,7 @@ export function ResourceDrawer({ resource, resourceType, onClose, extraHeaderAct
   const [fullLoading,      setFullLoading]      = useState(false)
   const [confirmDelete,    setConfirmDelete]    = useState(false)
   const [busy,             setBusy]             = useState(false)
+  const [drawerAIRequest,  setDrawerAIRequest]  = useState<AIAssistRequest | null>(null)
 
   const namespace = resource?.namespace ?? ''
   const name      = resource?.name ?? ''
@@ -945,6 +990,21 @@ export function ResourceDrawer({ resource, resourceType, onClose, extraHeaderAct
           <div className="flex items-center gap-2 py-2">
             {fullLoading && <span className="text-[10px] text-muted-foreground animate-pulse">Loading…</span>}
             <button
+              onClick={() => {
+                setDrawerAIRequest({
+                  task: 'auto_detect',
+                  resource: resource?.kind ?? resourceType,
+                  namespace,
+                  name,
+                  message: summarizeResourceForAI(resourceType, namespace, name, full),
+                  details: `activeTab=${activeTab}`,
+                })
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded text-[11px] font-semibold border border-violet-500/30 text-violet-300 hover:bg-violet-500/10 transition-colors"
+            >
+              <Sparkles size={13} /> Ask AI
+            </button>
+            <button
               onClick={() => setConfirmDelete(true)}
               disabled={busy}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded text-[11px] font-semibold border border-red-500/30 text-red-400 hover:bg-red-500/10 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
@@ -997,6 +1057,11 @@ export function ResourceDrawer({ resource, resourceType, onClose, extraHeaderAct
         confirmLabel="Delete"
         onConfirm={() => { setConfirmDelete(false); window.setTimeout(() => { void handleDelete() }, 0) }}
         onCancel={() => setConfirmDelete(false)}
+      />
+      <AiAssistModal
+        open={drawerAIRequest !== null}
+        request={drawerAIRequest}
+        onClose={() => setDrawerAIRequest(null)}
       />
     </>
   )

@@ -121,9 +121,9 @@ func Init() error {
 	defaultSettings := map[string]string{
 		"aiallow":    "false",
 		"aitoken":    "",
-		"aitype":     "",
-		"aimodel":    "",
-		"aiendpoint": "",
+		"aitype":     "openrouter",
+		"aimodel":    "meta-llama/llama-3.1-8b-instruct:free",
+		"aiendpoint": "https://openrouter.ai/api/v1/chat/completions",
 		"fsfont":     "Space Grotesk",
 		"fssize":     "11",
 	}

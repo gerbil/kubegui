@@ -7,6 +7,9 @@ export {
 };
 
 export {
+    AIAssistRequest,
+    AIAssistResponse,
+    AISettings,
     CRDMenuResponse,
     ClusterInfo,
     HelmAppInfo,

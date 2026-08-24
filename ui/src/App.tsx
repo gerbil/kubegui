@@ -25,6 +25,7 @@ import {
   Database,
   ShieldAlert,
   Wind,
+  Sparkles,
 } from 'lucide-react'
 import { store } from './store/store'
 import { ratioBadge, eventTypeBadge } from './lib/utils'
@@ -40,6 +41,7 @@ import { Sidebar } from './components/ui/Sidebar'
 import { InitPage } from './components/pages/InitPage'
 import {
   AppConfigPickClusterIcon,
+  AppGetVersion,
   DBGetClusterConfigs,
   DBGetActiveClusterConfig,
   DBMakeClusterConfigActive,
@@ -80,6 +82,7 @@ import { configureAceYamlEditor } from './lib/aceEditorConfig'
 import { uiNotify } from './components/ui/UiNotify'
 import { NamespaceLink } from './components/ui/NamespaceLink'
 import { CVE_SCANS_ENABLED_STORAGE_KEY, refreshCveDatabases } from './lib/cveScanSettings'
+import { getAISettings, updateAISettings, type AISettings } from './lib/aiAssistant'
 import { RESOURCE_YAML_TEMPLATES } from './lib/yamlTemplates'
 import { HIERARCHY_NAVIGATE_EVENT } from './lib/uiEvents'
 
@@ -134,6 +137,7 @@ const INIT_SESSION_KEY = 'kubegui:init-complete'
 const INIT_CONTEXT_SESSION_KEY = 'kubegui:init-context'
 const DEFAULT_FETCH_TIMEOUT_MS = 90000
 const LONG_RUNNING_FETCH_TIMEOUT_MS = 20 * 60 * 1000
+const PRODUCT_VERSION_FALLBACK = '2.0.0'
 
 function openExternalUrl(url: string) {
   try {
@@ -1200,7 +1204,7 @@ function applyFontSettings(settings: FontSettings) {
   document.body.style.fontFamily            = `'${settings.family}', ${fontFamily.fallback}`
 }
 
-type SettingsTab = 'appearance' | 'security'
+type SettingsTab = 'appearance' | 'security' | 'ai'
 
 function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [tab, setTab] = useState<SettingsTab>('appearance')
@@ -1209,6 +1213,15 @@ function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }
     size:   'medium',
   })
   const [cveScansEnabled, setCveScansEnabled] = usePersistentState<boolean>(CVE_SCANS_ENABLED_STORAGE_KEY, false)
+  const [aiSettings, setAiSettings] = useState<AISettings>({
+    enabled: false,
+    provider: 'openrouter',
+    model: 'meta-llama/llama-3.1-8b-instruct:free',
+    endpoint: 'https://openrouter.ai/api/v1/chat/completions',
+    token: '',
+  })
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiSaving, setAiSaving] = useState(false)
 
   useEffect(() => { applyFontSettings(fontSettings) }, [fontSettings])
 
@@ -1219,11 +1232,21 @@ function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }
     return () => window.removeEventListener('keydown', onKey)
   }, [open, onClose])
 
+  useEffect(() => {
+    if (!open) return
+    setAiLoading(true)
+    getAISettings()
+      .then((settings) => setAiSettings(settings))
+      .catch(() => {})
+      .finally(() => setAiLoading(false))
+  }, [open])
+
   if (!open) return null
 
   const TABS: { id: SettingsTab; label: string }[] = [
     { id: 'appearance', label: 'Appearance' },
     { id: 'security', label: 'Security' },
+    { id: 'ai', label: 'AI' },
   ]
 
   return createPortal(
@@ -1268,10 +1291,10 @@ function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }
         <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
           <div className="px-6 pt-5 pb-4 border-b border-border/60">
             <p className="text-sm font-semibold text-foreground">
-              {tab === 'appearance' ? 'Appearance' : tab === 'security' ? 'Security' : tab}
+              {tab === 'appearance' ? 'Appearance' : tab === 'security' ? 'Security' : tab === 'ai' ? 'AI' : tab}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              {tab === 'appearance' ? 'Customize fonts and visual style.' : tab === 'security' ? 'Control CVE scanning behavior.' : ''}
+              {tab === 'appearance' ? 'Customize fonts and visual style.' : tab === 'security' ? 'Control CVE scanning behavior.' : tab === 'ai' ? 'Configure AI provider for warnings, errors, and crashloops.' : ''}
             </p>
           </div>
 
@@ -1365,6 +1388,109 @@ function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }
                 </div>
               </div>
             )}
+
+            {tab === 'ai' && (
+              <div className="rounded-lg border border-border/60 bg-accent/20 p-4 space-y-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-foreground inline-flex items-center gap-1.5">
+                      <Sparkles size={14} className="text-violet-400" />
+                      AI assistant
+                    </p>
+                    <p className="mt-1 text-xs text-muted-foreground">Use AI to explain events/logs and suggest remediations.</p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={aiSettings.enabled}
+                    onClick={() => setAiSettings((prev) => ({ ...prev, enabled: !prev.enabled }))}
+                    className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border transition-colors ${
+                      aiSettings.enabled
+                        ? 'border-violet-400/40 bg-violet-500/30'
+                        : 'border-border bg-accent/40'
+                    }`}
+                  >
+                    <span
+                      className={`absolute left-0.5 top-0.5 h-[18px] w-[18px] rounded-full bg-white shadow transition-transform ${
+                        aiSettings.enabled ? 'translate-x-5' : 'translate-x-0'
+                      }`}
+                    />
+                  </button>
+                </div>
+
+                <label className="text-xs text-muted-foreground space-y-1 block">
+                  <span>Provider</span>
+                  <select
+                    value={aiSettings.provider}
+                    onChange={(e) => setAiSettings((prev) => ({ ...prev, provider: e.target.value }))}
+                    className="w-full lucid-control rounded px-2 py-1.5 text-sm focus:outline-none appearance-none border border-border/40 text-foreground bg-transparent"
+                  >
+                    <option value="openrouter">OpenRouter</option>
+                    <option value="groq">Groq</option>
+                    <option value="openai">OpenAI</option>
+                    <option value="ollama">Ollama (local)</option>
+                  </select>
+                </label>
+
+                <label className="text-xs text-muted-foreground space-y-1 block">
+                  <span>Model</span>
+                  <input
+                    value={aiSettings.model}
+                    onChange={(e) => setAiSettings((prev) => ({ ...prev, model: e.target.value }))}
+                    placeholder="meta-llama/llama-3.1-8b-instruct:free"
+                    className="w-full lucid-control rounded px-2 py-1.5 text-sm focus:outline-none"
+                  />
+                </label>
+
+                <label className="text-xs text-muted-foreground space-y-1 block">
+                  <span>Endpoint</span>
+                  <input
+                    value={aiSettings.endpoint}
+                    onChange={(e) => setAiSettings((prev) => ({ ...prev, endpoint: e.target.value }))}
+                    placeholder="https://openrouter.ai/api/v1/chat/completions"
+                    className="w-full lucid-control rounded px-2 py-1.5 text-sm focus:outline-none"
+                  />
+                </label>
+
+                <label className="text-xs text-muted-foreground space-y-1 block">
+                  <span>API token</span>
+                  <input
+                    type="password"
+                    value={aiSettings.token}
+                    onChange={(e) => setAiSettings((prev) => ({ ...prev, token: e.target.value }))}
+                    placeholder={
+                      aiSettings.provider === 'ollama'
+                        ? 'not required for local ollama'
+                        : aiSettings.provider === 'openrouter' && aiSettings.model.toLowerCase().includes('free')
+                          ? 'optional for free openrouter models'
+                          : 'provider api key'
+                    }
+                    className="w-full lucid-control rounded px-2 py-1.5 text-sm focus:outline-none"
+                  />
+                </label>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAiSaving(true)
+                    updateAISettings(aiSettings)
+                      .then((saved) => {
+                        setAiSettings(saved)
+                        uiNotify.success('AI settings saved')
+                      })
+                      .catch((err) => {
+                        const msg = err instanceof Error ? err.message : 'AI settings save failed'
+                        uiNotify.error(msg)
+                      })
+                      .finally(() => setAiSaving(false))
+                  }}
+                  disabled={aiLoading || aiSaving}
+                  className="px-3 py-1.5 rounded text-sm font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90"
+                >
+                  {aiSaving ? 'Saving…' : 'Save AI settings'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -1390,8 +1516,20 @@ function RootView() {
   const [pendingRequests, setPendingRequests] = useState(0)
   const [pendingRequestLabels, setPendingRequestLabels] = useState<string[]>([])
   const [showSettingsModal, setShowSettingsModal] = useState(false)
+  const [productVersion, setProductVersion] = useState(PRODUCT_VERSION_FALLBACK)
   const [cveScansEnabled] = usePersistentState<boolean>(CVE_SCANS_ENABLED_STORAGE_KEY, false)
   const previousCveScansEnabled = useRef<boolean | null>(null)
+
+  useEffect(() => {
+    AppGetVersion()
+      .then((version) => {
+        const normalized = String(version ?? '').trim()
+        if (normalized) setProductVersion(normalized)
+      })
+      .catch(() => {
+        setProductVersion(PRODUCT_VERSION_FALLBACK)
+      })
+  }, [])
 
   useEffect(() => {
     // Avoid concurrent legacy script prewarm races (xterm globals can redeclare).
@@ -1761,7 +1899,7 @@ function RootView() {
               <span>mem <span className="text-cyan-400">{formatStat(appStats?.vmsGB, 2)} GB</span></span>
             </span>
             <span className="mx-3 h-3 w-px bg-border/60 shrink-0" />
-            <span className="text-muted-foreground/50">© 2026 KubeGUI</span>
+            <span className="text-muted-foreground/50">© 2026 KubeGUI · v{productVersion}</span>
           </div>
         </footer>
       </main>
@@ -3145,13 +3283,14 @@ function PodsPage() {
     () => [
       {
         id: 'phase',
-        header: 'select',
+        header: '',
         accessorKey: 'statusText',
-        size: 44,
+        size: 40,
         enableSorting: false,
         meta: {
-          thClassName: 'pl-3',
-          tdClassName: 'pl-3',
+          fixedWidth: 40,
+          thClassName: 'px-2',
+          tdClassName: 'px-2',
         },
         cell: (info) => {
           return (
@@ -3672,7 +3811,7 @@ function InformerResourcePage({ resource }: { resource: string }) {
     const exSpec = (row: Row, key: string) => (row.extra.spec as Record<string, unknown> | undefined)?.[key]
     const exStatus = (row: Row, key: string) => (row.extra.status as Record<string, unknown> | undefined)?.[key]
 
-    const selectCol: ColumnDef<Row> = { id: 'select', header: 'select', accessorKey: 'name', enableSorting: false, enableGlobalFilter: false, size: 44, meta: { thClassName: 'pl-3', tdClassName: 'pl-3' }, cell: (info) => (<input type="checkbox" className="w-4 h-4 rounded cursor-pointer align-bottom appearance-none bg-[#354065] checked:bg-[#6a7fc9] checked:border-[#6a7fc9]" checked={info.row.getIsSelected()} onChange={info.row.getToggleSelectedHandler()} onClick={(e) => e.stopPropagation()} />) }
+    const selectCol: ColumnDef<Row> = { id: 'select', header: '', accessorKey: 'name', enableSorting: false, enableGlobalFilter: false, size: 40, meta: { fixedWidth: 40, thClassName: 'px-2', tdClassName: 'px-2' }, cell: (info) => (<input type="checkbox" className="w-4 h-4 rounded cursor-pointer align-bottom appearance-none bg-[#354065] checked:bg-[#6a7fc9] checked:border-[#6a7fc9]" checked={info.row.getIsSelected()} onChange={info.row.getToggleSelectedHandler()} onClick={(e) => e.stopPropagation()} />) }
     const nameCol: ColumnDef<Row> = { id: 'name', header: 'Name', accessorKey: 'name', cell: (info) => <span className="font-label text-sm text-foreground font-semibold">{String(info.getValue())}</span> }
     const nsCol: ColumnDef<Row> = {
       id: 'namespace',

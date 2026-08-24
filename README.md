@@ -23,11 +23,11 @@ Official website - https://kubegui.net
 > - RBAC roles/bindings graph/flow view
 > - Settings to change ui font/size
 > - Trivy cve scans (ondemand)
+> - Application auto update based on newer version from Github
+> - Helm respos+charts and releases (views)
 
 # TODO:
 - AI suggestions for issues/errors/warnings/etc
-- Application auto update based on newer version from Github
-- Helm respos+charts and releases (views)
 - ArgoCD rollout/apps flow view
 
 ## Scope:

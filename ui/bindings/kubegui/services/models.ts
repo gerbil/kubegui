@@ -9,6 +9,113 @@ import { Create as $Create } from "@wailsio/runtime";
 // @ts-ignore: Unused imports
 import * as crd$0 from "../internal/resources/crd/models.js";
 
+export class AIAssistRequest {
+    "task": string;
+    "resource": string;
+    "namespace": string;
+    "name": string;
+    "message": string;
+    "details": string;
+
+    /** Creates a new AIAssistRequest instance. */
+    constructor($$source: Partial<AIAssistRequest> = {}) {
+        if (!("task" in $$source)) {
+            this["task"] = "";
+        }
+        if (!("resource" in $$source)) {
+            this["resource"] = "";
+        }
+        if (!("namespace" in $$source)) {
+            this["namespace"] = "";
+        }
+        if (!("name" in $$source)) {
+            this["name"] = "";
+        }
+        if (!("message" in $$source)) {
+            this["message"] = "";
+        }
+        if (!("details" in $$source)) {
+            this["details"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new AIAssistRequest instance from a string or object.
+     */
+    static createFrom($$source: any = {}): AIAssistRequest {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new AIAssistRequest($$parsedSource as Partial<AIAssistRequest>);
+    }
+}
+
+export class AIAssistResponse {
+    "suggestion": string;
+    "provider": string;
+    "model": string;
+
+    /** Creates a new AIAssistResponse instance. */
+    constructor($$source: Partial<AIAssistResponse> = {}) {
+        if (!("suggestion" in $$source)) {
+            this["suggestion"] = "";
+        }
+        if (!("provider" in $$source)) {
+            this["provider"] = "";
+        }
+        if (!("model" in $$source)) {
+            this["model"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new AIAssistResponse instance from a string or object.
+     */
+    static createFrom($$source: any = {}): AIAssistResponse {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new AIAssistResponse($$parsedSource as Partial<AIAssistResponse>);
+    }
+}
+
+export class AISettings {
+    "enabled": boolean;
+    "provider": string;
+    "model": string;
+    "endpoint": string;
+    "token": string;
+
+    /** Creates a new AISettings instance. */
+    constructor($$source: Partial<AISettings> = {}) {
+        if (!("enabled" in $$source)) {
+            this["enabled"] = false;
+        }
+        if (!("provider" in $$source)) {
+            this["provider"] = "";
+        }
+        if (!("model" in $$source)) {
+            this["model"] = "";
+        }
+        if (!("endpoint" in $$source)) {
+            this["endpoint"] = "";
+        }
+        if (!("token" in $$source)) {
+            this["token"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new AISettings instance from a string or object.
+     */
+    static createFrom($$source: any = {}): AISettings {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new AISettings($$parsedSource as Partial<AISettings>);
+    }
+}
+
 export class CRDMenuResponse {
     "groups": crd$0.CategoryGroup[];
     "uiMap": { [_ in string]?: string };

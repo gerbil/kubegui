@@ -640,3 +640,9 @@ button:disabled,
   color: #c8d3f5;
   word-break: break-all;
 }
+
+/* AI settings select dropdown options */
+.lucid-control option {
+  background-color: #1a2035;
+  color: #cbd5e1;
+}

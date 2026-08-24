@@ -158,7 +158,7 @@ export function DataTable<T extends RowData>({
   rowSelectionResetKey,
   onRowClick,
 }: DataTableProps<T>) {
-  const FIRST_COLUMN_STRICT_WIDTH = 64
+  const DEFAULT_SELECT_COLUMN_WIDTH = 40
   const [sorting, setSorting] = useState<SortingState>(defaultSorting)
   const [columnFilters] = useState<ColumnFiltersState>([])
   const [internalColumnOrder, setInternalColumnOrder] = useState<ColumnOrderState>([])
@@ -258,6 +258,15 @@ export function DataTable<T extends RowData>({
     [virtualItems, totalSize]
   )
 
+  const strictWidthStyle = (width: number) => ({
+    width,
+    minWidth: width,
+    maxWidth: width,
+    whiteSpace: 'nowrap' as const,
+    overflow: 'hidden' as const,
+    textOverflow: 'ellipsis' as const,
+  })
+
   return (
     <div ref={parentRef} className="overflow-auto h-full w-full">
       <table className="w-full table-fixed border-collapse text-sm">
@@ -270,15 +279,9 @@ export function DataTable<T extends RowData>({
                 const meta = (header.column.columnDef.meta ?? {}) as ColumnMetaClass
                 const isSelectColumn = header.id === 'select'
                 const fixedWidthStyle = meta.fixedWidth
-                  ? {
-                      width: meta.fixedWidth,
-                      minWidth: meta.fixedWidth,
-                      maxWidth: meta.fixedWidth,
-                      whiteSpace: 'nowrap' as const,
-                      overflow: 'hidden' as const,
-                      textOverflow: 'ellipsis' as const,
-                    }
+                  ? strictWidthStyle(meta.fixedWidth)
                   : null
+                const selectWidth = meta.fixedWidth ?? header.getSize?.() ?? DEFAULT_SELECT_COLUMN_WIDTH
                 const headerOverflowStyle = meta.disableOverflowTooltip
                   ? { whiteSpace: 'nowrap' as const, overflow: 'hidden' as const, textOverflow: 'ellipsis' as const }
                   : { whiteSpace: 'nowrap' as const, overflow: 'hidden' as const, textOverflow: 'ellipsis' as const }
@@ -286,14 +289,7 @@ export function DataTable<T extends RowData>({
                   <th
                     key={header.id}
                     style={isSelectColumn
-                      ? {
-                          width: FIRST_COLUMN_STRICT_WIDTH,
-                          minWidth: FIRST_COLUMN_STRICT_WIDTH,
-                          maxWidth: FIRST_COLUMN_STRICT_WIDTH,
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                        }
+                        ? strictWidthStyle(selectWidth)
                         : fixedWidthStyle ?? headerOverflowStyle}
                     className={cn(
                       'px-3 py-2.5 text-left text-sm font-semibold text-muted-foreground uppercase tracking-wider border-b border-outline-variant/40 select-none align-middle',
@@ -361,27 +357,14 @@ export function DataTable<T extends RowData>({
                   const isSelectColumn = cell.column.id === 'select'
                   const shouldUseOverflowTooltip = !meta.disableOverflowTooltip && !meta.allowWrap
                   const fixedWidthStyle = meta.fixedWidth
-                    ? {
-                        width: meta.fixedWidth,
-                        minWidth: meta.fixedWidth,
-                        maxWidth: meta.fixedWidth,
-                        whiteSpace: 'nowrap' as const,
-                        overflow: 'hidden' as const,
-                        textOverflow: 'ellipsis' as const,
-                      }
+                    ? strictWidthStyle(meta.fixedWidth)
                     : null
+                  const selectWidth = meta.fixedWidth ?? cell.column.getSize?.() ?? DEFAULT_SELECT_COLUMN_WIDTH
                   return (
                     <td
                       key={cell.id}
                        style={isSelectColumn
-                        ? {
-                            width: FIRST_COLUMN_STRICT_WIDTH,
-                            minWidth: FIRST_COLUMN_STRICT_WIDTH,
-                            maxWidth: FIRST_COLUMN_STRICT_WIDTH,
-                            whiteSpace: 'nowrap',
-                            overflow: 'hidden',
-                            textOverflow: 'ellipsis',
-                          }
+                        ? strictWidthStyle(selectWidth)
                         : fixedWidthStyle ?? (meta.allowWrap
                           ? { overflow: 'visible', textOverflow: 'clip', whiteSpace: 'normal' }
                           : meta.disableOverflowTooltip
