@@ -93,7 +93,7 @@ func Scrape() {
 		// Start the machine. Scrape every metricResolution
 		ticker := time.NewTicker(metricResolution)
 
-		logger.Logger.Info("Starting Metrics Scraper - new ticker", ticker)
+		logger.Logger.Info("Starting Metrics Scraper", "new ticker", ticker)
 
 		for {
 			select {

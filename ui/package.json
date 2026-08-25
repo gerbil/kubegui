@@ -29,7 +29,9 @@
     "notyf": "^3.10.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "react-markdown": "^10.1.0",
     "react-redux": "^9.3.0",
+    "remark-gfm": "^4.0.1",
     "tailwind-merge": "^3.6.0",
     "zustand": "^5.0.14"
   },

@@ -3850,7 +3850,7 @@ function InformerResourcePage({ resource }: { resource: string }) {
         { id: 'node', header: 'Node', accessorFn: (r) => exSpec(r,'nodeName') ?? '—', cell: (i) => <span className="text-sm text-muted-foreground truncate max-w-[150px] block" title={String(i.getValue())}>{String(i.getValue())}</span> },
       ],
       deployments: [
-        { id: 'replicas', header: 'Replicas', size: 100, accessorFn: (r) => exStatus(r,'readyReplicas')??0, cell: (i) => { const r=i.row.original; const ready=Number(exStatus(r,'readyReplicas')??0); const desired=Number(exSpec(r,'replicas')??0); return ratioBadge(ready, desired) } },
+        { id: 'replicas', header: 'Replicas', size: 100, accessorFn: (r) => exStatus(r,'readyReplicas')??0, cell: (i) => { const r=i.row.original; const ready=Number(exStatus(r,'readyReplicas')??0); const total=Number(exStatus(r,'replicas')??exSpec(r,'replicas')??0); return ratioBadge(ready, total) } },
       ],
       statefulsets: [
         { id: 'pods', header: 'Pods', size: 90, accessorFn: (r) => exStatus(r,'availableReplicas')??0, cell: (i) => { const r=i.row.original; const avail=Number(exStatus(r,'availableReplicas')??0); const total=Number(exStatus(r,'replicas')??0); const ok=avail>=total&&total>0; return <span className={`text-sm font-semibold ${ok?'text-emerald-400':(avail>0?'text-amber-400':'text-red-400')}`}>{avail}/{total}</span> } },

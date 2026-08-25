@@ -1,9 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Container, Pencil, Radio, Trash2, X, Eye, FileText, RotateCw, Scaling } from 'lucide-react'
+import { Container, Pencil, Radio, Trash2, X, Eye, FileText, RotateCw, Scaling, Sparkles } from 'lucide-react'
 import { UiTooltip } from './UiTooltip'
 import { uiNotify } from './UiNotify'
+import { AiAssistModal } from './AiAssistModal'
+import type { AIAssistRequest } from '@/lib/aiAssistant'
 import { ResourceManifestOverview, LabelsSection, AnnotationsSection, EventsTimeline, type KubeEventItem } from './ResourceManifestOverview'
 import { deploymentOverviewFields } from '../../features/resources/resourceOverview'
 import { ConfirmDialog } from './Button'
@@ -558,6 +560,27 @@ export function DeploymentActionDrawer({ deployment, initialTab = 'overview', on
   const [scaleOpen, setScaleOpen] = useState(false)
   const [scaling, setScaling] = useState(false)
   const [restarting, setRestarting] = useState(false)
+  const [aiRequest, setAiRequest] = useState<AIAssistRequest | null>(null)
+
+  // Ask AI adapts to health: fully available objects get an explanation of their
+  // current state, degraded ones (e.g. a broken new-release pod in ImagePullBackOff /
+  // CrashLoopBackOff during a rollout surge) get concrete fix suggestions.
+  const askAI = () => {
+    if (!deployment) return
+    const { ready, desired, upToDate, available } = deployment
+    const healthy =
+      desired === 0 || (ready >= desired && available >= desired && upToDate >= desired)
+    setAiRequest({
+      task: healthy ? 'explain_event' : 'suggest_fix',
+      resource: 'deployment',
+      namespace: deployment.namespace,
+      name: deployment.name,
+      message: healthy
+        ? `Deployment "${deployment.name}" looks fully available (ready=${ready}/${desired}, up-to-date=${upToDate}, available=${available}). Describe what this deployment is running and explain its current state in plain English.`
+        : `Deployment is not fully available: ready=${ready}/${desired}, up-to-date=${upToDate}, available=${available}. A new-release pod may be stuck in ImagePullBackOff or CrashLoopBackOff. Diagnose why replicas are unavailable and provide step-by-step fix suggestions.`,
+      details: `resourceType=deployments; desired=${desired}; ready=${ready}; upToDate=${upToDate}; available=${available}`,
+    })
+  }
 
   useEffect(() => {
     if (deployment) { setActiveTab(initialTab); setScaleValue(String(deployment.desired)) }
@@ -680,6 +703,13 @@ export function DeploymentActionDrawer({ deployment, initialTab = 'overview', on
             ) : (
               <ActionBtn icon={<Scaling size={13} />} label="Scale" onClick={() => { setScaleValue(String(deployment?.desired ?? 1)); setScaleOpen(true) }} disabled={busy} />
             )}
+            <button
+              type="button"
+              onClick={askAI}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded text-[11px] font-semibold border border-violet-500/30 text-violet-300 hover:bg-violet-500/10 transition-colors"
+            >
+              <Sparkles size={13} /> Ask AI
+            </button>
             <ActionBtn icon={<RotateCw size={13} className={restarting ? 'animate-spin' : ''} />} label="Restart" onClick={() => void restart()} disabled={busy || restarting} />
             <ActionBtn icon={<Trash2 size={13} />} label="Delete" onClick={() => setConfirmDeleteOpen(true)} disabled={busy} danger />
           </div>
@@ -701,6 +731,11 @@ export function DeploymentActionDrawer({ deployment, initialTab = 'overview', on
         confirmLabel="Delete deployment"
         onConfirm={() => { setConfirmDeleteOpen(false); window.setTimeout(() => { void deleteDeployment() }, 0) }}
         onCancel={() => setConfirmDeleteOpen(false)}
+      />
+      <AiAssistModal
+        open={aiRequest !== null}
+        request={aiRequest}
+        onClose={() => setAiRequest(null)}
       />
     </>
   )

@@ -1,9 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { X, Boxes, Radio, Terminal, Trash2, FileText, Pencil, ShieldAlert, Loader2 } from 'lucide-react'
+import { X, Boxes, Radio, Terminal, Trash2, FileText, Pencil, ShieldAlert, Loader2, Sparkles } from 'lucide-react'
 import { UiTooltip } from './UiTooltip'
 import { uiNotify } from './UiNotify'
+import { AiAssistModal } from './AiAssistModal'
+import type { AIAssistRequest } from '@/lib/aiAssistant'
 import { configureAceYamlEditor } from '@/lib/aceEditorConfig'
 import { ConfirmDialog } from './Button'
 import { podOverviewFields } from '../../features/resources/resourceOverview'
@@ -1002,6 +1004,44 @@ function ActionBtn({ icon, label, onClick, disabled = false, danger = false }: {
 export function PodActionDrawer({ pod, initialTab = 'overview', onClose }: Props) {
   const [activeTab, setActiveTab] = useState<Tab>(initialTab)
   const [busy, setBusy] = useState(false)
+  const [aiRequest, setAiRequest] = useState<AIAssistRequest | null>(null)
+
+  // Ask AI adapts to health: normally running pods get a plain-English description of
+  // what they are doing; errored/crashed/pending pods get concrete fix suggestions.
+  const askAI = () => {
+    if (!pod) return
+    const bad = pod.containerStatuses.filter(
+      (cs) =>
+        cs.state?.waiting ||
+        (cs.state?.terminated && cs.state?.terminated?.reason !== 'Completed') ||
+        !cs.ready
+    )
+    const phase = pod.phase.toLowerCase()
+    // Non-standard success phases (Pending/Failed/Terminating/Unknown) count as problems too.
+    const problemPhase = phase !== 'running' && phase !== 'succeeded'
+    const needsFix = bad.length > 0 || (problemPhase && phase !== 'succeeded')
+    const detail =
+      bad.length > 0
+        ? bad
+            .map((cs) => {
+              const s = cs.state ?? {}
+              if (s.waiting) return `${cs.name}: waiting (${s.waiting.reason ?? ''}) restarts=${cs.restartCount ?? 0}`
+              if (s.terminated) return `${cs.name}: ${s.terminated.reason ?? 'terminated'}`
+              return `${cs.name}: not ready`
+            })
+            .join('; ')
+        : `phase=${pod.phase}, status=${pod.statusText || 'Unknown'}, restarts=${pod.restarts}`
+    setAiRequest({
+      task: needsFix ? 'suggest_fix' : 'explain_event',
+      resource: 'pod',
+      namespace: pod.namespace,
+      name: pod.name,
+      message: needsFix
+        ? `Pod phase=${pod.phase} — ${detail}. Diagnose why this pod is not running properly and provide step-by-step fix suggestions.`
+        : `Pod "${pod.name}" is running normally (phase=${pod.phase}, restarts=${pod.restarts}). Describe what this pod is running and explain its current state in plain English.`,
+      details: `resourceType=pods; node=${pod.node}`,
+    })
+  }
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false)
   const [scanOpen, setScanOpen] = useState(false)
   const [scanLoading, setScanLoading] = useState(false)
@@ -1132,6 +1172,13 @@ export function PodActionDrawer({ pod, initialTab = 'overview', onClose }: Props
                 <ActionBtn icon={<ShieldAlert size={13} />} label="Scan CVE" onClick={openCveScan} disabled={busy || scanLoading || !cveScansEnabled} />
               </span>
             </UiTooltip>
+            <button
+              type="button"
+              onClick={askAI}
+              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded text-[11px] font-semibold border border-violet-500/30 text-violet-300 hover:bg-violet-500/10 transition-colors"
+            >
+              <Sparkles size={13} /> Ask AI
+            </button>
             <ActionBtn icon={<Trash2 size={13} />} label="Delete" onClick={() => setConfirmDeleteOpen(true)} disabled={busy} danger />
           </div>
         </div>
@@ -1161,6 +1208,12 @@ export function PodActionDrawer({ pod, initialTab = 'overview', onClose }: Props
         error={scanError}
         onRescan={() => { void runCveScan() }}
         onClose={() => setScanOpen(false)}
+      />
+
+      <AiAssistModal
+        open={aiRequest !== null}
+        request={aiRequest}
+        onClose={() => setAiRequest(null)}
       />
     </>
   )

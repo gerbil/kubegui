@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom'
 import { Loader2, Sparkles, X } from 'lucide-react'
 import { requestAIAssist, type AIAssistRequest } from '@/lib/aiAssistant'
 import { uiNotify } from './UiNotify'
+import { Markdown } from './Markdown'
 
 type Props = {
   open: boolean
@@ -51,12 +52,13 @@ export function AiAssistModal({ open, onClose, request }: Props) {
 
   const title = useMemo(() => {
     if (!request) return 'AI Assistant'
+    const res = request.resource ? ` ${request.resource}` : ''
     switch (request.task) {
       case 'auto_detect': return 'AI suggestion'
-      case 'explain_event': return 'Explain event'
+      case 'explain_event': return res ? `Explain${res}` : 'Explain event'
       case 'generate_yaml': return 'Generate YAML fix'
       case 'explain_logs': return 'Explain logs'
-      default: return 'Suggest fix'
+      default: return res ? `Fix suggestions ·${res}` : 'Suggest fix'
     }
   }, [request])
 
@@ -91,7 +93,7 @@ export function AiAssistModal({ open, onClose, request }: Props) {
           {result && (
             <div className="rounded border border-border/40 bg-surface-container-high/20 p-3 max-h-[50vh] overflow-auto">
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Suggestion</p>
-              <pre className="whitespace-pre-wrap text-xs text-foreground/95 font-mono">{result}</pre>
+              <Markdown markdown={result} />
             </div>
           )}
         </div>

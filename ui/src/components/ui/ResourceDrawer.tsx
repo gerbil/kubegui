@@ -78,6 +78,107 @@ function summarizeResourceForAI(resourceType: string, namespace: string, name: s
   return raw.length > 8000 ? `${raw.slice(0, 8000)}\n...truncated...` : raw
 }
 
+/**
+ * Detects whether a resource is in a problematic state based on its status fields.
+ * - needsFix=true  -> AI should diagnose and propose remediation steps.
+ * - needsFix=false -> AI should just describe/explain the object (also used for
+ *   resources without a meaningful health model, e.g. Services, ConfigMaps).
+ */
+function assessResourceHealth(resourceType: string, full: Record<string, unknown> | null): { needsFix: boolean; summary: string } {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const status = (full?.status as Record<string, unknown> | undefined) ?? {}
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const spec = (full?.spec as Record<string, unknown> | undefined) ?? {}
+  const num = (v: unknown) => Number(v ?? 0)
+
+  switch (resourceType) {
+    case 'deployments': {
+      const total = num(status.replicas) || num(spec.replicas)
+      const ready = num(status.readyReplicas)
+      const available = num(status.availableReplicas)
+      const updated = num(status.updatedReplicas)
+      const specReplicas = num(spec.replicas)
+      const unhealthy =
+        total > 0 &&
+        (ready < total ||
+          (specReplicas > 0 && available < specReplicas) ||
+          num(status.unavailableReplicas) > 0 ||
+          updated < specReplicas)
+      return {
+        needsFix: unhealthy,
+        summary: unhealthy
+          ? `Deployment is not fully available: ready=${ready}/${total}, up-to-date=${updated}, available=${available}, unavailable=${num(status.unavailableReplicas)}. A new-release pod may be stuck in ImagePullBackOff or CrashLoopBackOff.`
+          : '',
+      }
+    }
+
+    case 'replicasets':
+    case 'replicationcontrollers': {
+      const total = num(status.replicas) || num(spec.replicas)
+      const ready = num(status.readyReplicas)
+      const unhealthy = total > 0 && ready < total
+      return { needsFix: unhealthy, summary: unhealthy ? `Only ${ready}/${total} replicas are ready.` : '' }
+    }
+
+    case 'statefulsets': {
+      const total = num(status.replicas) || num(spec.replicas)
+      const ready = num(status.readyReplicas)
+      const available = num(status.availableReplicas)
+      const unhealthy = total > 0 && (ready < total || (spec.replicas !== undefined && available < num(spec.replicas)))
+      return { needsFix: unhealthy, summary: unhealthy ? `StatefulSet pods not fully available: ready=${ready}/${total}, available=${available}.` : '' }
+    }
+
+    case 'daemonsets': {
+      const desired = num(status.desiredNumberScheduled)
+      const ready = num(status.numberReady)
+      const unhealthy = desired > 0 && ready < desired
+      return { needsFix: unhealthy, summary: unhealthy ? `DaemonSet has ${ready}/${desired} daemons ready.` : '' }
+    }
+
+    case 'jobs': {
+      const failed = num(status.failed)
+      const active = num(status.active)
+      const succeeded = num(status.succeeded)
+      const completions = spec.completions ?? null
+      if (failed > 0) return { needsFix: true, summary: `Job has ${failed} failed pod(s); succeeded=${succeeded}/${completions ?? '?'}.` }
+      const incomplete = !spec.suspend && active === 0 && !!completions && succeeded < num(completions)
+      return { needsFix: incomplete, summary: incomplete ? `Job has not completed successfully: succeeded=${succeeded}/${completions}.` : '' }
+    }
+
+    case 'cronjobs': {
+      if (spec.suspend) return { needsFix: false, summary: '' }
+      const lastSchedule = status.lastScheduleTime as string | undefined
+      const lastSuccessful = status.lastSuccessfulTime as string | undefined
+      if (!lastSchedule) return { needsFix: false, summary: '' }
+      const broken = !lastSuccessful || new Date(lastSuccessful).getTime() < new Date(lastSchedule).getTime()
+      return { needsFix: broken, summary: broken ? `CronJob's most recent run (${lastSchedule}) did not finish successfully.` : '' }
+    }
+
+    case 'pods': {
+      const statuses = [
+        ...((status.initContainerStatuses as unknown[] | undefined) ?? []),
+        ...((status.containerStatuses as unknown[] | undefined) ?? []),
+      ] as Array<{ name: string; ready: boolean; restartCount?: number; state?: { waiting?: { reason?: string }; terminated?: { reason?: string } } }>
+      const bad = statuses.filter((cs) => cs.state?.waiting || (cs.state?.terminated && cs.state?.terminated?.reason !== 'Completed') || !cs.ready)
+      if (!bad.length) return { needsFix: false, summary: '' }
+      const detail = bad
+        .map((cs) => {
+          const s = cs.state ?? {}
+          if (s.waiting) return `${cs.name}: waiting (${s.waiting.reason ?? ''}), restarts=${cs.restartCount ?? 0}`
+          if (s.terminated) return `${cs.name}: ${s.terminated.reason ?? 'terminated'}`
+          return `${cs.name}: not ready`
+        })
+        .join('; ')
+      return { needsFix: true, summary: `Pod phase=${String(status.phase ?? 'Unknown')} — ${detail}.` }
+    }
+
+    default:
+      // No health model for this kind (Services, ConfigMaps, Secrets, RBAC, CRDs…):
+      // treat as informational and let the AI describe/explain it.
+      return { needsFix: false, summary: '' }
+  }
+}
+
 // ── helpers ───────────────────────────────────────────────────────────────────
 
 function isPod(resourceType: string) {
@@ -991,13 +1092,17 @@ export function ResourceDrawer({ resource, resourceType, onClose, extraHeaderAct
             {fullLoading && <span className="text-[10px] text-muted-foreground animate-pulse">Loading…</span>}
             <button
               onClick={() => {
+                const health = assessResourceHealth(resourceType, full)
+                const kindLabel = String(resource?.kind ?? resourceType)
                 setDrawerAIRequest({
-                  task: 'auto_detect',
+                  task: health.needsFix ? 'suggest_fix' : 'explain_event',
                   resource: resource?.kind ?? resourceType,
                   namespace,
                   name,
-                  message: summarizeResourceForAI(resourceType, namespace, name, full),
-                  details: `activeTab=${activeTab}`,
+                  message: health.needsFix && health.summary
+                    ? `${health.summary}\n\n${summarizeResourceForAI(resourceType, namespace, name, full)}\n\nDiagnose the issue and provide step-by-step fix suggestions.`
+                    : `Describe what this ${kindLabel} is and explain its current state and configuration in plain English.\n\n${summarizeResourceForAI(resourceType, namespace, name, full)}`,
+                  details: `activeTab=${activeTab}; needsFix=${health.needsFix}`,
                 })
               }}
               className="flex items-center gap-1.5 px-2.5 py-1.5 rounded text-[11px] font-semibold border border-violet-500/30 text-violet-300 hover:bg-violet-500/10 transition-colors"

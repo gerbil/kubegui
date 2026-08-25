@@ -34,6 +34,107 @@ function getK8sStatus(resource: K8sResource) {
   return conditions[0]?.type ?? 'Unknown'
 }
 
+/** Singular resource label used when invoking the AI assistant. */
+const AI_RESOURCE_LABEL: Record<string, string> = {
+  deployments: 'deployment',
+  pods: 'pod',
+  replicasets: 'replicaset',
+  jobs: 'job',
+  cronjobs: 'cronjob',
+}
+
+/**
+ * Returns a human-readable summary of why a resource is unhealthy so it can be sent
+ * to the AI assistant, or null when the resource looks healthy.
+ * For the resource kinds the user wants an "Ask AI" entry point for, this is the
+ * single source of truth for deciding whether to show the button.
+ */
+function aiSuggestForResource(type: string, r: K8sResource): string | null {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const status = (r.status ?? {}) as any
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const spec = (r.spec ?? {}) as any
+
+  switch (type) {
+    case 'deployments': {
+      const total = status.replicas ?? spec.replicas ?? 0
+      const ready = status.readyReplicas ?? 0
+      const available = status.availableReplicas ?? 0
+      const updated = status.updatedReplicas ?? 0
+      const unhealthy =
+        total === 0
+          ? false
+          : ready < total ||
+            (spec.replicas > 0 && available < spec.replicas) ||
+            (status.unavailableReplicas ?? 0) > 0 ||
+            updated < (spec.replicas ?? 0)
+      if (!unhealthy) return null
+      return `Deployment is not fully available: ready=${ready}/${total}, available=${available}, updated=${updated}, unavailable=${status.unavailableReplicas ?? 0}.`
+    }
+
+    case 'pods': {
+      if (status.phase === 'Succeeded') return null
+      const statuses = [...(status.initContainerStatuses ?? []), ...(status.containerStatuses ?? [])] as Array<{
+        name: string
+        ready: boolean
+        restartCount?: number
+        state?: { waiting?: { reason?: string }; running?: object; terminated?: { reason?: string } }
+      }>
+      const bad = statuses.filter(
+        (cs) =>
+          cs.state?.waiting ||
+          (cs.state?.terminated && cs.state?.terminated?.reason !== 'Completed') ||
+          !cs.ready
+      )
+      if (!bad.length) return null
+      const detail = bad
+        .map((cs) => {
+          const s = cs.state ?? {}
+          if (s.waiting) return `${cs.name}: waiting (${s.waiting.reason ?? ''}) restarts=${cs.restartCount ?? 0}`
+          if (s.terminated) return `${cs.name}: ${s.terminated.reason ?? 'terminated'}`
+          return `${cs.name}: not ready`
+        })
+        .join('; ')
+      return `Pod phase=${status.phase ?? 'Unknown'} — ${detail}.`
+    }
+
+    case 'replicasets': {
+      const total = status.replicas ?? spec.replicas ?? 0
+      const ready = status.readyReplicas ?? 0
+      if (total === 0) return null
+      if (ready >= total) return null
+      return `ReplicaSet is not fully ready: ready=${ready}/${total}.`
+    }
+
+    case 'jobs': {
+      const failed = status.failed ?? 0
+      const active = status.active ?? 0
+      const succeeded = status.succeeded ?? 0
+      const completions = spec.completions ?? null
+      if (failed > 0) return `Job has ${failed} failed pod(s); succeeded=${succeeded}/${completions ?? '?'}.`
+      if (!spec.suspend && active === 0 && completions && succeeded < Number(completions)) {
+        return `Job has not completed successfully: succeeded=${succeeded}/${completions}.`
+      }
+      return null
+    }
+
+    case 'cronjobs': {
+      if (spec.suspend) return null
+      const lastSchedule = status.lastScheduleTime as string | undefined
+      const lastSuccessful = status.lastSuccessfulTime as string | undefined
+      if (!lastSchedule) return null // never scheduled yet -> not an error
+      if (!lastSuccessful) return `CronJob's last run (${lastSchedule}) did not finish successfully.`
+      if (new Date(lastSuccessful).getTime() < new Date(lastSchedule).getTime()) {
+        return `CronJob's last run (${lastSchedule}) did not finish successfully (last success before it).`
+      }
+      return null
+    }
+
+    default:
+      return null
+  }
+}
+
 function statusTextClass(status: string) {
   const normalized = status.toLowerCase()
   if (normalized === 'true' || normalized.includes('ready') || normalized.includes('running') || normalized.includes('active') || normalized.includes('succeeded') || normalized.includes('available') || normalized.includes('bound') || normalized.includes('completed')) {
@@ -300,32 +401,9 @@ export function ResourcesView() {
                       : sk === 'waiting' ? 'bg-amber-400' : 'bg-red-500'
                     const tip = sk === 'waiting' ? `${cs.name}: waiting (${cs.state?.waiting?.reason ?? ''}), restarts: ${cs.restartCount ?? 0}`
                       : sk === 'terminated' ? `${cs.name}: ${cs.state?.terminated?.reason ?? 'terminated'}` : `${cs.name}: running`
-                    const waitingReason = String(cs.state?.waiting?.reason ?? '')
-                    const showAI = sk === 'waiting' || (sk === 'terminated' && cs.state?.terminated?.reason !== 'Completed')
                     return (
                       <span key={i} className="inline-flex items-center gap-1">
                         <span title={tip} className={`w-2.5 h-2.5 rounded-full inline-block shrink-0 ${dot}`} />
-                        {showAI && (
-                          <button
-                            type="button"
-                            title="Suggest fix"
-                            onClick={(e) => {
-                              e.stopPropagation()
-                              setAiAssistRequest({
-                                task: 'auto_detect',
-                                resource: 'pod',
-                                namespace: String(info.row.original.metadata?.namespace ?? ''),
-                                name: String(info.row.original.metadata?.name ?? ''),
-                                message: tip,
-                                details: waitingReason,
-                              })
-                            }}
-                            className="inline-flex items-center gap-1 rounded border border-violet-500/30 px-1.5 py-0.5 text-[10px] font-medium text-violet-300 hover:text-violet-100 hover:bg-violet-500/20"
-                          >
-                            <Sparkles size={11} />
-                            Ask AI
-                          </button>
-                        )}
                       </span>
                     )
                   })}
@@ -345,8 +423,11 @@ export function ResourcesView() {
         base.push(
           col.accessor((r) => {
             const ready = (r.status as any)?.readyReplicas ?? 0
-            const desired = (r.spec as any)?.replicas ?? 0
-            return `${ready}/${desired}`
+            // Use status.replicas (actual non-terminated pods) instead of spec.replicas
+            // so rollouts that surge above the desired count (e.g. a broken new-release
+            // pod in ImagePullBackOff/CrashLoopBackOff) are reflected as ready/total.
+            const total = (r.status as any)?.replicas ?? (r.spec as any)?.replicas ?? 0
+            return `${ready}/${total}`
           }, {
             id: 'replicas', header: 'Replicas', size: 100,
             cell: (info) => ratioBadge(info.getValue<string>()),
@@ -742,6 +823,45 @@ export function ResourcesView() {
             id: 'policyType', header: 'Policy Type', size: 160,
             cell: (info) => <span className={xs}>{info.getValue<string>()}</span>,
           }),
+        )
+      }
+
+      // ── Ask AI per-row action (only for unhealthy resources) ────────────────
+      const AI_TYPES = new Set(['deployments', 'pods', 'replicasets', 'jobs', 'cronjobs'])
+      if (AI_TYPES.has(selectedResource)) {
+        base.push(
+          col.display({
+            id: 'ai',
+            header: '',
+            size: 72,
+            meta: { disableOverflowTooltip: true, fixedWidth: 72 },
+            cell: ({ row }) => {
+              const res = row.original
+              const message = aiSuggestForResource(selectedResource, res)
+              if (!message) return null
+              return (
+                <button
+                  type="button"
+                  title="Ask AI for a fix suggestion"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    setAiAssistRequest({
+                      task: 'auto_detect',
+                      resource: AI_RESOURCE_LABEL[selectedResource] ?? selectedResource,
+                      namespace: String(res.metadata?.namespace ?? ''),
+                      name: String(res.metadata?.name ?? ''),
+                      message,
+                      details: `resourceType=${selectedResource}`,
+                    })
+                  }}
+                  className="inline-flex items-center gap-1 rounded border border-violet-500/30 px-1.5 py-0.5 text-[10px] font-medium text-violet-300 hover:text-violet-100 hover:bg-violet-500/20 shrink-0"
+                >
+                  <Sparkles size={11} />
+                  Ask AI
+                </button>
+              )
+            },
+          })
         )
       }
 
