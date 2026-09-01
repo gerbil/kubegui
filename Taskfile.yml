@@ -207,7 +207,7 @@ tasks:
   build:mac:prod:upload:
     summary: Upload to github
     cmds:
-      - gh release create "v{{.version}}" --title "Release v{{.version}}" --notes "..." -R gerbil/kubegui || true
+      - gh release create "v{{.version}}" --title "v{{.version}}" --notes "..." -R gerbil/kubegui || true
       - gh release upload v{{.version}} {{.BIN_DIR}}/{{.APP_NAME}}-macos.zip --clobber -R gerbil/kubegui
 
   #  MISC
