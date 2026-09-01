@@ -9,7 +9,9 @@ import (
 	"sync"
 	"time"
 
+	authv1 "k8s.io/api/authorization/v1"
 	apiextensionsclientset "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
+	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -79,6 +81,9 @@ type GlobalInformers struct {
 	Resources      []ResourceInfo
 	resourceByName map[string]ResourceInfo
 	crdDefs        []CRDDefinition
+	// watchable records the cluster-wide list/watch RBAC verdict per GVR.
+	// A missing entry means "not checked" and is treated as allowed.
+	watchable map[schema.GroupVersionResource]bool
 
 	informers map[schema.GroupVersionResource]cache.SharedIndexInformer
 
@@ -135,6 +140,7 @@ func NewGlobalInformers(cfg *rest.Config) (*GlobalInformers, error) {
 		factory:        factory,
 		informers:      map[schema.GroupVersionResource]cache.SharedIndexInformer{},
 		resourceByName: map[string]ResourceInfo{},
+		watchable:      map[schema.GroupVersionResource]bool{},
 		subscriptions:  map[string]struct{}{},
 		queue:          make(chan globalInformerEvent, 4096),
 	}, nil
@@ -165,7 +171,7 @@ func (g *GlobalInformers) Start(ctx context.Context) error {
 	g.mu.Unlock()
 
 	for _, resource := range resources {
-		if !hasVerb(resource.Verbs, "watch") {
+		if !hasVerb(resource.Verbs, "watch") || !g.canWatch(resource.GVR) {
 			continue
 		}
 		informer := g.factory.ForResource(resource.GVR).Informer()
@@ -289,8 +295,9 @@ func (g *GlobalInformers) EnableCRDInformers(ctx context.Context) error {
 	resources := append([]ResourceInfo(nil), g.Resources...)
 	g.mu.RUnlock()
 
+	added := map[schema.GroupVersionResource]cache.SharedIndexInformer{}
 	for _, resource := range resources {
-		if !hasVerb(resource.Verbs, "watch") {
+		if !hasVerb(resource.Verbs, "watch") || !g.canWatch(resource.GVR) {
 			continue
 		}
 		informer := g.factory.ForResource(resource.GVR).Informer()
@@ -309,14 +316,36 @@ func (g *GlobalInformers) EnableCRDInformers(ctx context.Context) error {
 				},
 			})
 			g.informers[resource.GVR] = informer
+			added[resource.GVR] = informer
 		}
 		g.mu.Unlock()
 	}
 
 	g.factory.Start(runDone)
-	for gvr, synced := range g.factory.WaitForCacheSync(runDone) {
-		if !synced {
-			return fmt.Errorf("cache sync failed for %s", gvr.String())
+
+	// Wait only on the newly added CRD informers. factory.WaitForCacheSync would
+	// also block on standard informers that already failed to sync (e.g. secrets
+	// denied by RBAC), stalling CRD availability until the caller times out.
+	if len(added) > 0 {
+		syncCtx, syncCancel := context.WithTimeout(ctx, 45*time.Second)
+		defer syncCancel()
+
+		syncFuncs := make([]cache.InformerSynced, 0, len(added))
+		for _, informer := range added {
+			syncFuncs = append(syncFuncs, informer.HasSynced)
+		}
+		_ = cache.WaitForCacheSync(syncCtx.Done(), syncFuncs...)
+
+		var unsynced []string
+		for gvr, informer := range added {
+			if !informer.HasSynced() {
+				unsynced = append(unsynced, gvr.String())
+			}
+		}
+		// Partial CRD data is more useful than none, so degrade instead of failing.
+		if len(unsynced) > 0 {
+			sort.Strings(unsynced)
+			logger.Logger.Warn("CRD informer cache sync partial", "unsynced", strings.Join(unsynced, ", "))
 		}
 	}
 
@@ -334,6 +363,138 @@ func (g *GlobalInformers) DiscoverStandardReadableResources(ctx context.Context)
 	return g.discoverResources(ctx, false)
 }
 
+// serverPreferredResourcesWithRetry retries ServerPreferredResources on
+// transient errors (e.g. 503 Service Unavailable, which AKS private-link
+// clusters can return briefly right after the connection is established).
+func serverPreferredResourcesWithRetry(ctx context.Context, disco discovery.DiscoveryInterface) ([]*metav1.APIResourceList, error) {
+	const maxAttempts = 6
+	const maxBackoff = 8 * time.Second
+	backoff := 500 * time.Millisecond
+
+	var lists []*metav1.APIResourceList
+	var err error
+	for attempt := 1; attempt <= maxAttempts; attempt++ {
+		lists, err = disco.ServerPreferredResources()
+		if err == nil || len(lists) > 0 {
+			return lists, err
+		}
+		if !isRetryableDiscoveryError(err) || attempt == maxAttempts {
+			return lists, err
+		}
+		logger.Logger.Warn("server discovery attempt failed, retrying", "attempt", attempt, "err", err)
+		select {
+		case <-ctx.Done():
+			return lists, ctx.Err()
+		case <-time.After(backoff):
+		}
+		if backoff *= 2; backoff > maxBackoff {
+			backoff = maxBackoff
+		}
+	}
+	return lists, err
+}
+
+func isRetryableDiscoveryError(err error) bool {
+	if err == nil {
+		return false
+	}
+	return apierrors.IsServiceUnavailable(err) ||
+		apierrors.IsTimeout(err) ||
+		apierrors.IsTooManyRequests(err) ||
+		apierrors.IsInternalError(err)
+}
+
+// markWatchPermission records which resources the current user may cluster-wide
+// list and watch. SelfSubjectAccessReview is answered by the API server's
+// authorizer without touching etcd, so this is far cheaper than probing each
+// resource with a real List call.
+//
+// Denied resources are NOT removed from discovery: a user whose access comes
+// from namespaced RoleBindings is legitimately denied at cluster scope, but can
+// still read those resources per-namespace via direct live calls. Only the
+// cluster-wide informer is skipped, so its cache can never stall the sync stage.
+// Fails open: if the review itself errors, the resource stays watchable.
+func (g *GlobalInformers) markWatchPermission(ctx context.Context, resources []ResourceInfo) {
+	if len(resources) == 0 {
+		return
+	}
+
+	g.emit("informerProgress", map[string]any{
+		"stage":   "permissions",
+		"message": fmt.Sprintf("Checking access to %d resources…", len(resources)),
+	})
+
+	checkCtx, cancel := context.WithTimeout(ctx, 30*time.Second)
+	defer cancel()
+
+	allowed := make([]bool, len(resources))
+	sem := make(chan struct{}, 16)
+	var wg sync.WaitGroup
+
+	for i, resource := range resources {
+		if !hasVerb(resource.Verbs, "watch") {
+			continue
+		}
+		wg.Add(1)
+		go func(idx int, gvr schema.GroupVersionResource) {
+			defer wg.Done()
+			sem <- struct{}{}
+			defer func() { <-sem }()
+			allowed[idx] = g.canReadResource(checkCtx, gvr)
+		}(i, resource.GVR)
+	}
+	wg.Wait()
+
+	watchable := make(map[schema.GroupVersionResource]bool, len(resources))
+	var denied []string
+	for i, resource := range resources {
+		watchable[resource.GVR] = allowed[i]
+		if !allowed[i] && hasVerb(resource.Verbs, "watch") {
+			denied = append(denied, resource.GVR.String())
+		}
+	}
+
+	if len(denied) > 0 {
+		sort.Strings(denied)
+		logger.Logger.Info("no cluster-wide list/watch permission, informer skipped", "count", len(denied), "resources", strings.Join(denied, ", "))
+	}
+
+	g.mu.Lock()
+	g.watchable = watchable
+	g.mu.Unlock()
+}
+
+// canWatch reports whether an informer should be created for gvr.
+func (g *GlobalInformers) canWatch(gvr schema.GroupVersionResource) bool {
+	g.mu.RLock()
+	defer g.mu.RUnlock()
+	allowed, checked := g.watchable[gvr]
+	return !checked || allowed
+}
+
+func (g *GlobalInformers) canReadResource(ctx context.Context, gvr schema.GroupVersionResource) bool {
+	for _, verb := range []string{"list", "watch"} {
+		review := &authv1.SelfSubjectAccessReview{
+			Spec: authv1.SelfSubjectAccessReviewSpec{
+				ResourceAttributes: &authv1.ResourceAttributes{
+					Group:    gvr.Group,
+					Version:  gvr.Version,
+					Resource: gvr.Resource,
+					Verb:     verb,
+				},
+			},
+		}
+		result, err := g.clientset.AuthorizationV1().SelfSubjectAccessReviews().Create(ctx, review, metav1.CreateOptions{})
+		if err != nil {
+			return true
+		}
+		if !result.Status.Allowed {
+			return false
+		}
+	}
+	return true
+}
+
 func (g *GlobalInformers) discoverResources(ctx context.Context, includeCRDs bool) error {
 	// CRD ownership lookup is best-effort. On clusters where the CRD endpoint is
 	// slow or RBAC-restricted it will time out — skip gracefully with an empty set
@@ -343,7 +504,7 @@ func (g *GlobalInformers) discoverResources(ctx context.Context, includeCRDs boo
 		crdOwned = rawCRDs
 	}
 
-	lists, err := g.disco.ServerPreferredResources()
+	lists, err := serverPreferredResourcesWithRetry(ctx, g.disco)
 	if err != nil && len(lists) == 0 {
 		return fmt.Errorf("server discovery failed: %w", err)
 	}
@@ -373,8 +534,8 @@ func (g *GlobalInformers) discoverResources(ctx context.Context, includeCRDs boo
 				Resource: apiResource.Name,
 			}
 
-			// Trust the API server's verb declarations — probing each resource
-			// with canListResource added 20-30 s on slow clusters.
+			// Declared verbs are only an API-level capability hint; actual RBAC
+			// access is verified separately in markWatchPermission.
 
 			source := "standard"
 			if isCRDBacked {
@@ -391,6 +552,8 @@ func (g *GlobalInformers) discoverResources(ctx context.Context, includeCRDs boo
 			})
 		}
 	}
+
+	g.markWatchPermission(ctx, out)
 
 	sort.Slice(out, func(i, j int) bool {
 		if out[i].Name == out[j].Name {

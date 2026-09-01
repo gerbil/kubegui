@@ -165,6 +165,7 @@ func (s *Backend) DBUpdateClusterConfigImagePath(filename, context, newImagePath
 }
 func (s *Backend) DBMakeClusterConfigActive(clusterContext, filename string) error {
 	idb.ConnectConfig(clusterContext, filename)
+	application.Get().Event.Emit("clusterConfigsChanged", map[string]any{"source": "make-active"})
 	go func() {
 		if _, err := clusterruntime.StartForActiveCluster(context.Background()); err != nil {
 			logger.Logger.Warn("informer start failed after connect", "err", err)
@@ -181,6 +182,7 @@ func (s *Backend) DBDisconnectClusterConfig() error {
 		return err
 	}
 	idb.ResetActiveConfig()
+	application.Get().Event.Emit("clusterConfigsChanged", map[string]any{"source": "disconnect"})
 	return nil
 }
 func (s *Backend) DBDeleteClusterConfig(context, filename string) error {
@@ -213,8 +215,10 @@ func (s *Backend) DBDeleteAllPodPortForwardingsConfigs() error {
 
 // --- menu ---
 func (s *Backend) CRDGetMenuList() (CRDMenuResponse, error) {
+	// Menu data comes from a direct CRD list, so informer streaming is a
+	// best-effort enhancement and must not block the menu from rendering.
 	if err := enableCRDInformersForActiveCluster(); err != nil {
-		return CRDMenuResponse{}, err
+		logger.Logger.Warn("CRD informers unavailable, serving menu without live updates", "err", err)
 	}
 	groups, uiMap, err := crd.GetMenuList()
 	if err != nil {
@@ -339,7 +343,11 @@ func startGlobalInformerManagerForActiveCluster() (*informers.GlobalInformers, e
 	return clusterruntime.StartForActiveCluster(context.Background())
 }
 func enableCRDInformersForActiveCluster() error {
-	return clusterruntime.EnableCRDForActiveCluster(context.Background())
+	// Bounded so a slow/unreachable API server fails fast instead of leaving the
+	// frontend's own request timeout as the only thing that ever gives up.
+	ctx, cancel := context.WithTimeout(context.Background(), 150*time.Second)
+	defer cancel()
+	return clusterruntime.EnableCRDForActiveCluster(ctx)
 }
 func stopGlobalInformerManager() error {
 	return clusterruntime.StopForActiveCluster()

@@ -23,7 +23,10 @@ func (s *Helper) ServiceStartup(ctx context.Context, options application.Service
 
   logger.Logger.Info("Current", "version", version)
 
-  Update("v" + version);
+  // An update check failure must never prevent the application from starting.
+  if err := Update("v" + version); err != nil {
+    logger.Logger.Warn("application update check failed", "err", err)
+  }
 
   return nil
 }

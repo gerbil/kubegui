@@ -13,6 +13,8 @@ import { useNamespaceOptions } from '@/hooks/useNamespaceOptions'
 import { ResourceDrawer, type ResourceRef } from '@/components/ui/ResourceDrawer'
 import { NamespaceLink } from '@/components/ui/NamespaceLink'
 import { HIERARCHY_NAVIGATE_EVENT } from '@/lib/uiEvents'
+import { NAMESPACE_STORAGE_KEY } from '@/lib/namespaceStorage'
+import { usePersistentState } from '@/hooks/usePersistentState'
 
 type LegacyAce = {
   edit: (el: HTMLElement) => any
@@ -472,7 +474,7 @@ export function CRDResourcePage({ definition, namespace = '', onNavigateBack, ca
   const [items, setItems] = useState<Record<string, any>[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
-  const [selectedNamespace, setSelectedNamespace] = useState(navigationFilter.namespace || namespace || 'all')
+  const [selectedNamespace, setSelectedNamespace] = usePersistentState(NAMESPACE_STORAGE_KEY, navigationFilter.namespace || namespace || 'all')
   const [globalFilter, setGlobalFilter] = useState(navigationFilter.query)
   const [createModalYaml, setCreateModalYaml] = useState<string | null>(null)
   const [templateLoading, setTemplateLoading] = useState(false)

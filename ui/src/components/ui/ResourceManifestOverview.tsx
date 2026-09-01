@@ -2,8 +2,9 @@ import { UiTooltip } from './UiTooltip'
 import type { OverviewFieldSpec } from '../../features/resources/resourceOverview'
 import { resolveOverviewValue, K8S_FIELD_DESCRIPTIONS } from '../../features/resources/resourceOverview'
 import { conditionBadge } from '@/lib/utils'
-import { forwardRef } from 'react'
+import { forwardRef, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
+import { ResourceGetDetails } from '../../../bindings/kubegui/services/backend'
 const HIDDEN_ANNOTATION_KEYS = new Set([
   'kubectl.kubernetes.io/last-applied-configuration',
 ])
@@ -117,7 +118,7 @@ function getFieldDescriptionKey(path: string): string | undefined {
   if (K8S_FIELD_DESCRIPTIONS[normalized]) return normalized
 
   const parts = normalized.split('.')
-  for (let length = parts.length - 1; length >= 2; length -= 1) {
+  for (let length = parts.length - 1; length >= 1; length -= 1) {
     const candidate = parts.slice(0, length).join('.')
     if (K8S_FIELD_DESCRIPTIONS[candidate]) return candidate
   }
@@ -400,4 +401,169 @@ export function TooltipResourceSection({
       flattenValue(value, `${sectionPrefix}.${key}`, lines)
     })
   return <FlatLines title={title} lines={lines} query={query} headerAction={headerAction} />
+}
+// ─── Secrets / Env vars (workloads) ──────────────────────────────────────────
+type Container = Record<string, unknown>
+
+/** Pulls the pod-template container list out of any workload kind's spec shape. */
+export function extractWorkloadContainers(full: Record<string, unknown> | null | undefined, resourceType?: string): Container[] {
+  if (!full) return []
+  const spec = full.spec as Record<string, unknown> | undefined
+  if (!spec) return []
+  const podSpec = resourceType === 'pods'
+    ? spec
+    : resourceType === 'cronjobs'
+      ? (((spec.jobTemplate as Record<string, unknown> | undefined)?.spec as Record<string, unknown> | undefined)
+          ?.template as Record<string, unknown> | undefined)?.spec as Record<string, unknown> | undefined
+      : (spec.template as Record<string, unknown> | undefined)?.spec as Record<string, unknown> | undefined
+  const containers = (podSpec?.containers as Container[] | undefined) ?? []
+  const initContainers = (podSpec?.initContainers as Container[] | undefined) ?? []
+  return [...containers, ...initContainers]
+}
+
+type EnvLine = { container: string; name: string; source: string; value: string; secret: boolean }
+
+export function decodeBase64(raw: string): string {
+  try {
+    return new TextDecoder().decode(Uint8Array.from(atob(raw), (character) => character.charCodeAt(0)))
+  } catch {
+    return raw
+  }
+}
+
+async function fetchByName(resource: string, namespace: string, name: string, cache: Map<string, Record<string, unknown> | null>): Promise<Record<string, unknown> | null> {
+  if (!name) return null
+  const cacheKey = `${resource}/${name}`
+  if (cache.has(cacheKey)) return cache.get(cacheKey) ?? null
+  try {
+    const obj = await ResourceGetDetails(resource, namespace, name)
+    const result = (obj && typeof obj === 'object') ? obj as Record<string, unknown> : null
+    cache.set(cacheKey, result)
+    return result
+  } catch {
+    cache.set(cacheKey, null)
+    return null
+  }
+}
+
+/** Env vars + envFrom for all containers, with Secret/ConfigMap references resolved and secrets base64-decoded to plaintext. */
+export function EnvSecretsSection({ containers, namespace }: { containers: Container[]; namespace: string }) {
+  const hasEnvRefs = containers.some((c) => (Array.isArray(c.env) && c.env.length > 0) || (Array.isArray(c.envFrom) && c.envFrom.length > 0))
+  const containersKey = JSON.stringify(containers.map((c) => ({ name: c.name, env: c.env, envFrom: c.envFrom })))
+  const [lines, setLines] = useState<EnvLine[]>([])
+  const [loading, setLoading] = useState(hasEnvRefs)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (!hasEnvRefs) { setLines([]); setLoading(false); return }
+    let cancelled = false
+    setLoading(true)
+    setError(null)
+
+    ;(async () => {
+      const objCache = new Map<string, Record<string, unknown> | null>()
+      const out: EnvLine[] = []
+
+      for (const container of containers) {
+        const containerName = String(container.name ?? 'container')
+
+        for (const raw of (container.env as Array<Record<string, unknown>> | undefined) ?? []) {
+          const varName = String(raw.name ?? '')
+          const valueFrom = raw.valueFrom as Record<string, unknown> | undefined
+          const secretRef = valueFrom?.secretKeyRef as Record<string, unknown> | undefined
+          const cmRef = valueFrom?.configMapKeyRef as Record<string, unknown> | undefined
+          const fieldRef = valueFrom?.fieldRef as Record<string, unknown> | undefined
+          const resourceFieldRef = valueFrom?.resourceFieldRef as Record<string, unknown> | undefined
+
+          if (secretRef) {
+            const secretName = String(secretRef.name ?? '')
+            const key = String(secretRef.key ?? '')
+            const secretObj = await fetchByName('secrets', namespace, secretName, objCache)
+            const data = (secretObj?.data as Record<string, string> | undefined) ?? {}
+            const decoded = key in data ? decodeBase64(data[key]) : '(key not found)'
+            out.push({ container: containerName, name: varName, source: `Secret: ${secretName}.${key}`, value: decoded, secret: true })
+          } else if (cmRef) {
+            const cmName = String(cmRef.name ?? '')
+            const key = String(cmRef.key ?? '')
+            const cmObj = await fetchByName('configmaps', namespace, cmName, objCache)
+            const data = (cmObj?.data as Record<string, string> | undefined) ?? {}
+            out.push({ container: containerName, name: varName, source: `ConfigMap: ${cmName}.${key}`, value: data[key] ?? '(key not found)', secret: false })
+          } else if (fieldRef) {
+            out.push({ container: containerName, name: varName, source: 'FieldRef', value: String(fieldRef.fieldPath ?? ''), secret: false })
+          } else if (resourceFieldRef) {
+            out.push({ container: containerName, name: varName, source: 'ResourceFieldRef', value: String(resourceFieldRef.resource ?? ''), secret: false })
+          } else {
+            out.push({ container: containerName, name: varName, source: 'Direct', value: String(raw.value ?? ''), secret: false })
+          }
+        }
+
+        for (const ef of (container.envFrom as Array<Record<string, unknown>> | undefined) ?? []) {
+          const prefix = String(ef.prefix ?? '')
+          const secretRef = ef.secretRef as Record<string, unknown> | undefined
+          const cmRef = ef.configMapRef as Record<string, unknown> | undefined
+
+          if (secretRef) {
+            const secretName = String(secretRef.name ?? '')
+            const secretObj = await fetchByName('secrets', namespace, secretName, objCache)
+            const data = (secretObj?.data as Record<string, string> | undefined) ?? {}
+            for (const [key, value] of Object.entries(data)) {
+              out.push({ container: containerName, name: `${prefix}${key}`, source: `Secret: ${secretName} (envFrom)`, value: decodeBase64(value), secret: true })
+            }
+          }
+          if (cmRef) {
+            const cmName = String(cmRef.name ?? '')
+            const cmObj = await fetchByName('configmaps', namespace, cmName, objCache)
+            const data = (cmObj?.data as Record<string, string> | undefined) ?? {}
+            for (const [key, value] of Object.entries(data)) {
+              out.push({ container: containerName, name: `${prefix}${key}`, source: `ConfigMap: ${cmName} (envFrom)`, value, secret: false })
+            }
+          }
+        }
+      }
+
+      if (!cancelled) setLines(out)
+    })()
+      .catch((e: unknown) => { if (!cancelled) setError(e instanceof Error ? e.message : 'Failed to load env vars') })
+      .finally(() => { if (!cancelled) setLoading(false) })
+
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [containersKey, namespace, hasEnvRefs])
+
+  if (!hasEnvRefs) return null
+
+  return (
+    <div>
+      <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">
+        Secrets / Env Vars
+        {!loading && <span className="ml-1.5 text-muted-foreground/50 normal-case tracking-normal">({lines.length})</span>}
+      </p>
+      {loading && <p className="text-[11px] text-muted-foreground/60 px-1 py-1">Resolving env vars...</p>}
+      {error && <p className="text-[11px] text-red-400 px-1 py-1">Error: {error}</p>}
+      {!loading && !error && (
+        <div className="space-y-0.5">
+          {lines.map((line, index) => (
+            <div key={`${line.container}:${line.name}:${index}`} className="font-modal text-[11.5px] leading-snug py-1 px-1 rounded hover:bg-accent/30 break-all">
+              {new Set(lines.map((l) => l.container)).size > 1 && (
+                <><span className="text-muted-foreground/40">[{line.container}]</span>{' '}</>
+              )}
+              <span className="text-muted-foreground/70">{line.name}</span>
+              <span className="text-muted-foreground/50">: </span>
+              <span className="text-foreground">{line.value}</span>
+              {line.secret && (
+                <span className="ml-1.5 text-[9px] px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-400 align-middle">
+                  decoded from base64 &middot; {line.source}
+                </span>
+              )}
+              {!line.secret && line.source !== 'Direct' && (
+                <span className="ml-1.5 text-[9px] px-1.5 py-0.5 rounded bg-accent/50 text-muted-foreground/70 align-middle">
+                  {line.source}
+                </span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
 }

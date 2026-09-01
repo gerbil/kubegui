@@ -1,10 +1,10 @@
 {
   "fixed": {
-    "file_version": "2.1.0"
+    "file_version": "2.2.0"
   },
   "info": {
     "0000": {
-      "ProductVersion": "2.1.0",
+      "ProductVersion": "2.2.0",
       "CompanyName": "KubeGUI",
       "FileDescription": "KubeGUI - Kubernetes admin desktop client",
       "LegalCopyright": "© 2026, Jurijs Kobecs",

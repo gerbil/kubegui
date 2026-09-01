@@ -1,5 +1,5 @@
 import { Events } from '@wailsio/runtime'
-import { CheckCircle2, CloudUpload, Database, FileText, FolderOpen, Loader2, Network, Server, User, Wifi, X, Zap } from 'lucide-react'
+import { CheckCircle2, CloudUpload, Database, FileText, FolderOpen, LayoutGrid, LayoutList, Loader2, Network, Server, ShieldCheck, User, Wifi, X, Zap } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import type { Clusterconfig } from '../../../bindings/kubegui/internal/db'
@@ -13,8 +13,10 @@ import {
   DBMakeClusterConfigActive,
   DBRenameClusterConfig,
 } from '../../../bindings/kubegui/services/backend'
+import { usePersistentState } from '../../hooks/usePersistentState'
 import defaultClusterIcon from '../../assets/icons/cluster.svg'
-import { ContextCardsSkeleton } from '../ui/Skeleton'
+import { ContextCardsSkeleton, ContextListSkeleton } from '../ui/Skeleton'
+import { UiTooltip } from '../ui/UiTooltip'
 
 const PRODUCT_VERSION_FALLBACK = '2.0.0'
 
@@ -98,7 +100,7 @@ function getResolvedIconPath(cfg: ClusterConfig): string {
   return `/local-images/${encodeURIComponent(fileName)}`
 }
 
-type InformerStage = 'connecting' | 'discovering' | 'discovered' | 'started' | 'synced' | 'error'
+type InformerStage = 'connecting' | 'discovering' | 'permissions' | 'discovered' | 'started' | 'synced' | 'error'
 
 interface InformerProgress {
   stage: InformerStage
@@ -118,6 +120,7 @@ export function InitPage({ onContextSelected, hideHeader = false }: InitPageProp
   const [syncProgress, setSyncProgress] = useState<InformerProgress | null>(null)
   const [menuState, setMenuState] = useState<InitPageContextMenuState | null>(null)
   const [configErrors, setConfigErrors] = useState<Record<string, string>>({})
+  const [contextsView, setContextsView] = usePersistentState<'cards' | 'list'>('init:contexts:view', 'list')
   const navigatedRef = useRef(false)
   const offProgressRef = useRef<(() => void) | null>(null)
 
@@ -352,7 +355,7 @@ export function InitPage({ onContextSelected, hideHeader = false }: InitPageProp
 
       {/* Main */}
       <main className="flex-1 overflow-y-auto p-12 relative z-10">
-        <div className="max-w-[1100px] mx-auto grid grid-cols-[1fr_420px] gap-8 pt-18">
+        <div className="max-w-[1200px] mx-auto grid grid-cols-[1fr_520px] gap-8 pt-18">
 
           {/* Left */}
           <div className="flex flex-col gap-8">
@@ -443,11 +446,31 @@ export function InitPage({ onContextSelected, hideHeader = false }: InitPageProp
                     {loadingConfigs ? 'Loading...' : `${configs.length} available`}
                   </p>
                 </div>
-                {selectedConfig && !loadingConfigs && (
-                  <span className="text-[9px] font-bold px-2 py-0.5 rounded-full border bg-primary/15 border-primary/30 text-primary uppercase tracking-wider">
-                    1 selected
-                  </span>
-                )}
+                <div className="flex items-center gap-2">
+                  {selectedConfig && !loadingConfigs && (
+                    <span className="text-[9px] font-bold px-2 py-0.5 rounded-full border bg-primary/15 border-primary/30 text-primary uppercase tracking-wider">
+                      1 selected
+                    </span>
+                  )}
+                  <div className="flex items-center rounded-md border border-border/50 overflow-hidden">
+                    <UiTooltip content="Cards view">
+                      <button
+                        onClick={() => setContextsView('cards')}
+                        className={`px-2 py-1.5 transition-colors ${contextsView === 'cards' ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'}`}
+                      >
+                        <LayoutGrid size={12} />
+                      </button>
+                    </UiTooltip>
+                    <UiTooltip content="List view">
+                      <button
+                        onClick={() => setContextsView('list')}
+                        className={`px-2 py-1.5 transition-colors ${contextsView === 'list' ? 'bg-primary/20 text-primary' : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'}`}
+                      >
+                        <LayoutList size={12} />
+                      </button>
+                    </UiTooltip>
+                  </div>
+                </div>
               </div>
 
               <input
@@ -458,15 +481,15 @@ export function InitPage({ onContextSelected, hideHeader = false }: InitPageProp
                 className="lucid-control w-full rounded-lg px-4 py-2 text-sm mb-4 focus:outline-none"
               />
 
-              {/* Cards grid */}
+              {/* Cards / list */}
               <div className="max-h-[400px] overflow-y-auto pr-1">
                 {loadingConfigs ? (
-                  <ContextCardsSkeleton count={4} />
+                  contextsView === 'cards' ? <ContextCardsSkeleton count={4} /> : <ContextListSkeleton count={4} />
                 ) : filteredConfigs.length === 0 ? (
                   <p className="text-center text-muted-foreground text-sm py-6">
                     {searchQuery ? 'No matches.' : 'No contexts found.'}
                   </p>
-                ) : (
+                ) : contextsView === 'cards' ? (
                   <div className="grid grid-cols-2 gap-3">
                     {filteredConfigs.map((cfg, i) => {
                       const ctxName  = getContextName(cfg) || getClusterName(cfg)
@@ -567,6 +590,89 @@ export function InitPage({ onContextSelected, hideHeader = false }: InitPageProp
                       )
                     })}
                   </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {filteredConfigs.map((cfg, i) => {
+                      const ctxName  = getContextName(cfg) || getClusterName(cfg)
+                      const cluster  = getClusterName(cfg)
+                      const user     = getUserName(cfg)
+                      const source   = getConfigSource(cfg)
+                      const isAuto   = source === AUTO_DETECTED_SOURCE
+                      const isActive = isActiveValue(cfg.active) || isActiveValue(cfg.Active)
+                      const isSelected = selectedConfig === cfg
+                      const cfgKey = `${getConfigFileName(cfg)}|${getConfigContext(cfg)}`
+
+                      return (
+                        <button
+                          key={i}
+                          onContextMenu={(e) => {
+                            e.preventDefault()
+                            e.stopPropagation()
+                            setSelectedConfig(cfg)
+                            setConnectError(null)
+                            setMenuState({ config: cfg, x: e.clientX, y: e.clientY })
+                          }}
+                          onClick={() => { setSelectedConfig(cfg); setConnectError(null) }}
+                          className={`group relative w-full text-left rounded-lg px-3.5 py-2.5 flex items-center gap-3 transition-all duration-150 border active:scale-[0.99] ${
+                            isSelected
+                              ? 'lucid-panel ring-1 ring-primary/40 bg-primary/10 border-primary/20'
+                              : 'lucid-panel border-transparent hover:ring-1 hover:ring-primary/25 hover:bg-accent/30'
+                          }`}
+                        >
+                          <div className="w-6 h-6 rounded-md bg-primary/10 flex items-center justify-center shrink-0">
+                            <img
+                              src={getResolvedIconPath(cfg)}
+                              alt="cluster"
+                              className="w-4 h-4 object-contain"
+                              onError={(e) => { (e.currentTarget as HTMLImageElement).src = defaultClusterIcon }}
+                            />
+                          </div>
+
+                          <span className="font-semibold text-[12px] leading-tight text-foreground truncate min-w-0 flex-1 basis-1/4">
+                            {ctxName}
+                          </span>
+
+                          {cluster ? (
+                            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground min-w-0 flex-1 basis-1/4">
+                              <Server size={10} className="shrink-0 text-cyan-400/80" />
+                              <span className="truncate">{cluster}</span>
+                            </div>
+                          ) : <div className="min-w-0 flex-1 basis-1/4" />}
+
+                          {user ? (
+                            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground min-w-0 flex-1">
+                              <User size={10} className="shrink-0 text-violet-400/80" />
+                              <span className="truncate">{user}</span>
+                            </div>
+                          ) : <div className="flex-1" />}
+
+                          <div className="flex items-center gap-1.5 flex-wrap shrink-0">
+                            {isAuto && (
+                              <span className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400">
+                                Auto
+                              </span>
+                            )}
+                            {source && !isAuto && (
+                              <span className="flex items-center gap-1 text-[8px] font-medium uppercase tracking-wider text-muted-foreground/60">
+                                <FolderOpen size={8} className="text-amber-400/70" />{source}
+                              </span>
+                            )}
+                            {configErrors[cfgKey] && (
+                              <span title={configErrors[cfgKey]} className="text-[8px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-400">
+                                Not working
+                              </span>
+                            )}
+                            {isSelected
+                              ? <CheckCircle2 size={13} className="text-primary shrink-0" />
+                              : isActive
+                                ? <span className="shrink-0 text-[8px] font-bold px-1.5 py-0.5 rounded-full border bg-emerald-500/15 border-emerald-500/30 text-emerald-300 uppercase tracking-wide">Active</span>
+                                : null
+                            }
+                          </div>
+                        </button>
+                      )
+                    })}
+                  </div>
                 )}
               </div>
 
@@ -622,12 +728,13 @@ export function InitPage({ onContextSelected, hideHeader = false }: InitPageProp
                     {(
                       [
                         { key: 'discovering', icon: <Wifi size={10} />, label: 'Discover resources', color: 'text-cyan-400' },
+                        { key: 'permissions', icon: <ShieldCheck size={10} />, label: 'Check access', color: 'text-sky-400' },
                         { key: 'discovered',  icon: <Database size={10} />, label: syncProgress.resourceCount ? `${syncProgress.resourceCount} resources found` : 'Resources found', color: 'text-violet-400' },
                         { key: 'started',     icon: <Zap size={10} />, label: 'Informers started', color: 'text-amber-400' },
                         { key: 'synced',      icon: <CheckCircle2 size={10} />, label: 'Caches synced', color: 'text-emerald-400' },
                       ] as { key: InformerStage; icon: ReactNode; label: string; color: string }[]
                     ).map(({ key, icon, label, color }) => {
-                      const stages: InformerStage[] = ['connecting', 'discovering', 'discovered', 'started', 'synced']
+                      const stages: InformerStage[] = ['connecting', 'discovering', 'permissions', 'discovered', 'started', 'synced']
                       const currentIdx = stages.indexOf(syncProgress.stage)
                       const stepIdx   = stages.indexOf(key)
                       const done    = stepIdx < currentIdx || syncProgress.stage === key && (key === 'synced')

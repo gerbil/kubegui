@@ -301,6 +301,8 @@ tasks:
   go:mod:tidy:
     summary: Runs `go mod tidy`
     internal: true
+    env:
+      GONOPROXY: 'github.com/open-policy-agent/opa,github.com/bytecodealliance/wasmtime-go/v44'
     generates:
       - go.sum
     sources:

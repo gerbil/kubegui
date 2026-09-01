@@ -98,13 +98,13 @@
     inset: 0;
     z-index: -1;
 
-    background: url("/build/forest.jpg") center/cover no-repeat;
+    background: url("/build/vibrant.jpg") center/cover no-repeat;
 
-    filter: blur(6px);
+    filter: blur(8px);
     transform: scale(1.1); /* hide blurred edges */
 
     /* optional */
-    opacity: 0.7;
+    opacity: 0.5;
   }
 
   aside {

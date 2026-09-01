@@ -6,7 +6,7 @@ import { UiTooltip } from './UiTooltip'
 import { uiNotify } from './UiNotify'
 import { AiAssistModal } from './AiAssistModal'
 import type { AIAssistRequest } from '@/lib/aiAssistant'
-import { ResourceManifestOverview, LabelsSection, AnnotationsSection, EventsTimeline, type KubeEventItem } from './ResourceManifestOverview'
+import { ResourceManifestOverview, LabelsSection, AnnotationsSection, EventsTimeline, EnvSecretsSection, extractWorkloadContainers, type KubeEventItem } from './ResourceManifestOverview'
 import { deploymentOverviewFields } from '../../features/resources/resourceOverview'
 import { ConfirmDialog } from './Button'
 import { BackendEventSource } from '../../lib/wailsBackendTransport'
@@ -155,6 +155,7 @@ function OverviewTab({ deployment }: { deployment: DeploymentRow }) {
         <MetricCard label="Available" value={String(deployment.available)} color="#34d399" />
       </div>
       <ResourceManifestOverview resource={details} fields={deploymentOverviewFields} />
+      <EnvSecretsSection containers={extractWorkloadContainers(details, 'deployments')} namespace={deployment.namespace} />
       <LabelsSection resource={details} />
       <AnnotationsSection resource={details} />
     </div>

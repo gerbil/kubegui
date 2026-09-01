@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { configureAceYamlEditor } from '@/lib/aceEditorConfig'
-import { Boxes, Database, FileText, GitBranch, Globe, HardDrive, Network, Pencil, Radio, RefreshCw, Search, Shield, Sparkles, Terminal, Trash2, X } from 'lucide-react'
+import { Boxes, Database, FileText, GitBranch, Globe, HardDrive, Network, Pencil, Radio, RefreshCw, Shield, Sparkles, Terminal, Trash2, X } from 'lucide-react'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
@@ -14,7 +14,7 @@ import { BackendEventSource } from '../../lib/wailsBackendTransport'
 import { INFORMER_RESOURCE_NAMES } from '../../lib/menu.config'
 import { ConfirmDialog } from './Button'
 import { PortForwardBadges } from './PortForwardBadges'
-import { AnnotationsSection, DynamicResourceSection, EventsTimeline, LabelsSection, TooltipResourceSection } from './ResourceManifestOverview'
+import { AnnotationsSection, decodeBase64, DynamicResourceSection, EnvSecretsSection, EventsTimeline, extractWorkloadContainers, LabelsSection, TooltipResourceSection } from './ResourceManifestOverview'
 import { uiNotify } from './UiNotify'
 import { UiTooltip } from './UiTooltip'
 import { NetworkPolicyFlowTab } from '../../features/resources/NetworkPolicyFlowTab'
@@ -331,19 +331,20 @@ function ResourceQuotaSection({ full }: { full: Record<string, unknown> }) {
 }
 
 function OverviewTab({ full, resourceType, namespace, name }: { full: Record<string, unknown> | null; resourceType?: string; namespace?: string; name?: string }) {
-  const [detailFilter, setDetailFilter] = useState('')
-
-  useEffect(() => {
-    setDetailFilter('')
-  }, [full])
-
   if (!full) return <div className="flex-1 flex items-center justify-center"><p className="text-[11px] text-muted-foreground">Loading…</p></div>
 
   // Collect top-level fields that aren't handled by dedicated sections
   // (spec, status, labels, annotations).  Event objects store their payload
   // here (involvedObject, reason, message, type, count, timestamps, …).
   const extraTopLevel = Object.fromEntries(
-    Object.entries(full).filter(([k, v]) => !STANDARD_TOP_LEVEL_KEYS.has(k) && v !== null && v !== undefined)
+    Object.entries(full)
+      .filter(([key, value]) => !STANDARD_TOP_LEVEL_KEYS.has(key) && value !== null && value !== undefined)
+      .map(([key, value]) => [
+        key,
+        resourceType === 'secrets' && key === 'data' && typeof value === 'object' && !Array.isArray(value)
+          ? Object.fromEntries(Object.entries(value as Record<string, unknown>).map(([dataKey, dataValue]) => [dataKey, typeof dataValue === 'string' ? decodeBase64(dataValue) : dataValue]))
+          : value,
+      ])
   )
 
   // Extract container ports for port-forwarding badges (pods only)
@@ -365,45 +366,27 @@ function OverviewTab({ full, resourceType, namespace, name }: { full: Record<str
     return ports
   })()
 
-  const filterBar = (
-    <div className="flex items-center gap-1.5 rounded border border-border/50 bg-accent/25 px-2 py-0.5 self-start">
-      <Search size={11} className="text-muted-foreground/60 shrink-0" />
-      <input
-        value={detailFilter}
-        onChange={(event) => setDetailFilter(event.target.value)}
-        placeholder="filter…"
-        className="w-32 bg-transparent font-modal text-[11px] text-foreground outline-none placeholder:text-muted-foreground/40"
-      />
-      {detailFilter && (
-        <button
-          onClick={() => setDetailFilter('')}
-          className="text-[11px] leading-none text-muted-foreground hover:text-foreground"
-          aria-label="Clear detail filter"
-        >
-          {String.fromCharCode(215)}
-        </button>
-      )}
-    </div>
-  )
+  const workloadContainers = extractWorkloadContainers(full, resourceType)
 
   return (
     <div className="flex-1 overflow-y-auto p-5 space-y-5">
-      {filterBar}
       {containerPorts.length > 0 && namespace && name && (
         <PortForwardBadges namespace={namespace} podName={name} ports={containerPorts} />
       )}
       {resourceType === 'resourcequotas' && <ResourceQuotaSection full={full} />}
-      <DynamicResourceSection title="Details" data={extraTopLevel} query={detailFilter} />
+      <DynamicResourceSection title="Details" data={extraTopLevel} />
       <TooltipResourceSection
         title="Spec"
         data={full.spec}
         sectionPrefix="spec"
         omit={SPEC_OMIT}
-        query={detailFilter}
       />
-      <TooltipResourceSection title="Status" data={full.status} sectionPrefix="status" query={detailFilter} />
-      <AnnotationsSection resource={full} query={detailFilter} />
-      <LabelsSection resource={full} query={detailFilter} />
+      <TooltipResourceSection title="Status" data={full.status} sectionPrefix="status" />
+      {workloadContainers.length > 0 && namespace && (
+        <EnvSecretsSection containers={workloadContainers} namespace={namespace} />
+      )}
+      <AnnotationsSection resource={full} />
+      <LabelsSection resource={full} />
     </div>
   )
 }

@@ -339,7 +339,7 @@ export function DataTable<T extends RowData>({
               <tr
                 key={row.id}
                 className={cn(
-                  'border-b border-outline-variant/30 transition-colors',
+                  'border-b border-outline-variant/60 transition-colors',
                   isClickable
                     ? 'cursor-pointer hover:bg-surface-container-high/45 focus-within:bg-surface-container-high/45'
                     : 'hover:bg-surface-container-high/45',

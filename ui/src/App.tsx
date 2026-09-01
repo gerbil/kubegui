@@ -26,6 +26,7 @@ import {
   ShieldAlert,
   Wind,
   Sparkles,
+  Loader2,
 } from 'lucide-react'
 import { store } from './store/store'
 import { ratioBadge, eventTypeBadge } from './lib/utils'
@@ -60,7 +61,7 @@ import { CRDResourcePage as CRDResourcePageComponent } from './features/crds/CRD
 import { MyPermissionsPage } from './features/permissions/MyPermissionsPage'
 import { wailsCall } from './lib/wailsQueue'
 import type { Clusterconfig } from '../bindings/kubegui/internal/db/models'
-import { Events, Window as WailsWindow } from '@wailsio/runtime'
+import { Browser, Events, Window as WailsWindow } from '@wailsio/runtime'
 import { useKubernetesContext } from './hooks/useKubernetesContext'
 import { useSystemLogs } from './hooks/useSystemLogs'
 import { useSystemEvents } from './hooks/useSystemEvents'
@@ -82,6 +83,7 @@ import { configureAceYamlEditor } from './lib/aceEditorConfig'
 import { uiNotify } from './components/ui/UiNotify'
 import { NamespaceLink } from './components/ui/NamespaceLink'
 import { CVE_SCANS_ENABLED_STORAGE_KEY, refreshCveDatabases } from './lib/cveScanSettings'
+import { NAMESPACE_STORAGE_KEY } from './lib/namespaceStorage'
 import { getAISettings, updateAISettings, type AISettings } from './lib/aiAssistant'
 import { RESOURCE_YAML_TEMPLATES } from './lib/yamlTemplates'
 import { HIERARCHY_NAVIGATE_EVENT } from './lib/uiEvents'
@@ -129,19 +131,22 @@ type NetworkActivityDetail = {
   label: string
 }
 
-type ExternalLinkWindow = Window & { openURL?: (url: string) => void }
-
 const NETWORK_ACTIVITY_EVENT = 'kubegui:network-activity'
 const CLUSTER_CONNECTION_LOST_EVENT = 'kubegui:cluster-connection-lost'
 const INIT_SESSION_KEY = 'kubegui:init-complete'
 const INIT_CONTEXT_SESSION_KEY = 'kubegui:init-context'
 const DEFAULT_FETCH_TIMEOUT_MS = 90000
 const LONG_RUNNING_FETCH_TIMEOUT_MS = 20 * 60 * 1000
+// CRD discovery re-lists every CRD-backed resource on the cluster and can take
+// well over 90s on slow/remote (e.g. private-link) API servers.
+const CRD_FETCH_TIMEOUT_MS = 3 * 60 * 1000
+// Wails RPC method IDs (from ui/bindings) for calls that enable CRD informers.
+const CRD_ENABLING_METHOD_IDS = new Set([344254838, 2131523584])
 const PRODUCT_VERSION_FALLBACK = '2.0.0'
 
 function openExternalUrl(url: string) {
   try {
-    (window as ExternalLinkWindow).openURL?.(url)
+    void Browser.OpenURL(url)
   } catch {
     window.open(url, '_blank')
   }
@@ -183,7 +188,7 @@ function fetchWithTimeout(
     })
 }
 
-function resolveFetchTimeoutMs(input: RequestInfo | URL, fallback = DEFAULT_FETCH_TIMEOUT_MS) {
+function resolveFetchTimeoutMs(input: RequestInfo | URL, init: RequestInit | undefined, fallback = DEFAULT_FETCH_TIMEOUT_MS) {
   const raw = typeof input === 'string'
     ? input
     : input instanceof URL
@@ -193,7 +198,20 @@ function resolveFetchTimeoutMs(input: RequestInfo | URL, fallback = DEFAULT_FETC
   if (path.includes('/api/v1/cve-scan') || path.includes('/api/v1/cve-db/refresh')) {
     return LONG_RUNNING_FETCH_TIMEOUT_MS
   }
+  if (isCRDEnablingWailsCall(init?.body)) {
+    return CRD_FETCH_TIMEOUT_MS
+  }
   return fallback
+}
+
+function isCRDEnablingWailsCall(body: RequestInit['body']) {
+  if (typeof body !== 'string') return false
+  try {
+    const parsed = JSON.parse(body) as { method?: number }
+    return typeof parsed.method === 'number' && CRD_ENABLING_METHOD_IDS.has(parsed.method)
+  } catch {
+    return false
+  }
 }
 
 function emitNetworkActivity(detail: NetworkActivityDetail) {
@@ -1373,14 +1391,14 @@ function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }
                     role="switch"
                     aria-checked={cveScansEnabled}
                     onClick={() => setCveScansEnabled((prev) => !prev)}
-                    className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border transition-colors ${
+                    className={`top-auto relative inline-flex h-6 w-11 shrink-0 rounded-full border transition-colors ${
                       cveScansEnabled
                         ? 'border-emerald-400/40 bg-emerald-500/30'
                         : 'border-border bg-accent/40'
                     }`}
                   >
                     <span
-                      className={`absolute left-0.5 top-0.5 h-[18px] w-[18px] rounded-full bg-white shadow transition-transform ${
+                      className={`top-auto absolute left-0.5 top-0.5 h-[18px] w-[18px] rounded-full bg-white shadow transition-transform ${
                         cveScansEnabled ? 'translate-x-5' : 'translate-x-0'
                       }`}
                     />
@@ -1411,7 +1429,7 @@ function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }
                     }`}
                   >
                     <span
-                      className={`absolute left-0.5 top-0.5 h-[18px] w-[18px] rounded-full bg-white shadow transition-transform ${
+                      className={`top-auto absolute left-0.5 top-0.5 h-[18px] w-[18px] rounded-full bg-white shadow transition-transform ${
                         aiSettings.enabled ? 'translate-x-5' : 'translate-x-0'
                       }`}
                     />
@@ -1499,6 +1517,51 @@ function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }
   )
 }
 
+type ClusterSwitchStage = 'connecting' | 'discovering' | 'permissions' | 'discovered' | 'started' | 'synced' | 'error'
+
+function ClusterSwitchOverlay({ progress, onCancel }: { progress: { stage: ClusterSwitchStage; message: string; resourceCount?: number }; onCancel: () => void }) {
+  const stages: Array<{ key: Exclude<ClusterSwitchStage, 'connecting' | 'error'>; label: string }> = [
+    { key: 'discovering', label: 'Discover resources' },
+    { key: 'permissions', label: 'Check access' },
+    { key: 'discovered', label: progress.resourceCount ? `${progress.resourceCount} resources found` : 'Resources found' },
+    { key: 'started', label: 'Informers started' },
+    { key: 'synced', label: 'Caches synced' },
+  ]
+  const order: ClusterSwitchStage[] = ['connecting', 'discovering', 'permissions', 'discovered', 'started', 'synced']
+  const currentIndex = order.indexOf(progress.stage)
+
+  return createPortal(
+    <div className="fixed inset-0 z-[1300] flex items-center justify-center bg-slate-950/35 backdrop-blur-sm p-4" role="dialog" aria-modal="true" aria-label="Switching cluster">
+      <section className="w-full max-w-sm border border-border/60 bg-card shadow-2xl">
+        <header className="flex items-center gap-2 border-b border-border/50 px-5 py-4">
+          <Loader2 size={15} className="animate-spin text-primary" />
+          <div className="min-w-0 flex-1">
+            <h2 className="text-sm font-semibold">Switching cluster</h2>
+            <p className="truncate text-[11px] text-muted-foreground">{progress.message || 'Preparing cluster connection...'}</p>
+          </div>
+          <button type="button" onClick={onCancel} className="lucid-control px-2.5 py-1 text-[11px] text-muted-foreground hover:text-foreground" title="Cancel cluster switch">
+            Cancel
+          </button>
+        </header>
+        <div className="space-y-3 px-5 py-5">
+          {stages.map(({ key, label }) => {
+            const stageIndex = order.indexOf(key)
+            const complete = stageIndex < currentIndex
+            const active = stageIndex === currentIndex
+            return (
+              <div key={key} className={`flex items-center gap-3 text-xs ${stageIndex > currentIndex ? 'text-muted-foreground/40' : 'text-foreground'}`}>
+                {complete ? <CheckCircle2 size={15} className="shrink-0 text-emerald-400" /> : active ? <Loader2 size={15} className="shrink-0 animate-spin text-primary" /> : <span className="h-[15px] w-[15px] shrink-0 rounded-full border border-border/70" />}
+                <span>{label}</span>
+              </div>
+            )
+          })}
+        </div>
+      </section>
+    </div>,
+    document.body,
+  )
+}
+
 // ── RootView ─────────────────────────────────────────────────────────────────
 
 function RootView() {
@@ -1507,11 +1570,16 @@ function RootView() {
   const [userRole] = useState<'admin' | 'user' | 'viewer'>('admin')
   const [informerStatus, setInformerStatus] = useState<{ started: boolean; synced: boolean; lastError?: string } | null>(null)
   const [isClusterSwitching, setIsClusterSwitching] = useState(false)
+  const [clusterSwitchProgress, setClusterSwitchProgress] = useState<{ stage: ClusterSwitchStage; message: string; resourceCount?: number }>({ stage: 'connecting', message: 'Preparing cluster connection...' })
   const informerReady = informerStatus?.started === true && informerStatus?.synced === true
-  const shouldShowInitPage = !isInitialized || currentPath === '/init' || (!informerReady && !isClusterSwitching)
+  // Latched once the cluster has synced. Without it, any transient dip in
+  // informer status (re-announced "started", a failed status poll) throws the
+  // user back to the init page mid-session.
+  const [informerEverReady, setInformerEverReady] = useState(false)
+  const shouldShowInitPage = !isInitialized || currentPath === '/init' || (!informerReady && !informerEverReady && !isClusterSwitching)
   const { context } = useKubernetesContext()
-  const { info: clusterInfo, appStats } = useClusterInfo(!shouldShowInitPage)
-  const { stats: podStats, error: podStatsError, isLoading: podStatsLoading } = usePodStats(!shouldShowInitPage)
+  const { info: clusterInfo, appStats } = useClusterInfo(!shouldShowInitPage && !isClusterSwitching)
+  const { stats: podStats, error: podStatsError, isLoading: podStatsLoading } = usePodStats(!shouldShowInitPage && !isClusterSwitching)
   const [pendingActionLabel] = useState<string | null>(null)
   const [pendingRequests, setPendingRequests] = useState(0)
   const [pendingRequestLabels, setPendingRequestLabels] = useState<string[]>([])
@@ -1560,7 +1628,7 @@ function RootView() {
     window.addEventListener(NETWORK_ACTIVITY_EVENT, onNetworkActivity as EventListener)
 
     window.fetch = (async (...args: Parameters<typeof fetch>) => {
-      const timeoutMs = resolveFetchTimeoutMs(args[0], DEFAULT_FETCH_TIMEOUT_MS)
+      const timeoutMs = resolveFetchTimeoutMs(args[0], args[1], DEFAULT_FETCH_TIMEOUT_MS)
       const fetchTask = () => fetchWithTimeout(originalFetch, args[0], args[1], timeoutMs)
       if (!shouldTrackPendingFetch(args[0], args[1])) {
         return await fetchTask()
@@ -1627,8 +1695,12 @@ function RootView() {
     const off = Events.On('informerProgress', (ev: unknown) => {
       const payload = (ev as { data?: { stage?: string; message?: string } })?.data
       if (!payload?.stage) return
+      const stage = payload.stage as ClusterSwitchStage
+      if (isClusterSwitching && stage !== 'error') {
+        setClusterSwitchProgress({ stage, message: payload.message ?? '', resourceCount: (payload as { resourceCount?: number }).resourceCount })
+      }
 
-      if (payload.stage === 'discovering' || payload.stage === 'discovered') {
+      if (payload.stage === 'discovering' || payload.stage === 'permissions' || payload.stage === 'discovered') {
         setInformerStatus((prev) => ({
           started: false,
           synced: false,
@@ -1638,7 +1710,13 @@ function RootView() {
       }
 
       if (payload.stage === 'started') {
-        setInformerStatus({ started: true, synced: false, lastError: '' })
+        // A re-announced "started" (e.g. "Already connected") must not clear an
+        // existing synced state, or the view bounces back to the init page.
+        setInformerStatus((prev) => ({
+          started: true,
+          synced: prev?.synced ?? false,
+          lastError: '',
+        }))
         return
       }
 
@@ -1649,17 +1727,28 @@ function RootView() {
       }
 
       if (payload.stage === 'error') {
+        if (isClusterSwitching) {
+          setIsInitialized(false)
+          setInformerEverReady(false)
+          window.history.pushState({}, '', '/init')
+          setCurrentPath('/init')
+        }
         setIsClusterSwitching(false)
         setInformerStatus({ started: false, synced: false, lastError: payload.message ?? 'informer error' })
       }
     })
     return () => { off?.() }
-  }, [])
+  }, [isClusterSwitching])
+
+  useEffect(() => {
+    if (informerReady) setInformerEverReady(true)
+  }, [informerReady])
 
   useEffect(() => {
     if (!isInitialized) {
       setIsClusterSwitching(false)
       setInformerStatus(null)
+      setInformerEverReady(false)
       return
     }
 
@@ -1715,7 +1804,7 @@ function RootView() {
   const navigateToResourceTarget = useCallback((target: AllocationNavigationTarget) => {
     const path = target.resource === 'pods' ? '/pods' : `/resources/${target.resource}`
     const params = new URLSearchParams()
-    if (target.namespace && target.namespace !== 'all') params.set('namespace', target.namespace)
+    if (target.namespace) params.set('namespace', target.namespace)
     if (target.name) params.set('q', target.name)
     if (target.statusFilter) params.set('filter', target.statusFilter)
     const query = params.toString()
@@ -1766,6 +1855,16 @@ function RootView() {
     }
     navigateTo('/')
   }
+
+  const handleCancelClusterSwitch = useCallback(() => {
+    setIsClusterSwitching(false)
+    setIsInitialized(false)
+    setInformerStatus(null)
+    setInformerEverReady(false)
+    window.history.pushState({}, '', '/init')
+    setCurrentPath('/init')
+    void DBDisconnectClusterConfig().catch(() => {})
+  }, [])
 
   if (shouldShowInitPage) {
     return (
@@ -1866,8 +1965,8 @@ function RootView() {
       }} onConnectFailed={() => {
         setIsClusterSwitching(false)
       }} />
-      <Sidebar userRole={userRole} health={sidebarHealth} currentPath={currentPath} onNavigate={(href) => navigateTo(href)} isClusterConnected={isInitialized} />
-      <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
+      {!isClusterSwitching && <Sidebar userRole={userRole} health={sidebarHealth} currentPath={currentPath} onNavigate={(href) => navigateTo(href)} isClusterConnected={isInitialized} />}
+      {!isClusterSwitching && <main className="flex-1 min-w-0 flex flex-col overflow-hidden">
         <AppChrome pageTitle={pageTitle} context={context} onSettings={() => setShowSettingsModal(true)} />
         {pageContent}
         <footer className="lucid-footer h-10 flex items-center justify-between px-6 text-[10px] text-muted-foreground font-mono overflow-hidden">
@@ -1902,7 +2001,8 @@ function RootView() {
             <span className="text-muted-foreground/50">© 2026 KubeGUI · v{productVersion}</span>
           </div>
         </footer>
-      </main>
+      </main>}
+      {isClusterSwitching && <ClusterSwitchOverlay progress={clusterSwitchProgress} onCancel={handleCancelClusterSwitch} />}
       <SettingsModal open={showSettingsModal} onClose={() => {
         setShowSettingsModal(false)
         if (currentPath === '/settings') {
@@ -2301,7 +2401,7 @@ function DashboardPage({
               <StatCard title="Total Pods" value={String(stats.total)} delta={`+${Math.max(0, stats.total - 236)}`} icon={<Boxes size={32} />} deltaClass="text-emerald-400" percent={Math.min(100, Math.round((stats.total / Math.max(1, stats.total)) * 100))} barColor="bg-primary" />
               <StatCard title="Healthy" value={String(stats.healthy)} delta={`${Math.round((stats.healthy / Math.max(1, stats.total)) * 100)}% UP`} icon={<CheckCircle2 size={32} />} deltaClass="text-muted-foreground" iconClass="text-emerald-400" percent={Math.round((stats.healthy / Math.max(1, stats.total)) * 100)} barColor="bg-emerald-400" />
               <StatCard title="Warnings" value={String(stats.warnings)} delta={stats.total > 0 ? `${Math.round((stats.warnings / stats.total) * 100)}% of pods` : '—'} icon={<TriangleAlert size={32} />} deltaClass="text-amber-400/80" iconClass="text-amber-400" percent={stats.total > 0 ? Math.round((stats.warnings / stats.total) * 100) : 0} barColor="bg-amber-400" onClick={() => onNavigateToResource({ resource: 'pods', namespace: 'all', name: '', statusFilter: 'warnings' })} />
-              <StatCard title="Failed" value={String(stats.failed)} delta={stats.total > 0 ? `${Math.round((stats.failed / stats.total) * 100)}% of pods` : '—'} icon={<XCircle size={32} />} deltaClass="text-red-400/80" iconClass="text-red-400" percent={stats.total > 0 ? Math.round((stats.failed / stats.total) * 100) : 0} barColor="bg-red-400" />
+              <StatCard title="Failed" value={String(stats.failed)} delta={stats.total > 0 ? `${Math.round((stats.failed / stats.total) * 100)}% of pods` : '—'} icon={<XCircle size={32} />} deltaClass="text-red-400/80" iconClass="text-red-400" percent={stats.total > 0 ? Math.round((stats.failed / stats.total) * 100) : 0} barColor="bg-red-400" onClick={() => onNavigateToResource({ resource: 'pods', namespace: 'all', name: '', statusFilter: 'failed' })} />
             </div>
             )}
             {statsError && <div className="text-sm text-red-400 mt-1">Stats error: {statsError}</div>}
@@ -3027,7 +3127,7 @@ function PodsPage() {
   const [items, setItems] = useState<PodRow[]>([])
   const [error, setError] = useState<string | null>(null)
   const [globalFilter, setGlobalFilter] = useState(navigationFilter.query)
-  const [selectedNamespace, setSelectedNamespace] = usePersistentState('pods:namespace', navigationFilter.namespace || 'all')
+  const [selectedNamespace, setSelectedNamespace] = usePersistentState(NAMESPACE_STORAGE_KEY, navigationFilter.namespace || 'all')
   const { namespaces: namespaceList } = useNamespaceOptions()
   const namespaces = useMemo(() => ['all', ...namespaceList], [namespaceList])
   const [loading, setLoading] = useState(false)
@@ -3706,7 +3806,7 @@ function InformerResourcePage({ resource }: { resource: string }) {
   const navigationFilter = useMemo(() => readNavigationFilterFromUrl(), [])
   const urlFilterHydratedRef = useRef(false)
   const [globalFilter, setGlobalFilter] = useState(navigationFilter.query)
-  const [selectedNamespace, setSelectedNamespace] = usePersistentState(`resources:${resource}:namespace`, navigationFilter.namespace || 'all')
+  const [selectedNamespace, setSelectedNamespace] = usePersistentState(NAMESPACE_STORAGE_KEY, navigationFilter.namespace || 'all')
   const [streamError, setStreamError] = useState<string | null>(null)
   const [selectedRows, setSelectedRows] = useState<Row[]>([])
   const [bulkDeleteBusy, setBulkDeleteBusy] = useState(false)

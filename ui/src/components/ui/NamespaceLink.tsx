@@ -39,7 +39,7 @@ export function NamespaceLink({ namespace, targetResource, className = '', onSel
     <button
       type="button"
       onClick={handleClick}
-      className={`inline-flex items-center cursor-pointer bg-transparent border-0 p-0 font-inherit text-inherit underline decoration-dashed underline-offset-3 hover:opacity-70 transition-opacity ${className}`}
+      className={`inline-flex items-center cursor-pointer bg-transparent border-0 p-0 font-inherit text-inherit underline decoration-dotted underline-offset-3 hover:opacity-70 transition-opacity ${className}`}
       title={title}
     >
       {namespace}

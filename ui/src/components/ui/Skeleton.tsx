@@ -188,3 +188,25 @@ export function ContextCardsSkeleton({ count = 4 }: { count?: number }) {
     </div>
   )
 }
+
+/** Context list row skeleton for the InitPage */
+export function ContextRowSkeleton() {
+  return (
+    <div className="lucid-panel rounded-lg px-3.5 py-2.5 flex items-center gap-3">
+      <Skeleton className="w-6 h-6 rounded-md shrink-0" />
+      <Skeleton className="h-3 w-1/4" />
+      <Skeleton className="h-2 w-1/5" />
+      <Skeleton className="h-2 w-1/6" />
+      <Skeleton className="h-4 w-8 rounded-full ml-auto" />
+    </div>
+  )
+}
+
+/** List of context row skeletons */
+export function ContextListSkeleton({ count = 4 }: { count?: number }) {
+  return (
+    <div className="flex flex-col gap-2">
+      {Array.from({ length: count }).map((_, i) => <ContextRowSkeleton key={i} />)}
+    </div>
+  )
+}

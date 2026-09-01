@@ -10,7 +10,7 @@ import { configureAceYamlEditor } from '@/lib/aceEditorConfig'
 import { ConfirmDialog } from './Button'
 import { podOverviewFields } from '../../features/resources/resourceOverview'
 import { ResourceManifestOverview } from './ResourceManifestOverview'
-import { LabelsSection, AnnotationsSection, EventsTimeline } from './ResourceManifestOverview'
+import { LabelsSection, AnnotationsSection, EventsTimeline, EnvSecretsSection, extractWorkloadContainers } from './ResourceManifestOverview'
 import { PortForwardBadges } from './PortForwardBadges'
 import { BackendEventSource } from '../../lib/wailsBackendTransport'
 import { Events } from '@wailsio/runtime'
@@ -281,6 +281,7 @@ function OverviewTab({ pod }: { pod: PodRow }) {
         <PortForwardBadges namespace={pod.namespace} podName={pod.name} ports={containerPorts} />
       )}
 
+      {resource && <EnvSecretsSection containers={extractWorkloadContainers(resource, 'pods')} namespace={pod.namespace} />}
       {resource && <LabelsSection resource={resource} />}
       {resource && <AnnotationsSection resource={resource} />}
     </div>
