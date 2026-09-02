@@ -74,6 +74,6 @@ jobs:
         with:
           tag_name: ${{ env.VERSION }}
           name: ${{ env.VERSION }}
-          generate_release_notes: true
+          generate_release_notes: false
           files: |
             ${{ github.workspace }}/.bin/*.zip
