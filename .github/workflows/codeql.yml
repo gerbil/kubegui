@@ -23,6 +23,9 @@ on:
 permissions:
   contents: read
 
+env:
+  GOEXPERIMENT: jsonv2
+
 jobs:
   analyze:
     name: Analyze

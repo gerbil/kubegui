@@ -6,6 +6,9 @@ on:
 permissions:
   contents: write
 
+env:
+  GOEXPERIMENT: jsonv2
+
 jobs:
   winlinx:
     runs-on: ubuntu-latest
