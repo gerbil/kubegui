@@ -17,7 +17,7 @@ require (
 	github.com/stretchr/testify v1.12.1
 	github.com/wailsapp/wails/v3 v3.0.0-beta.16
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
-	helm.sh/helm/v3 v3.21.4
+	helm.sh/helm/v4 v4.2.4
 	helm.sh/helm/v4 v4.2.4
 	k8s.io/api v0.37.0
 	k8s.io/apiextensions-apiserver v0.37.0
