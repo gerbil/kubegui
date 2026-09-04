@@ -10,7 +10,7 @@ require (
 	github.com/creativeprojects/go-selfupdate v1.6.0
 	github.com/go-logr/logr v1.4.4
 	github.com/golang-migrate/migrate/v4 v4.19.1
-	github.com/google/go-containerregistry v0.22.0
+	github.com/google/go-containerregistry v0.22.1
 	github.com/gorilla/websocket v1.5.4-0.20250319132907-e064f32e3674
 	github.com/matryer/runner v0.0.0-20211213160944-9f99df82ff29
 	github.com/samber/slog-multi v1.8.0
