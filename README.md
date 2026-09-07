@@ -25,9 +25,10 @@ Official website - https://kubegui.net
 > - Trivy cve scans (ondemand)
 > - Application auto update based on newer version from Github
 > - Helm respos+charts and releases (views)
+> - AI suggestions for issues/errors/warnings/etc
 
 # TODO:
-- AI suggestions for issues/errors/warnings/etc
+
 - ArgoCD rollout/apps flow view
 
 ## Scope:
