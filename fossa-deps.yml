@@ -1,0 +1,106 @@
+# Manually declared npm dependencies for the Wails frontend.
+#
+# Section 1 — Production npm deps (bundled by Vite into the binary).
+#   Auto-target for ui/ is disabled in .fossa.yml to exclude build-only
+#   devDependencies (e.g. vite → lightningcss MPL-2.0).
+#   Keep in sync with ui/package.json "dependencies".
+#
+# Section 2 — Vendored JS assets (ui/public/assets/js/).
+#   These files are loaded at runtime as legacy scripts (not bundled by Vite)
+#   and are embedded in the Go binary by Wails. FOSSA cannot parse minified
+#   single-line bundles, so they are declared here explicitly.
+#   The assets/ path is excluded from FOSSA path scanning in .fossa.yml.
+referenced-dependencies:
+  - type: npm
+    name: "@mantine/core"
+    version: 8.3.18
+  - type: npm
+    name: "@mantine/hooks"
+    version: 8.3.18
+  - type: npm
+    name: "@reduxjs/toolkit"
+    version: 2.11.2
+  - type: npm
+    name: "@tanstack/react-query"
+    version: 5.100.14
+  - type: npm
+    name: "@tanstack/react-table"
+    version: 8.21.3
+  - type: npm
+    name: "@tanstack/react-virtual"
+    version: 3.13.24
+  - type: npm
+    name: "@wailsio/runtime"
+    version: 3.0.0-alpha.79
+  - type: npm
+    name: choices.js
+    version: 10.2.0
+  - type: npm
+    name: clsx
+    version: 2.1.1
+  - type: npm
+    name: cronstrue
+    version: 3.24.0
+  - type: npm
+    name: lucide-react
+    version: 1.8.0
+  - type: npm
+    name: notyf
+    version: 3.10.0
+  - type: npm
+    name: react
+    version: 18.3.1
+  - type: npm
+    name: react-dom
+    version: 18.3.1
+  - type: npm
+    name: react-redux
+    version: 9.2.0
+  - type: npm
+    name: tailwind-merge
+    version: 3.6.0
+  - type: npm
+    name: zustand
+    version: 5.0.14
+
+# ── Vendored JS assets (ui/public/assets/js/) ─────────────────────────────
+# Versions confirmed from file headers; update when files are replaced.
+  - type: npm
+    name: ace-builds           # ace.js + themes + extensions
+    version: 1.41.0
+  - type: npm
+    name: jquery
+    version: 3.7.1
+  - type: npm
+    name: js-yaml
+    version: 4.1.0
+  - type: npm
+    name: choices.js           # legacy v9 copy in public/assets (distinct from npm v10)
+    version: 9.0.1
+  - type: npm
+    name: xterm                # xterm.js terminal emulator
+    version: 5.3.0
+  - type: npm
+    name: xterm-addon-fit
+    version: 0.8.0
+  - type: npm
+    name: xterm-addon-clipboard
+    version: 0.1.0
+
+# ── highlight.js — partial use declaration ───────────────────────────────
+# The full highlight.js npm package bundles CC BY-SA 4.0 themes (nnfx-dark/
+# nnfx-light) alongside BSD-3-Clause code. Only the following BSD-3-Clause
+# sub-paths are imported by the app:
+#   highlight.js/lib/core, /lib/languages/{json,bash,yaml,accesslog},
+#   /styles/atom-one-dark.css
+# The CC BY-SA themes are never imported or distributed.
+custom-dependencies:
+  - name: highlight.js
+    version: 11.11.1
+    license: BSD-3-Clause
+    metadata:
+      homepage: https://highlightjs.org
+      description: >
+        Only core + json/bash/yaml/accesslog languages + atom-one-dark theme
+        are imported. The CC BY-SA 4.0 nnfx-dark/nnfx-light themes bundled
+        in the npm package are not used or distributed.

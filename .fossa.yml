@@ -1,0 +1,29 @@
+version: 3
+
+project:
+  name: kubegui
+  url: https://github.com/gerbil/kubegui
+
+# Exclude paths that are only used during development/testing and
+# are not part of the distributed binary.
+paths:
+  exclude:
+    # Static marketing/docs site — not part of the distributed app
+    - web
+    # Test fixtures and generated bindings
+    - "**/testdata/**"
+    - ui/bindings
+    # Vendored JS assets — declared explicitly in fossa-deps.yml below.
+    # FOSSA cannot detect licenses from minified single-file bundles.
+    - ui/public/assets
+    - ui/public/build
+
+# Disable automatic npm detection for the ui/ directory.
+# Production-only npm dependencies are declared explicitly in fossa-deps.yml
+# to avoid including build-time-only devDependencies (e.g. vite → lightningcss MPL-2.0).
+targets:
+  exclude:
+    - type: npm
+      path: ui
+    - type: yarn
+      path: ui

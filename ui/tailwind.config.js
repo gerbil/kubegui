@@ -1,0 +1,80 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  darkMode: 'class',
+  content: ['./index.html', './src/**/*.{ts,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        border: 'rgb(from var(--border) r g b / <alpha-value>)',
+        background: 'rgb(from var(--background) r g b / <alpha-value>)',
+        foreground: 'rgb(from var(--foreground) r g b / <alpha-value>)',
+        tertiary: 'rgb(from var(--tertiary) r g b / <alpha-value>)',
+        outline: 'rgb(from var(--outline) r g b / <alpha-value>)',
+        'outline-variant': 'rgb(from var(--outline-variant) r g b / <alpha-value>)',
+        'on-surface': 'rgb(from var(--on-surface) r g b / <alpha-value>)',
+        'on-surface-variant': 'rgb(from var(--on-surface-variant) r g b / <alpha-value>)',
+        'surface-container-lowest': 'rgb(from var(--surface-container-lowest) r g b / <alpha-value>)',
+        'surface-container-low': 'rgb(from var(--surface-container-low) r g b / <alpha-value>)',
+        'surface-container': 'rgb(from var(--surface-container) r g b / <alpha-value>)',
+        'surface-container-high': 'rgb(from var(--surface-container-high) r g b / <alpha-value>)',
+        'surface-container-highest': 'rgb(from var(--surface-container-highest) r g b / <alpha-value>)',
+        'surface-bright': 'rgb(from var(--surface-bright) r g b / <alpha-value>)',
+        muted: {
+          DEFAULT: 'rgb(from var(--muted) r g b / <alpha-value>)',
+          foreground: 'rgb(from var(--muted-foreground) r g b / <alpha-value>)',
+        },
+        accent: {
+          DEFAULT: 'rgb(from var(--accent) r g b / <alpha-value>)',
+          foreground: 'rgb(from var(--accent-foreground) r g b / <alpha-value>)',
+        },
+        primary: {
+          DEFAULT: 'rgb(from var(--primary) r g b / <alpha-value>)',
+          foreground: 'rgb(from var(--primary-foreground) r g b / <alpha-value>)',
+        },
+        'primary-container': 'rgb(from var(--primary-container) r g b / <alpha-value>)',
+        'on-primary': 'rgb(from var(--on-primary) r g b / <alpha-value>)',
+        'on-primary-container': 'rgb(from var(--on-primary-container) r g b / <alpha-value>)',
+        card: {
+          DEFAULT: 'rgb(from var(--card) r g b / <alpha-value>)',
+          foreground: 'rgb(from var(--card-foreground) r g b / <alpha-value>)',
+        },
+        destructive: {
+          DEFAULT: 'rgb(from var(--destructive) r g b / <alpha-value>)',
+          foreground: 'rgb(from var(--destructive-foreground) r g b / <alpha-value>)',
+        },
+      },
+      fontFamily: {
+        sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
+        headline: ['Space Grotesk', 'system-ui', 'sans-serif'],
+        label: ['Space Grotesk', 'system-ui', 'sans-serif'],
+        mono: ['Space Grotesk', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+      },
+      fontWeight: {
+        light: '300',
+        normal: '300',
+        medium: '400',
+        semibold: '400',
+        bold: '500',
+        extrabold: '500',
+      },
+      backdropBlur: {
+        xs: '2px',
+        sm: '4px',
+        DEFAULT: '8px',
+        md: '12px',
+        lg: '14px',
+        xl: '16px',
+        '2xl': '20px',
+      },
+      backdropSaturate: {
+        75: '0.75',
+        100: '1',
+        125: '1.25',
+        130: '1.3',
+        135: '1.35',
+        150: '1.5',
+      },
+    },
+  },
+  plugins: [],
+}

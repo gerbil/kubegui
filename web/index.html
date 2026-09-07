@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="shortcut icon" href="./archive/assets/images/favicon.ico">
+  <title>KubeGUI - Kubernetes Management, Reimagined</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="initial-scale=1, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="Kubernetes UI / admin desktop application for Devops, SRE and platform engineers.">
+  <meta name="og:title" content="KubeGUI - Kubernetes admin desktop application">
+  <meta name="og:description" content="Kubernetes UI / admin desktop application for Devops, SRE and platform engineers.">
+  <meta name="og:image" content="https://kubegui.net/archive/assets/images/big.png">
+  <meta name="og:type" content="website">
+  <meta name="og:site_name" content="KubeGUI">
+  <meta property="og:locale" content="en_US" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/@simondmc/popup-js@1.4.2/popup.min.js"></script>
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "KubeGUI",
+      "operatingSystem": "Windows,Macos,Linux",
+      "applicationCategory": "DeveloperApplication",
+      "author": {
+        "@type": "Person",
+        "name": "Jurijs Kobecs"
+      }
+    }
+  </script>
+</head>
+<body>
+<!-- Aurora Background -->
+<div class="aurora-bg"></div>
+
+<!-- Floating Particles -->
+<div class="particles">
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+  <div class="particle"></div>
+</div>
+
+<!-- Grid Overlay -->
+<div class="grid-overlay"></div>
+
+<!-- Main Content -->
+<div class="content">
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="logo-title">
+        <img src="./images/appicon.png" height="32px"/>
+        <h2>KubeGUI</h2>
+      </div>
+
+      <h1 class="hero-title">
+        Kubernetes Management,<br>
+        <span class="gradient-text">Reimagined.</span>
+      </h1>
+
+      <p class="hero-subtitle">
+        The air-gap ready desktop client for DevOps professionals.<br>
+        No dependencies. Minimalistic. Pure performance.
+      </p>
+
+      <!-- App Preview -->
+      <div class="app-preview fade-in">
+        <img src="images/kubegui.png" alt="KubeGUI Interface" class="preview-image"
+             style="image-rendering: auto;-webkit-font-smoothing: antialiased;-webkit-transform: translateZ(0);transform: translateZ(0);" />
+      </div>
+
+      <div class="hero-buttons">
+        <a href="#download">
+          <button class="btn-primary" data-testid="download-btn">
+            <span><img src="images/download.png" height="24"/></span> Download Now
+          </button>
+        </a>
+        <a href="https://github.com/gerbil/kubegui/" target="_blank">
+          <button class="btn-secondary" data-testid="github-btn">
+            <span><img src="images/github.png" height="24"/></span> View on GitHub
+          </button>
+        </a>
+      </div>
+
+      <div class="badge">
+        <span class="badge-dot"></span>
+        Free for personal and commercial usage
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="section" id="features">
+    <div class="container">
+      <h2 class="section-title">Built for Performance</h2>
+
+      <div class="features-grid"></div>
+    </div>
+  </section>
+
+  <!-- Unique Features -->
+  <section class="section" id="unique-features">
+    <div class="container">
+      <h2 class="section-title">Unique Features</h2>
+      <p class="section-subtitle">KubeGUI super powers provided out-of-the-box</p>
+
+      <div class="unique-grid"></div>
+    </div>
+  </section>
+
+  <!-- Roadmap -->
+  <section class="section" id="roadmap">
+    <div class="container">
+      <h2 class="section-title">Roadmap</h2>
+      <p class="section-subtitle">Our journey to build the ultimate Kubernetes desktop client</p>
+
+      <div class="roadmap-container"></div>
+    </div>
+  </section>
+
+  <!-- Download Section -->
+  <section class="section download-section" id="download">
+    <div class="container">
+      <h2 class="section-title">Download for Your Platform</h2>
+
+      <div class="download-grid">
+        <button onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-windows-x86_64.zip', '_blank');"
+                title="By downloading app, you agree with our terms and conditions"
+                class="os-button"
+                data-testid="download-windows-btn">
+          <span class="os-icon"><img src="images/windows.png" /></span>
+          <span class="os-name">Windows</span>
+          <span class="os-version"><span class="text-xs release-version">(v2.2.0)</span></span>
+        </button>
+
+        <button onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-linux_amd64.zip', '_blank');"
+                title="By downloading app, you agree with our terms and conditions"
+                class="os-button"
+                data-testid="download-linux-btn">
+          <span class="os-icon"><img src="images/linux.png" /></span>
+          <span class="os-name">Linux</span>
+          <span class="os-version"><span class="text-xs release-version">(v2.2.0)</span></span>
+        </button>
+
+        <button onclick="window.open('https://github.com/gerbil/kubegui/releases/latest/download/kubegui-macos.zip', '_blank');"
+                class="os-button"
+                data-testid="download-mac-btn">
+          <span class="os-icon"><img src="images/apple.png" /></span>
+          <span class="os-name">macOS</span>
+          <span class="os-version"><span class="text-xs release-version">(v2.2.0)</span></span>
+        </button>
+      </div>
+
+      <div style="display: flex; justify-content: center; align-items: center;">
+        <div onclick="popup.show();"
+             class="text-center mt-2"
+             style="color: #8994a9; cursor: pointer; text-decoration:underline; text-decoration-style: dotted;">
+          Terms &amp; Conditions
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>
+
+<script>
+  const popup = new Popup({
+    id: "disclaimer",
+    title: "",
+    content:
+      "Original author: Jurijs Kobecs" +
+      "No rights reserved. Redistribution in source and binary forms, with or without modification - is fully permitted!\n" +
+      "BUT, THIS SOFTWARE IS PROVIDED BY THE CONTRIBUTORS 'AS IS' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL JURIJS KOBECS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.",
+    sideMargin: "1.9vw",
+    titleColor: "#fff",
+    textColor: "#fff",
+    backgroundColor: "#3d4086",
+    closeColor: "#fff",
+    fontSizeMultiplier: 0.6,
+    linkColor: "#4e95de",
+    font: "Poppins",
+    css: `
+      .popup {
+        background-color: transparent !important;
+      }
+      .popup-title {
+        background-color: transparent !important;
+        font-weight: 200 !important;
+        font-size: min(35px, 11vw);
+      }
+      .popup.disclaimer .popup-header {
+        margin-bottom: 0% !important;
+      }`
+  });
+</script>

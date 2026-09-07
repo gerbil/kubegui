@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "skipLibCheck": true,
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "noEmit": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "paths": { "@/*": ["./src/*"] },
+    "types": ["vite/client"]
+  },
+  "include": ["src/components/ui/AiAssistModal.tsx", "src/components/ui/Markdown.tsx"]
+}

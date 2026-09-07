@@ -1,0 +1,10 @@
+apiVersion: storage.k8s.io/v1
+kind: VolumeAttachment
+metadata:
+  name: my-volumeattachment
+spec:
+  attacher: kubernetes.io/no-provisioner
+  source:
+    persistentVolumeName: my-pv
+  nodeName: my-node
+

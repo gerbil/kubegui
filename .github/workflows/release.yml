@@ -1,0 +1,79 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+env:
+  GOEXPERIMENT: jsonv2
+
+jobs:
+  winlinx:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Harden the runner (Audit all outbound calls)
+        uses: step-security/harden-runner@e14015d583714f6e62063499dc959a02595150a1 # v2.21.1
+        with:
+          egress-policy: audit
+
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Go
+        uses: actions/setup-go@b7ad1dad31e06c5925ef5d2fc7ad053ef454303e # v7.0.0
+        with:
+          go-version: '1.26.3'
+
+      - name: Deps
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --fix-missing \
+            build-essential \
+            jq \
+            libgtk-4-dev \
+            libwebkitgtk-6.0-dev
+
+      - name: Install Wails v3
+        run: |
+          go install github.com/wailsapp/wails/v3/cmd/wails3@latest
+          echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
+
+      - name: Run wails doctor
+        run: wails3 doctor
+
+      - name: Build Windows
+        run: |
+          go mod tidy
+          wails3 task build:windows:prod
+
+      - name: Build Linux
+        run: |
+          wails3 task build:linux
+
+      - name: Get version
+        run: |
+          VERSION=$(jq -r '.info."0000".ProductVersion' build/info.json)
+          echo "VERSION=v$VERSION" >> "$GITHUB_ENV"
+
+      - name: Archive Windows
+        run: |
+          cd .bin
+          zip kubegui-windows-x86_64.zip kubegui.exe
+
+      - name: Archive Linux
+        run: |
+          cd .bin
+          zip kubegui-linux-amd64.zip kubegui
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@efb35369e0ad2afab669f228072c1b0d510eae64 # v3.0.3
+        env:
+          VERSION: ${{ env.VERSION }}
+        with:
+          tag_name: ${{ env.VERSION }}
+          name: ${{ env.VERSION }}
+          generate_release_notes: false
+          files: |
+            ${{ github.workspace }}/.bin/*.zip

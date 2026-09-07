@@ -1,0 +1,20 @@
+# Ignore all folders starting with a dot
+.*/
+
+# But keep some specific dotfolders
+!.gitignore
+!.github
+
+.editorconfig
+
+/tmp/
+/.bin/
+
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.db
+.DS_Store
+ bin/.DS_Store

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/x-icon" href="/build/icon.ico" />
+    <link rel="apple-touch-icon" href="/build/appicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>KubeGUI</title>
+    <style>
+      /* Splash screen shown while React boots up — prevents grey/blank flash on Windows */
+      html { height: 100%; background: #0d1117; }
+      body { height: 100%; margin: 0; }
+      #root { display: flex; align-items: center; justify-content: center; height: 100%; }
+      #splash { display: flex; align-items: center; justify-content: center; }
+      /* Keep icon at 64px wide, preserve original 510x486 ratio */
+      #splash img { width: 64px; height: auto; opacity: 0.6; animation: pulse 1.5s ease-in-out infinite; }
+      @keyframes pulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 0.8; } }
+    </style>
+  </head>
+  <body>
+    <div id="root">
+      <!-- Splash screen shown while React boots up to prevent grey/blank flash -->
+      <div id="splash">
+        <img src="/build/appicon.png" alt="KubeGUI" />
+      </div>
+    </div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
