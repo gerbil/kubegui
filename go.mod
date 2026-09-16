@@ -17,7 +17,8 @@ require (
 	github.com/stretchr/testify v1.12.1
 	github.com/wailsapp/wails/v3 v3.0.0-beta.16
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
-	helm.sh/helm/v3 v3.21.4
+	helm.sh/helm/v3 v3.22.0
+	helm.sh/helm/v4 v4.2.4
 	k8s.io/api v0.37.0
 	k8s.io/apiextensions-apiserver v0.37.0
 	k8s.io/apimachinery v0.37.0
@@ -258,7 +259,7 @@ require (
 	github.com/rust-secure-code/go-rustaudit v0.0.0-20250226111315-e20ec32e963c // indirect
 	github.com/samber/oops v1.18.1 // indirect
 	github.com/samber/slog-common v0.21.0 // indirect
-	github.com/santhosh-tekuri/jsonschema/v6 v6.0.2 // indirect
+	github.com/santhosh-tekuri/jsonschema/v6 v6.0.3 // indirect
 	github.com/sassoftware/go-rpmutils v0.4.0 // indirect
 	github.com/secure-systems-lab/go-securesystemslib v0.11.0 // indirect
 	github.com/segmentio/asm v1.2.1 // indirect
@@ -324,11 +325,10 @@ require (
 	gopkg.in/ini.v1 v1.67.3 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
-	helm.sh/helm/v4 v4.2.4 // indirect
 	k8s.io/apiserver v0.37.0 // indirect
-	k8s.io/cli-runtime v0.36.3 // indirect
+	k8s.io/cli-runtime v0.37.0 // indirect
 	k8s.io/component-base v0.37.0 // indirect
-	k8s.io/kubectl v0.36.3 // indirect
+	k8s.io/kubectl v0.37.0 // indirect
 	k8s.io/streaming v0.37.0 // indirect
 	mvdan.cc/sh/v3 v3.12.0 // indirect
 	oras.land/oras-go/v2 v2.6.2 // indirect
