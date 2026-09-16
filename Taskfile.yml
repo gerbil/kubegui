@@ -144,7 +144,7 @@ tasks:
     summary: Cleanup
     cmds:
       - rm -f wails.syso
-      - rm -rf .{{.BIN_DIR}}/*
+      - rm -rf {{.BIN_DIR}}/*
 
   build:mac:prod:arm64:
     summary: Creates a production build for ARM64
