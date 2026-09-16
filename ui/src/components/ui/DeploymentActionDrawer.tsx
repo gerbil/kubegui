@@ -195,14 +195,20 @@ const LOG_LEVEL_COLORS: Record<string, string> = {
   TRACE:    '#94a3b8',
 }
 
-function decodeHtmlEntities(s: string): string {
-  const decoded = s
-    .replace(/&amp;/gi, '&')
-    .replace(/&lt;/gi, '<')
-    .replace(/&gt;/gi, '>')
-    .replace(/&quot;/gi, '"')
-    .replace(/&apos;/gi, "'")
-    .replace(/&#39;/gi, "'")
+function decodeHtmlEntities(value: string): string {
+  let decoded = value
+  // Decode twice to handle payloads that arrive escaped as &amp;#34;.
+  for (let i = 0; i < 2; i += 1) {
+    decoded = decoded
+      .replace(/&amp;/gi, '&')
+      .replace(/&lt;/gi, '<')
+      .replace(/&gt;/gi, '>')
+      .replace(/&quot;/gi, '"')
+      .replace(/&apos;/gi, "'")
+      .replace(/&#39;/gi, "'")
+      .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) => String.fromCodePoint(Number.parseInt(hex, 16)))
+      .replace(/&#(\d+);/g, (_, dec: string) => String.fromCodePoint(Number.parseInt(dec, 10)))
+  }
   return decoded.replace(/\t/g, '  ')
 }
 
