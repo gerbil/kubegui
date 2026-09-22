@@ -56,11 +56,11 @@ func Update(version string) (err error) {
 	}
 
 	if latest.LessOrEqual(version) {
-		logger.Logger.Info("Current version is the", "latest", version)
+		logger.Logger.Info("Latest version available", "version", version)
 		return nil
 	}
 
-	logger.Logger.Info("Current version is not the latest, updating to", "version", latest.Version())
+	logger.Logger.Info("Newer version available; updating", "version", latest.Version())
 
 	if latest.AssetURL == "" {
 		logger.Logger.Warn("no downloadable asset for this platform",

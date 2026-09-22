@@ -1,6 +1,7 @@
 package services
 
 import (
+	"bufio"
 	"context"
 	"encoding/base64"
 	"encoding/json"
@@ -315,6 +316,56 @@ func (s *Backend) LogsGetDeployment(namespace, name string) ([]string, error) {
 }
 func (s *Backend) LogsGetCluster(limit int) (any, error) { return events.GetClusterLogs(limit) }
 
+// AppGetLogFilePath returns the path to the app's own log file on disk.
+func (s *Backend) AppGetLogFilePath() (string, error) {
+	if local.AppDataDir == "" {
+		return "", errors.New("app data directory is not initialized")
+	}
+	return filepath.Join(local.AppDataDir, "kubegui.log"), nil
+}
+
+// AppGetLogs returns the last maxLines lines of the app's own log file.
+func (s *Backend) AppGetLogs(maxLines int) (string, error) {
+	if maxLines <= 0 {
+		maxLines = 500
+	}
+	path, err := s.AppGetLogFilePath()
+	if err != nil {
+		return "", err
+	}
+	f, err := os.Open(path)
+	if err != nil {
+		if os.IsNotExist(err) {
+			return "", nil
+		}
+		return "", err
+	}
+	defer f.Close()
+
+	lines := make([]string, 0, maxLines)
+	scanner := bufio.NewScanner(f)
+	scanner.Buffer(make([]byte, 0, 64*1024), 1024*1024)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+		if len(lines) > maxLines {
+			lines = lines[1:]
+		}
+	}
+	if err := scanner.Err(); err != nil {
+		return "", err
+	}
+	return strings.Join(lines, "\n"), nil
+}
+
+// AppRevealLogFile opens the folder containing the log file in the OS file manager.
+func (s *Backend) AppRevealLogFile() error {
+	if local.AppDataDir == "" {
+		return errors.New("app data directory is not initialized")
+	}
+	application.Get().Browser.OpenURL("file://" + local.AppDataDir)
+	return nil
+}
+
 // --- events ---
 func (s *Backend) EventsGetNamespace(namespace string, limit int) (any, error) {
 	return events.GetNamespaceEvents(namespace, limit)
@@ -399,6 +450,7 @@ func (s *Backend) ResourceAdd(resource, objectJSON string) (map[string]any, erro
 	}
 	return created.Object, nil
 }
+
 // NetworkPolicyGetGraph returns a react-flow compatible graph for a NetworkPolicy.
 func (s *Backend) NetworkPolicyGetGraph(namespace, name string) (networkpolicies.Graph, error) {
 	raw, err := std.GetResource("networkpolicies", namespace, name)

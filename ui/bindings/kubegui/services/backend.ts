@@ -70,6 +70,20 @@ export function AppConfigPickClusterIcon(context: string, filename: string): $Ca
     return $Call.ByID(1300389295, context, filename);
 }
 
+/**
+ * AppGetLogFilePath returns the path to the app's own log file on disk.
+ */
+export function AppGetLogFilePath(): $CancellablePromise<string> {
+    return $Call.ByID(244490980);
+}
+
+/**
+ * AppGetLogs returns the last maxLines lines of the app's own log file.
+ */
+export function AppGetLogs(maxLines: number): $CancellablePromise<string> {
+    return $Call.ByID(4060290434, maxLines);
+}
+
 export function AppGetMyPermissions(ns: string): $CancellablePromise<cani$0.CanIResourceRow[]> {
     return $Call.ByID(1238686409, ns).then(($result: any) => {
         return $$createType4($result);
@@ -84,6 +98,13 @@ export function AppGetStats(): $CancellablePromise<app$0.AppStats> {
 
 export function AppGetVersion(): $CancellablePromise<string> {
     return $Call.ByID(3886070275);
+}
+
+/**
+ * AppRevealLogFile opens the folder containing the log file in the OS file manager.
+ */
+export function AppRevealLogFile(): $CancellablePromise<void> {
+    return $Call.ByID(3255251710);
 }
 
 /**

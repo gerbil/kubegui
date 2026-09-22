@@ -261,7 +261,7 @@ tasks:
       - "ui/bindings/**/*"
     cmds:
       # For a complete list of options, run `wails3 generate bindings -help`
-      - wails3 generate bindings ./... -ts -d ui/bindings
+      - wails3 generate bindings . ./bin/... ./build/... ./internal/... ./services/... -ts -d ui/bindings
 
   install:frontend:deps:
     summary: Install frontend dependencies
@@ -281,6 +281,8 @@ tasks:
 
   build:frontend:
     summary: Builds the frontend for production
+    deps:
+      - task: generate:bindings
     dir: ui
     sources:
       - "src/**/*"

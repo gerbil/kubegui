@@ -18,3 +18,4 @@
 *.db
 .DS_Store
  bin/.DS_Store
+/desktop

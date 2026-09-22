@@ -43,6 +43,9 @@ import { InitPage } from './components/pages/InitPage'
 import {
   AppConfigPickClusterIcon,
   AppGetVersion,
+  AppGetLogs,
+  AppGetLogFilePath,
+  AppRevealLogFile,
   DBGetClusterConfigs,
   DBGetActiveClusterConfig,
   DBMakeClusterConfigActive,
@@ -1222,7 +1225,39 @@ function applyFontSettings(settings: FontSettings) {
   document.body.style.fontFamily            = `'${settings.family}', ${fontFamily.fallback}`
 }
 
-type SettingsTab = 'appearance' | 'security' | 'ai'
+type SettingsTab = 'appearance' | 'security' | 'ai' | 'logs'
+
+// Matches the app's own slog logfmt output, e.g.:
+//   time=2025-09-21T10:00:00.000-04:00 level=INFO msg="using informer" component=deployments
+// Highlights the level word, every `key=` field name, and quoted/error values.
+const APP_LOG_TOKEN_RE = /\b(?:DEBUG|INFO|WARN|ERROR)\b|\b[A-Za-z_][\w.]*=|"[^"]*"/g
+
+function highlightedAppLogLine(line: string, key: string): ReactNode {
+  const parts: ReactNode[] = []
+  let cursor = 0
+
+  for (const match of line.matchAll(APP_LOG_TOKEN_RE)) {
+    const index = match.index ?? 0
+    if (index > cursor) parts.push(line.slice(cursor, index))
+
+    const token = match[0]
+    const isLevel = /^(DEBUG|INFO|WARN|ERROR)$/.test(token)
+    const isQuoted = token.startsWith('"')
+    const isErrorField = /^(error|err)=$/.test(token)
+    const className = isLevel
+      ? token === 'ERROR' ? 'text-red-300 font-semibold' : token === 'WARN' ? 'text-amber-300 font-semibold' : token === 'DEBUG' ? 'text-sky-300' : 'text-emerald-300 font-semibold'
+      : isQuoted ? 'text-lime-300/90'
+      : isErrorField ? 'text-red-300/90'
+      : 'text-cyan-300/90'
+    parts.push(
+      <span key={`${key}-${index}`} className={className}>{token}</span>,
+    )
+    cursor = index + token.length
+  }
+
+  if (cursor < line.length) parts.push(line.slice(cursor))
+  return parts.length > 0 ? parts : line
+}
 
 function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [tab, setTab] = useState<SettingsTab>('appearance')
@@ -1240,6 +1275,10 @@ function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }
   })
   const [aiLoading, setAiLoading] = useState(false)
   const [aiSaving, setAiSaving] = useState(false)
+  const [appLogs, setAppLogs] = useState('')
+  const [appLogsError, setAppLogsError] = useState<string | null>(null)
+  const [appLogsLoading, setAppLogsLoading] = useState(false)
+  const [appLogFilePath, setAppLogFilePath] = useState('')
 
   useEffect(() => { applyFontSettings(fontSettings) }, [fontSettings])
 
@@ -1259,12 +1298,30 @@ function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }
       .finally(() => setAiLoading(false))
   }, [open])
 
+  const loadAppLogs = useCallback(() => {
+    setAppLogsLoading(true)
+    setAppLogsError(null)
+    Promise.all([AppGetLogs(2000), AppGetLogFilePath()])
+      .then(([content, path]) => {
+        setAppLogs(content)
+        setAppLogFilePath(path)
+      })
+      .catch((err) => setAppLogsError(err instanceof Error ? err.message : 'Failed to load logs'))
+      .finally(() => setAppLogsLoading(false))
+  }, [])
+
+  useEffect(() => {
+    if (!open || tab !== 'logs') return
+    loadAppLogs()
+  }, [open, tab, loadAppLogs])
+
   if (!open) return null
 
   const TABS: { id: SettingsTab; label: string }[] = [
     { id: 'appearance', label: 'Appearance' },
     { id: 'security', label: 'Security' },
     { id: 'ai', label: 'AI' },
+    { id: 'logs', label: 'Logs' },
   ]
 
   return createPortal(
@@ -1309,10 +1366,10 @@ function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }
         <div className="flex-1 min-w-0 flex flex-col overflow-hidden">
           <div className="px-6 pt-5 pb-4 border-b border-border/60">
             <p className="text-sm font-semibold text-foreground">
-              {tab === 'appearance' ? 'Appearance' : tab === 'security' ? 'Security' : tab === 'ai' ? 'AI' : tab}
+              {tab === 'appearance' ? 'Appearance' : tab === 'security' ? 'Security' : tab === 'ai' ? 'AI' : tab === 'logs' ? 'Logs' : tab}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
-              {tab === 'appearance' ? 'Customize fonts and visual style.' : tab === 'security' ? 'Control CVE scanning behavior.' : tab === 'ai' ? 'Configure AI provider for warnings, errors, and crashloops.' : ''}
+              {tab === 'appearance' ? 'Customize fonts and visual style.' : tab === 'security' ? 'Control CVE scanning behavior.' : tab === 'ai' ? 'Configure AI provider for warnings, errors, and crashloops.' : tab === 'logs' ? 'View the application\u2019s own log file.' : ''}
             </p>
           </div>
 
@@ -1507,6 +1564,56 @@ function SettingsModal({ open, onClose }: { open: boolean; onClose: () => void }
                 >
                   {aiSaving ? 'Saving…' : 'Save AI settings'}
                 </button>
+              </div>
+            )}
+
+            {tab === 'logs' && (
+              <div className="flex flex-col h-full">
+                <div className="flex items-center justify-between gap-2 mb-3">
+                  <p className="text-[10px] text-muted-foreground truncate font-mono" title={appLogFilePath}>
+                    {appLogFilePath || 'Loading log file path…'}
+                  </p>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        void navigator.clipboard.writeText(appLogs).then(
+                          () => uiNotify.success('Logs copied to clipboard'),
+                          () => uiNotify.error('Failed to copy logs'),
+                        )
+                      }}
+                      disabled={!appLogs}
+                      className="px-2.5 py-1 rounded text-[11px] font-medium border border-border text-muted-foreground hover:text-foreground disabled:opacity-40 transition-colors"
+                    >
+                      Copy
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => { void AppRevealLogFile().catch(() => uiNotify.error('Failed to reveal log file')) }}
+                      className="px-2.5 py-1 rounded text-[11px] font-medium border border-border text-muted-foreground hover:text-foreground transition-colors"
+                    >
+                      Reveal in Finder
+                    </button>
+                    <button
+                      type="button"
+                      onClick={loadAppLogs}
+                      disabled={appLogsLoading}
+                      className="px-2.5 py-1 rounded text-[11px] font-medium border border-border text-muted-foreground hover:text-foreground disabled:opacity-40 transition-colors"
+                    >
+                      {appLogsLoading ? 'Refreshing…' : 'Refresh'}
+                    </button>
+                  </div>
+                </div>
+                {appLogsError && <p className="text-xs text-red-400 mb-2">Error: {appLogsError}</p>}
+                <div className="flex-1 min-h-[280px] overflow-y-auto rounded border border-border/60 bg-[#0d1117] p-3 font-mono text-[11px] leading-5 text-slate-300 whitespace-pre-wrap break-words">
+                  {appLogsLoading && !appLogs && <span className="text-muted-foreground/40">Loading…</span>}
+                  {!appLogsLoading && !appLogs && !appLogsError && <span className="text-muted-foreground/40">No logs found.</span>}
+                  {appLogs && appLogs.split('\n').map((line, index) => (
+                    <span key={index} className={`block ${line.includes('ERROR') ? 'bg-red-400/5' : line.includes('WARN') ? 'bg-amber-400/5' : ''}`}>
+                      {highlightedAppLogLine(line, String(index)) || '\u00a0'}
+                    </span>
+                  ))}
+                </div>
               </div>
             )}
           </div>
@@ -2618,6 +2725,7 @@ function NamespacesPage() {
     phase: string
     createdAt: string
     labels: Record<string, string>
+    annotations: Record<string, string>
   }
 
   const [items, setItems] = useState<NamespaceRow[]>([])
@@ -2641,12 +2749,18 @@ function NamespacesPage() {
       acc[k] = String(v)
       return acc
     }, {})
+    const rawAnnotations = (meta.annotations as Record<string, unknown> | undefined) ?? {}
+    const annotations = Object.entries(rawAnnotations).reduce<Record<string, string>>((acc, [k, v]) => {
+      acc[k] = String(v)
+      return acc
+    }, {})
 
     return {
       name: String(meta.name ?? 'unknown'),
       phase: String(status.phase ?? 'Unknown'),
       createdAt: String(meta.creationTimestamp ?? ''),
       labels,
+      annotations,
     }
   }, [])
 
@@ -2796,6 +2910,28 @@ function NamespacesPage() {
         },
       },
       {
+        id: 'annotations',
+        header: 'Annotations',
+        accessorFn: (row) => Object.entries(row.annotations).map(([k, v]) => `${k}: ${v}`).join(' '),
+        enableSorting: false,
+        meta: { fixedWidth: 420 },
+        cell: (info) => {
+          const entries = Object.entries(info.row.original.annotations).slice(0, 5)
+          const total = Object.keys(info.row.original.annotations).length
+          if (entries.length === 0) return <span className="text-sm text-muted-foreground/40">—</span>
+          return (
+            <div className="flex flex-col gap-0.5">
+              {entries.map(([k, v]) => (
+                <span key={k} className="text-[11px] text-muted-foreground leading-4 truncate max-w-[400px] block" title={`${k}: ${v}`}>
+                  <span className="text-outline">{k}</span>: {v}
+                </span>
+              ))}
+              {total > 5 && <span className="text-[10px] text-muted-foreground/60">+{total - 5} more</span>}
+            </div>
+          )
+        },
+      },
+      {
         id: 'age',
         header: 'Age',
         accessorFn: (row) => row.createdAt,
@@ -2894,7 +3030,7 @@ function NamespacesPage() {
           estimateSize={52}
           emptyLabel="No namespaces found."
           loading={namespacesLoading}
-          columnOrder={['select', 'name', 'labels', 'age']}
+          columnOrder={['select', 'name', 'labels', 'annotations', 'age']}
           persistKey="namespaces"
           onSelectedRowsChange={setSelectedNamespaceRows}
           rowSelectionResetKey={rowSelectionResetKey}

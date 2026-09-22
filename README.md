@@ -93,7 +93,7 @@ wails3 task dev:backend
 - All tests passed
 - Windows and Mac prod versions built and tested
 - All release notesand changelog updated
-- Version bump - `version=x.x.x wails3 task release`\
+- Version bump - `version=x.x.x wails3 task release`
 
 # Post-release checks
 - Check and fix FOSSA license and security issues
