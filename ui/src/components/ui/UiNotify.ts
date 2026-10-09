@@ -87,6 +87,7 @@ async function getRuntime(): Promise<NotifyRuntime> {
       const rt = new win.Notyf({
         duration: 10_000,
         dismissible: true,
+        ripple: false,
         position: { x: 'right', y: 'bottom' },
         types: [
           { type: 'warning', background: 'orange', icon: false },

@@ -1,8 +1,7 @@
-import { UiTooltip } from './UiTooltip'
+import { FieldKey, FieldRow, GroupHeader, PathBreadcrumb, SectionCard, ValueView, HighlightMatch, splitPath } from './OverviewParts'
 import type { OverviewFieldSpec } from '../../features/resources/resourceOverview'
 import { resolveOverviewValue, K8S_FIELD_DESCRIPTIONS } from '../../features/resources/resourceOverview'
-import { conditionBadge } from '@/lib/utils'
-import { forwardRef, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { ResourceGetDetails } from '../../../bindings/kubegui/services/backend'
 const HIDDEN_ANNOTATION_KEYS = new Set([
@@ -124,29 +123,6 @@ function getFieldDescriptionKey(path: string): string | undefined {
   }
   return undefined
 }
-const HighlightMatch = forwardRef<HTMLSpanElement, { text: string; query: string; className?: string }>(
-  function HighlightMatch({ text, query, className }, ref) {
-    const trimmed = query.trim()
-    if (!trimmed) return <span ref={ref} className={className}>{text}</span>
-    const lower = text.toLowerCase()
-    const needle = trimmed.toLowerCase()
-    const parts: ReactNode[] = []
-    let cursor = 0
-    let idx = lower.indexOf(needle)
-    while (idx !== -1) {
-      if (idx > cursor) parts.push(text.slice(cursor, idx))
-      parts.push(
-        <mark key={`${idx}-${parts.length}`} className="rounded bg-primary/25 px-0.5 text-foreground">
-          {text.slice(idx, idx + trimmed.length)}
-        </mark>,
-      )
-      cursor = idx + trimmed.length
-      idx = lower.indexOf(needle, cursor)
-    }
-    if (cursor < text.length) parts.push(text.slice(cursor))
-    return <span ref={ref} className={className}>{parts}</span>
-  }
-)
 function isPrimitive(value: unknown): value is string | number | boolean {
   return typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean'
 }
@@ -205,65 +181,87 @@ function appendConditionLines(value: unknown, path: string, lines: FlatLine[]) {
     const reason = obj.reason ? `reason=${String(obj.reason)}` : ''
     const message = obj.message ? `message=${String(obj.message)}` : ''
     const details = [reason, message].filter(Boolean).join(' ')
-    lines.push({ key: `${path}.${type}`, value: details || (status && !['true', 'false'].includes(status.toLowerCase()) ? status : '—') })
+    const isBool = ['true', 'false', 'unknown'].includes(status.toLowerCase())
+    const head = isBool ? status[0].toUpperCase() + status.slice(1).toLowerCase() : status
+    lines.push({ key: `${path}.${type}`, value: head ? (details ? `${head} · ${details}` : head) : (details || '—') })
   })
 }
-function FlatLines({ title, lines, query = '', headerAction }: { title: string; lines: FlatLine[]; query?: string; headerAction?: ReactNode }) {
+type Group = { label: string[] | null; lines: FlatLine[] }
+
+function groupLines(lines: FlatLine[]): Group[] {
+  const roots = new Set(lines.map((l) => splitPath(l.key)[0]))
+  const stripRoot = roots.size === 1 && lines.every((l) => splitPath(l.key).length > 1)
+  const groups: Group[] = []
+  for (const line of lines) {
+    let segs = splitPath(line.key)
+    if (stripRoot) segs = segs.slice(1)
+    const parent = segs.slice(0, -1)
+    const label = parent.length > 0 ? parent : null
+    const last = groups[groups.length - 1]
+    if (last && JSON.stringify(last.label) === JSON.stringify(label)) last.lines.push(line)
+    else groups.push({ label, lines: [line] })
+  }
+  return groups
+}
+
+function FlatLines({ title, lines, query = '', headerAction, variant = 'rows' }: {
+  title: string
+  lines: FlatLine[]
+  query?: string
+  headerAction?: ReactNode
+  variant?: 'rows' | 'chips' | 'stack'
+}) {
   const normalizedQuery = normalizeFilter(query)
   const filtered = lines.filter((line) => lineMatches(line, normalizedQuery))
   if (lines.length === 0) return null
-  return (
-    <div>
-      <div className="flex items-center justify-between gap-3 mb-2">
-        <p className="text-[11px] uppercase tracking-wider text-muted-foreground shrink-0">
-          {title}
-          <span className="ml-1.5 text-muted-foreground/50 normal-case tracking-normal">
-            ({filtered.length}{filtered.length !== lines.length ? `/${lines.length}` : ''})
+  const count = `${filtered.length}${filtered.length !== lines.length ? `/${lines.length}` : ''}`
+
+  let body: ReactNode
+  if (filtered.length === 0) {
+    body = <p className="text-[10px] text-muted-foreground/40 px-1.5 py-1">No matches for "{query}"</p>
+  } else if (variant === 'chips') {
+    body = (
+      <div className="flex flex-wrap gap-1.5 p-1">
+        {filtered.map((line, index) => (
+          <span key={`${line.key}:${index}`} className="font-modal inline-flex max-w-full text-[11px] rounded-md overflow-hidden ring-1 ring-inset ring-white/10">
+            <HighlightMatch text={line.key} query={query} className="px-1.5 py-0.5 bg-primary/15 text-primary/90 break-all" />
+            <HighlightMatch text={line.value} query={query} className="px-1.5 py-0.5 bg-white/[0.04] text-foreground break-all" />
           </span>
-        </p>
-        {headerAction}
+        ))}
       </div>
+    )
+  } else if (variant === 'stack') {
+    body = (
       <div className="space-y-0.5">
-        {filtered.map((line, index) => {
+        {filtered.map((line, index) => (
+          <div key={`${line.key}:${index}`} className="font-modal px-1.5 py-1 rounded-md hover:bg-accent/30 transition-colors">
+            <HighlightMatch text={line.key} query={query} className="block text-[10.5px] text-primary/80 break-all" />
+            <HighlightMatch text={line.value} query={query} className="block text-[11.5px] text-foreground/90 break-all whitespace-pre-wrap" />
+          </div>
+        ))}
+      </div>
+    )
+  } else {
+    body = groupLines(filtered).map((group, gi) => (
+      <div key={gi}>
+        {group.label && <GroupHeader label={<PathBreadcrumb segments={group.label} />} count={group.lines.length} />}
+        {group.lines.map((line, index) => {
           const descriptionKey = getFieldDescriptionKey(line.key)
           const description = descriptionKey ? K8S_FIELD_DESCRIPTIONS[descriptionKey] : undefined
-          const keyNode = (
-            <HighlightMatch
-              text={line.key}
-              query={query}
-              className={description
-                ? 'inline cursor-help text-muted-foreground/70 underline decoration-dotted underline-offset-2'
-                : 'text-muted-foreground/70'}
+          const segs = splitPath(line.key)
+          return (
+            <FieldRow
+              key={`${line.key}:${index}`}
+              keyNode={<FieldKey label={segs[segs.length - 1].replace(/\[(\d+)\]$/, (_, n) => ` #${Number(n) + 1}`)} path={descriptionKey ?? line.key} description={description} query={query} />}
+              valueNode={<ValueView text={line.value} query={query} />}
             />
           )
-
-          return (
-            <div key={`${line.key}:${index}`} className="font-modal text-[11.5px] leading-snug py-1 px-1 rounded hover:bg-accent/30 break-all">
-              {description ? (
-                <UiTooltip
-                  content={
-                    <div className="max-w-full space-y-1 text-left leading-relaxed">
-                      <p className="font-modal text-[11px] text-muted-foreground break-all">{descriptionKey}</p>
-                      <p className="font-modal text-[11px] text-foreground/90 break-words">{description}</p>
-                    </div>
-                  }
-                  side="bottom"
-                  align="start"
-                >
-                  {keyNode}
-                </UiTooltip>
-              ) : keyNode}
-              <span className="text-muted-foreground/50">: </span>
-              <HighlightMatch text={line.value} query={query} className="text-foreground" />
-            </div>
-          )
         })}
-        {filtered.length === 0 && (
-          <p className="text-[10px] text-muted-foreground/40 px-1 py-1">No matches for "{query}"</p>
-        )}
       </div>
-    </div>
-  )
+    ))
+  }
+
+  return <SectionCard title={title} count={count} headerAction={headerAction}>{body}</SectionCard>
 }
 // ─── Shared Labels / Annotations ─────────────────────────────────────────────
 export function LabelsSection({ resource, query = '' }: { resource: Record<string, unknown>; query?: string }) {
@@ -271,7 +269,7 @@ export function LabelsSection({ resource, query = '' }: { resource: Record<strin
   if (!raw || typeof raw !== 'object') return null
   const entries = Object.entries(raw as Record<string, unknown>).map(([key, value]) => ({ key, value: primitiveToString(value) }))
   if (entries.length === 0) return null
-  return <FlatLines title="Labels" lines={entries} query={query} />
+  return <FlatLines title="Labels" lines={entries} query={query} variant="chips" />
 }
 export function AnnotationsSection({ resource, query = '' }: { resource: Record<string, unknown>; query?: string }) {
   const raw = (resource.metadata as Record<string, unknown> | undefined)?.annotations
@@ -280,7 +278,7 @@ export function AnnotationsSection({ resource, query = '' }: { resource: Record<
     .filter(([key]) => !HIDDEN_ANNOTATION_KEYS.has(key))
     .map(([key, value]) => ({ key, value: primitiveToString(value) }))
   if (entries.length === 0) return null
-  return <FlatLines title="Annotations" lines={entries} query={query} />
+  return <FlatLines title="Annotations" lines={entries} query={query} variant="stack" />
 }
 // ─── Dynamic resource sections ───────────────────────────────────────────────
 export function DynamicResourceSection({
@@ -320,47 +318,55 @@ export function ResourceManifestOverview({
       const status = resource.status as Record<string, unknown> | undefined
       const raw = status?.conditions
       const conditions = Array.isArray(raw) ? (raw as Array<Record<string, unknown>>) : []
-      if (conditions.length === 0) {
-        return <span className="font-modal text-[11.5px] text-muted-foreground/50">—</span>
-      }
+      if (conditions.length === 0) return <ValueView text="—" />
       return (
         <span className="inline-flex flex-wrap gap-1.5 align-middle">
-          {conditions.map((condition, index) => (
-            <span key={`${condition?.type}-${index}`}>
-              {conditionBadge(String(condition?.type ?? ''), String(condition?.status ?? 'Unknown'))}
-            </span>
-          ))}
+          {conditions.map((condition, index) => {
+            const st = String(condition?.status ?? 'Unknown')
+            const tone = st.toLowerCase() === 'true' ? 'bg-emerald-500/15 text-emerald-300 ring-emerald-500/30'
+              : st.toLowerCase() === 'false' ? 'bg-red-500/15 text-red-300 ring-red-500/30'
+              : 'bg-amber-500/15 text-amber-300 ring-amber-500/30'
+            return (
+              <span key={`${condition?.type}-${index}`} title={[condition?.reason, condition?.message].filter(Boolean).join(': ') || undefined}
+                className={`px-1.5 py-px rounded-full ring-1 ring-inset text-[10.5px] font-medium ${tone}`}>
+                {String(condition?.type ?? 'Condition')}
+              </span>
+            )
+          })}
         </span>
       )
     }
-    return <span>{resolveOverviewValue(resource, field)}</span>
+    return <ValueView text={resolveOverviewValue(resource, field)} />
   }
+
+  const ROOT_LABELS: Record<string, string> = { metadata: 'Metadata', spec: 'Spec', status: 'Status' }
+  const groups: Array<{ root: string; fields: OverviewFieldSpec[] }> = []
+  for (const field of rows) {
+    const root = field.path.split('.')[0]
+    const last = groups[groups.length - 1]
+    if (last && last.root === root) last.fields.push(field)
+    else groups.push({ root, fields: [field] })
+  }
+
   return (
-    <div>
-      {title && <p className="text-[11px] uppercase tracking-wider text-muted-foreground mb-2">{title}</p>}
-      <div className="space-y-0.5">
-        {rows.map((field) => (
-          <div key={field.path} className="font-modal text-[11.5px] leading-snug py-1 px-1 rounded hover:bg-accent/30 break-all">
-            <UiTooltip
-              content={
-                <div className="max-w-full space-y-1 text-left leading-relaxed">
-                  <p className="font-modal text-[11px] text-muted-foreground break-all">{field.path}</p>
-                  <p className="font-modal text-[11px] text-foreground/90 break-words">{field.description}</p>
-                </div>
-              }
-              side="bottom"
-              align="start"
-            >
-              <span className="inline cursor-help text-muted-foreground/70 underline decoration-dotted underline-offset-2">
-                {field.path}
-              </span>
-            </UiTooltip>
-            <span className="text-muted-foreground/50">: </span>
-            <span className="text-foreground">{renderOverviewCell(field)}</span>
-          </div>
-        ))}
-      </div>
-    </div>
+    <SectionCard title={title || undefined} count={title ? rows.length : undefined}>
+      {groups.map((group) => (
+        <div key={group.root}>
+          <GroupHeader label={ROOT_LABELS[group.root] ?? group.root} count={group.fields.length} />
+          {group.fields.map((field) => {
+            const segs = field.path.split('.').slice(1)
+            const label = (segs.length ? segs : [field.path]).join('.')
+            return (
+              <FieldRow
+                key={field.path}
+                keyNode={<FieldKey label={label} path={field.path} description={field.description} />}
+                valueNode={renderOverviewCell(field)}
+              />
+            )
+          })}
+        </div>
+      ))}
+    </SectionCard>
   )
 }
 /**

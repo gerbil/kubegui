@@ -270,12 +270,31 @@
 .notyf-toast {
   position: relative;
   width: max-content;
+  max-width: min(420px, calc(100vw - 40px));
   font-size: 12px;
+}
+
+.notyf__wrapper {
+  align-items: flex-start;
+  min-width: 0;
+  background: inherit;
+  word-break: normal;
+}
+
+.notyf__icon {
+  flex-shrink: 0;
 }
 
 .notyf__message {
   font-size: 12px;
   line-height: 1.5em;
+  flex: 1 1 auto;
+  min-width: 0;
+  max-height: 40vh;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: normal;
 }
 
 /* Restore original full-height dismiss strip (undoes our broken overrides) */

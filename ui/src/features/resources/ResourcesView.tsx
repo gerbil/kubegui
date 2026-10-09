@@ -262,7 +262,7 @@ export function ResourcesView() {
 
       const nameCol = col.accessor((r) => r.metadata.name, {
         id: 'name', header: 'Name', size: 300,
-        cell: (info) => <span className="font-medium text-foreground truncate max-w-[280px] block" title={info.getValue<string>()}>{info.getValue<string>()}</span>,
+        cell: (info) => <span className="font-medium text-foreground truncate block" title={info.getValue<string>()}>{info.getValue<string>()}</span>,
       })
 
        const nsCol = col.accessor((r) => r.metadata.namespace ?? 'cluster', {

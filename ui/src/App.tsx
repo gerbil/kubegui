@@ -79,7 +79,7 @@ import { INFORMER_RESOURCE_NAMES, getInformerResourceLabel } from './lib/menu.co
 import { CRDDefinitionsPage } from './features/crds/CRDDefinitionsPage'
 import { HelmReposPage } from './features/helm/HelmReposPage'
 import { HelmAppsPage } from './features/helm/HelmAppsPage'
-import { Select as MantineSelect } from '@mantine/core'
+import { NamespaceSelect } from '@/components/ui/NamespaceSelect'
 import { useNamespaceOptions } from './hooks/useNamespaceOptions'
 import { useK8sResourceStore, type ResourceRow } from './store/useK8sResourceStore'
 import { configureAceYamlEditor } from './lib/aceEditorConfig'
@@ -3736,22 +3736,12 @@ function PodsPage() {
 
       <div className="lucid-surface pods-glass-surface rounded-lg p-3 flex items-center justify-between gap-3 flex-wrap relative z-[120] overflow-visible" id="pods-toolbar">
         <div className="flex items-center gap-3 flex-wrap overflow-visible">
-          <div className="flex items-center gap-2">
-            <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-label shrink-0" htmlFor="pods-namespace">Namespace</label>
-            <MantineSelect
-              id="pods-namespace"
-              value={selectedNamespace}
-              onChange={(value) => setSelectedNamespace(value ?? 'all')}
-              data={namespaces.map((n) => ({ value: n, label: n === 'all' ? 'All namespaces' : n }))}
-              size="sm"
-              w={320}
-              searchable
-              allowDeselect={false}
-              spellCheck={false}
-              classNames={{ input: 'pods-glass-control' }}
-              styles={{ input: { fontFamily: 'Space Grotesk, sans-serif', fontSize: '0.75rem' } }}
-            />
-          </div>
+          <NamespaceSelect
+            id="pods-namespace"
+            value={selectedNamespace}
+            onChange={setSelectedNamespace}
+            options={namespaces.map((n) => ({ value: n, label: n === 'all' ? 'All namespaces' : n }))}
+          />
           <div className="relative">
             <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
             <input
@@ -4262,22 +4252,12 @@ function InformerResourcePage({ resource }: { resource: string }) {
       <div className="lucid-surface pods-glass-surface rounded-lg p-3 flex items-center justify-between gap-3 flex-wrap relative z-[120] overflow-visible">
         <div className="flex items-center gap-3 flex-wrap overflow-visible">
           {isNamespaced && (
-            <div className="flex items-center gap-2">
-              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-label shrink-0" htmlFor={`${resource}-namespace`}>Namespace</label>
-              <MantineSelect
-                id={`${resource}-namespace`}
-                value={selectedNamespace}
-                onChange={(value) => setSelectedNamespace(value ?? 'all')}
-                data={namespaces.map((n) => ({ value: n, label: n === 'all' ? 'All namespaces' : n }))}
-                size="sm"
-                w={320}
-                searchable
-                allowDeselect={false}
-                spellCheck={false}
-                classNames={{ input: 'pods-glass-control' }}
-                styles={{ input: { fontFamily: 'Space Grotesk, sans-serif', fontSize: '0.75rem' } }}
-              />
-            </div>
+            <NamespaceSelect
+              id={`${resource}-namespace`}
+              value={selectedNamespace}
+              onChange={setSelectedNamespace}
+              options={namespaces.map((n) => ({ value: n, label: n === 'all' ? 'All namespaces' : n }))}
+            />
           )}
           <div className="relative">
             <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />

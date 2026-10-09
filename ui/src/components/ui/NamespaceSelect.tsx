@@ -1,3 +1,5 @@
+import { CloseButton, Select as MantineSelect } from '@mantine/core'
+
 type NSOption = { value: string; label: string }
 
 export function NamespaceSelect({
@@ -5,11 +7,13 @@ export function NamespaceSelect({
   value,
   onChange,
   options,
+  allValue = 'all',
 }: {
   id?: string
   value: string
   onChange: (value: string) => void
   options: NSOption[]
+  allValue?: string | null
 }) {
   return (
     <div className="flex items-center gap-2">
@@ -19,21 +23,30 @@ export function NamespaceSelect({
       >
         Namespace
       </label>
-      <select
+      <MantineSelect
         id={id}
         value={value}
-        onChange={(e) => onChange(e.target.value)}
-        className="flex h-8 rounded-md border border-border bg-muted px-3 py-1 text-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary disabled:opacity-50 font-label min-w-[220px] appearance-none cursor-pointer"
+        onChange={(v) => onChange(v ?? allValue ?? value)}
+        data={options}
+        size="sm"
+        w={320}
+        searchable
+        allowDeselect={false}
         spellCheck={false}
-        autoComplete="off"
-      >
-        {options.map((opt) => (
-          <option key={opt.value} value={opt.value}>
-            {opt.label}
-          </option>
-        ))}
-      </select>
+        classNames={{ input: 'pods-glass-control' }}
+        styles={{ input: { fontFamily: 'Space Grotesk, sans-serif', fontSize: '0.75rem' } }}
+        rightSectionPointerEvents="all"
+        rightSection={
+          allValue && value !== allValue ? (
+            <CloseButton
+              size="sm"
+              aria-label="Show all namespaces"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => onChange(allValue)}
+            />
+          ) : undefined
+        }
+      />
     </div>
   )
 }
-

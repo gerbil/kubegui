@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { ArrowDown, ArrowUp, ArrowUpDown, ChevronRight, Search } from 'lucide-react'
-import { Select as MantineSelect } from '@mantine/core'
+import { NamespaceSelect } from '@/components/ui/NamespaceSelect'
 import { Events } from '@wailsio/runtime'
 import { ResourceList, ResourceAdd, ResourceDelete, CRDGenerateTemplate } from '../../../bindings/kubegui/services/backend'
 import type { CRDDefinition } from '../../../bindings/kubegui/internal/resources/informers/models'
@@ -750,22 +750,12 @@ export function CRDResourcePage({ definition, namespace = '', onNavigateBack, ca
       <div className="lucid-surface pods-glass-surface rounded-lg p-3 flex items-center justify-between gap-3 flex-wrap relative z-[120] overflow-visible min-w-0">
         <div className="flex items-center gap-3 flex-wrap overflow-visible min-w-0">
           {isNamespaced && (
-            <div className="flex items-center gap-2">
-              <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-label shrink-0" htmlFor="crd-resource-namespace">Namespace</label>
-              <MantineSelect
-                id="crd-resource-namespace"
-                value={selectedNamespace}
-                onChange={(v) => setSelectedNamespace(v ?? 'all')}
-                data={namespaces.map((n) => ({ value: n, label: n === 'all' ? 'All namespaces' : n }))}
-                size="xs"
-                w={220}
-                searchable
-                allowDeselect={false}
-                spellCheck={false}
-                classNames={{ input: 'pods-glass-control' }}
-                styles={{ input: { fontFamily: 'Space Grotesk, sans-serif', fontSize: '0.75rem' } }}
-              />
-            </div>
+            <NamespaceSelect
+              id={"crd-resource-namespace"}
+              value={selectedNamespace}
+              onChange={setSelectedNamespace}
+              options={namespaces.map((n) => ({ value: n, label: n === 'all' ? 'All namespaces' : n }))}
+            />
           )}
           <div className="relative">
             <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
@@ -837,6 +827,7 @@ export function CRDResourcePage({ definition, namespace = '', onNavigateBack, ca
                   return (
                     <th
                       key={col.key}
+                      style={col.key === 'name' ? { width: '32%' } : undefined}
                       className="px-3 py-2.5 text-left text-sm font-semibold text-muted-foreground uppercase tracking-wider border-b border-outline-variant/40 whitespace-nowrap overflow-hidden text-ellipsis select-none"
                     >
                       <button

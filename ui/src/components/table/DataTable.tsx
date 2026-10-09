@@ -158,7 +158,8 @@ export function DataTable<T extends RowData>({
   rowSelectionResetKey,
   onRowClick,
 }: DataTableProps<T>) {
-  const DEFAULT_SELECT_COLUMN_WIDTH = 40
+  const NAME_COLUMN_WIDTH = '32%'
+const DEFAULT_SELECT_COLUMN_WIDTH = 40
   const [sorting, setSorting] = useState<SortingState>(defaultSorting)
   const [columnFilters] = useState<ColumnFiltersState>([])
   const [internalColumnOrder, setInternalColumnOrder] = useState<ColumnOrderState>([])
@@ -258,6 +259,8 @@ export function DataTable<T extends RowData>({
     [virtualItems, totalSize]
   )
 
+  const nameColumnStyle = { width: NAME_COLUMN_WIDTH }
+
   const strictWidthStyle = (width: number) => ({
     width,
     minWidth: width,
@@ -268,7 +271,7 @@ export function DataTable<T extends RowData>({
   })
 
   return (
-    <div ref={parentRef} className="overflow-auto h-full w-full">
+    <div ref={parentRef} className="overflow-y-auto overflow-x-hidden h-full w-full">
       <table className="w-full table-fixed border-collapse text-sm">
         <thead className="sticky top-0 z-10 bg-surface-container-high/60 backdrop-blur-md">
           {table.getHeaderGroups().map((hg) => (
@@ -290,7 +293,7 @@ export function DataTable<T extends RowData>({
                     key={header.id}
                     style={isSelectColumn
                         ? strictWidthStyle(selectWidth)
-                        : fixedWidthStyle ?? headerOverflowStyle}
+                        : fixedWidthStyle ?? (header.id === 'name' ? { ...headerOverflowStyle, ...nameColumnStyle } : headerOverflowStyle)}
                     className={cn(
                       'px-3 py-2.5 text-left text-sm font-semibold text-muted-foreground uppercase tracking-wider border-b border-outline-variant/40 select-none align-middle',
                       canSort && 'cursor-pointer hover:text-foreground transition-colors',

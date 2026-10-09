@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ColumnDef } from '@tanstack/react-table'
 import { Select as MantineSelect } from '@mantine/core'
+import { NamespaceSelect } from '@/components/ui/NamespaceSelect'
 import { Search } from 'lucide-react'
 import { DataTable } from '@/components/table/DataTable'
 import { ConfirmDialog } from '@/components/ui/Button'
@@ -285,22 +286,12 @@ export function HelmAppsPage() {
 
       <div className="lucid-surface pods-glass-surface rounded-lg p-3 flex items-center justify-between gap-3 flex-wrap relative z-[120] overflow-visible">
         <div className="flex items-center gap-3 flex-wrap overflow-visible">
-          <div className="flex items-center gap-2">
-            <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-label shrink-0" htmlFor="helm-apps-namespace">Namespace</label>
-            <MantineSelect
-              id="helm-apps-namespace"
-              value={selectedNamespace}
-              onChange={(value) => setSelectedNamespace(value ?? 'all')}
-              data={namespaces.map((n) => ({ value: n, label: n === 'all' ? 'All namespaces' : n }))}
-              size="sm"
-              w={320}
-              searchable
-              allowDeselect={false}
-              spellCheck={false}
-              classNames={{ input: 'pods-glass-control' }}
-              styles={{ input: { fontFamily: 'Space Grotesk, sans-serif', fontSize: '0.75rem' } }}
-            />
-          </div>
+          <NamespaceSelect
+            id={"helm-apps-namespace"}
+            value={selectedNamespace}
+            onChange={setSelectedNamespace}
+            options={namespaces.map((n) => ({ value: n, label: n === 'all' ? 'All namespaces' : n }))}
+          />
 
           <div className="relative">
             <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />

@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { ColumnDef, createColumnHelper } from '@tanstack/react-table'
-import { Select as MantineSelect } from '@mantine/core'
+import { NamespaceSelect } from '@/components/ui/NamespaceSelect'
 import { Search } from 'lucide-react'
 import { AppGetMyPermissions } from '../../../bindings/kubegui/services/backend'
 import type { CanIResourceRow } from '../../../bindings/kubegui/internal/cani/models'
@@ -129,22 +129,13 @@ export function MyPermissionsPage() {
       {/* Toolbar */}
       <div className="lucid-surface rounded-lg p-3 flex items-center justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-2">
-            <label className="text-[10px] uppercase tracking-wider text-muted-foreground font-label shrink-0" htmlFor="permissions-namespace">Namespace</label>
-            <MantineSelect
-              id="permissions-namespace"
-              value={ns}
-              onChange={(value) => setNs(value ?? 'kube-system')}
-              data={namespaceOptions.filter(o => o.value !== 'all')}
-              size="sm"
-              w={320}
-              searchable
-              allowDeselect={false}
-              spellCheck={false}
-              classNames={{ input: 'pods-glass-control' }}
-              styles={{ input: { fontFamily: 'Space Grotesk, sans-serif', fontSize: '0.75rem' } }}
-            />
-          </div>
+          <NamespaceSelect
+            id="permissions-namespace"
+            value={ns}
+            onChange={setNs}
+            options={namespaceOptions.filter(o => o.value !== 'all')}
+            allValue={null}
+          />
           <div className="flex items-center gap-1.5">
             <div className="relative">
               <Search size={12} className="absolute left-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
