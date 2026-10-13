@@ -647,9 +647,17 @@ export class BackendEventSource extends EventTarget {
         : Array.isArray(payload)
           ? payload.map((line) => String(line))
           : []
-      const startIndex = lines.length >= this.previousLines.length && this.previousLines.every((value, index) => lines[index] === value)
-        ? this.previousLines.length
-        : 0
+      // The backend returns a sliding tail window, so find how much of the
+      // previous window's end overlaps the start of this one.
+      const prev = this.previousLines
+      let startIndex = 0
+      for (let k = Math.min(prev.length, lines.length); k > 0; k--) {
+        let match = true
+        for (let i = 0; i < k; i++) {
+          if (prev[prev.length - k + i] !== lines[i]) { match = false; break }
+        }
+        if (match) { startIndex = k; break }
+      }
       for (const line of lines.slice(startIndex)) {
         dispatchCustom(this, 'log', line)
       }

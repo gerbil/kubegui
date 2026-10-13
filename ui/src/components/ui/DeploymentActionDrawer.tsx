@@ -17,6 +17,7 @@ import hljsJson from 'highlight.js/lib/languages/json'
 import hljsBash from 'highlight.js/lib/languages/bash'
 import hljsYaml from 'highlight.js/lib/languages/yaml'
 import hljsAccesslog from 'highlight.js/lib/languages/accesslog'
+import { MemoHtml } from './MemoHtml'
 
 hljs.registerLanguage('json', hljsJson)
 hljs.registerLanguage('bash', hljsBash)
@@ -284,8 +285,10 @@ async function fetchDeploymentPods(ns: string, name: string): Promise<string[]> 
   } catch { return [] }
 }
 
+let logLineSeq = 0
+
 function LogsTab({ deployment }: { deployment: DeploymentRow }) {
-  const [lines, setLines] = useState<string[]>([])
+  const [lines, setLines] = useState<{ id: number; raw: string }[]>([])
   const [connected, setConnected] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
@@ -314,8 +317,9 @@ function LogsTab({ deployment }: { deployment: DeploymentRow }) {
       setConnected(true)
       const html = String(msg.data ?? '').trim()
       if (!html) return
+      const entry = { id: logLineSeq++, raw: html }
       setLines((prev) => {
-        const next = [...prev, html]
+        const next = [...prev, entry]
         return next.length > 2000 ? next.slice(-2000) : next
       })
     }
@@ -333,7 +337,7 @@ function LogsTab({ deployment }: { deployment: DeploymentRow }) {
     if (follow) bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [lines, follow])
 
-  const parsedLines = lines.map(parseDeploymentLogLine)
+  const parsedLines = lines.map((l) => ({ ...parseDeploymentLogLine(l.raw), id: l.id }))
   const filteredLines = search
     ? parsedLines.filter((l) => l.message.toLowerCase().includes(search.toLowerCase()))
     : parsedLines
@@ -397,15 +401,11 @@ function LogsTab({ deployment }: { deployment: DeploymentRow }) {
         {filteredLines.length === 0 && !error && (
           <span className="text-muted-foreground/40">Waiting for log stream…</span>
         )}
-        {filteredLines.map((line, i) => {
+        {filteredLines.map((line) => {
           const tone = getLogTone(line.severityClass, line.message)
           return (
-            <div key={i} className={`log-line log-tone-${tone}`}>
-              <span
-                className="code hljs"
-                 
-                dangerouslySetInnerHTML={{ __html: applySearchHighlight(highlightLogLine(line.message), search) }}
-              />
+            <div key={line.id} className={`log-line log-tone-${tone}`}>
+              <MemoHtml className="code hljs" html={applySearchHighlight(highlightLogLine(line.message), search)} />
             </div>
           )
         })}

@@ -23,6 +23,7 @@ import hljsBash from 'highlight.js/lib/languages/bash'
 import hljsYaml from 'highlight.js/lib/languages/yaml'
 import hljsAccesslog from 'highlight.js/lib/languages/accesslog'
 import 'highlight.js/styles/atom-one-dark.css'
+import { MemoHtml } from './MemoHtml'
 
 hljs.registerLanguage('json', hljsJson)
 hljs.registerLanguage('bash', hljsBash)
@@ -430,8 +431,10 @@ function getLogTone(severityClass: string, message: string): 'normal' | 'warning
 }
 
 
+let logLineSeq = 0
+
 function LogsTab({ pod }: { pod: PodRow }) {
-  const [lines, setLines] = useState<string[]>([])
+  const [lines, setLines] = useState<{ id: number; raw: string }[]>([])
   const [error, setError] = useState<string | null>(null)
   const [connected, setConnected] = useState(false)
   const [search, setSearch] = useState('')
@@ -455,8 +458,9 @@ function LogsTab({ pod }: { pod: PodRow }) {
       setConnected(true)
       const msg = e as MessageEvent
       const html = String(msg.data ?? '').trim()
+      const entry = { id: logLineSeq++, raw: html }
       if (html) setLines((prev) => {
-        const next = [...prev, html]
+        const next = [...prev, entry]
         return next.length > 50 ? next.slice(-50) : next
       })
     })
@@ -484,7 +488,7 @@ function LogsTab({ pod }: { pod: PodRow }) {
     ? pod.containerStatuses.map((c) => c.name)
     : [pod.primaryContainer]
 
-  const parsedLines = lines.map(parsePodLogLine)
+  const parsedLines = lines.map((l) => ({ ...parsePodLogLine(l.raw), id: l.id }))
   const filteredLines = search
     ? parsedLines.filter((line) => line.message.toLowerCase().includes(search.toLowerCase()) || line.containerLabel.toLowerCase().includes(search.toLowerCase()))
     : parsedLines
@@ -546,15 +550,11 @@ function LogsTab({ pod }: { pod: PodRow }) {
         {filteredLines.length === 0 && !error && (
           <span className="text-muted-foreground/40">Waiting for log stream…</span>
         )}
-        {filteredLines.map((line, i) => {
+        {filteredLines.map((line) => {
           const tone = getLogTone(line.severityClass, line.message)
           return (
-            <div key={i} className={`log-line ${line.lineClass} log-tone-${tone}`}>
-              <span
-                className="code hljs"
-                 
-                dangerouslySetInnerHTML={{ __html: applySearchHighlight(highlightLogLine(line.message), search) }}
-              />
+            <div key={line.id} className={`log-line ${line.lineClass} log-tone-${tone}`}>
+              <MemoHtml className="code hljs" html={applySearchHighlight(highlightLogLine(line.message), search)} />
             </div>
           )
         })}

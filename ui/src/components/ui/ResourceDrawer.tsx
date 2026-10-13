@@ -3,6 +3,7 @@ import { configureAceYamlEditor } from '@/lib/aceEditorConfig'
 import { Boxes, Database, FileText, GitBranch, Globe, HardDrive, Network, Pencil, Radio, RefreshCw, Shield, Sparkles, Terminal, Trash2, X } from 'lucide-react'
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { MemoHtml } from './MemoHtml'
 import {
   EventsGetForResource,
   ResourceDelete,
@@ -800,8 +801,10 @@ function EditTab({
 
 // ── Logs Tab (pods only) ──────────────────────────────────────────────────────
 
+let logLineSeq = 0
+
 function LogsTab({ namespace, name, containers }: { namespace: string; name: string; containers: string[] }) {
-  const [lines, setLines]   = useState<string[]>([])
+  const [lines, setLines]   = useState<{ id: number; html: string }[]>([])
   const [error, setError]   = useState<string | null>(null)
   const [connected, setConnected] = useState(false)
   const [search, setSearch] = useState('')
@@ -809,6 +812,7 @@ function LogsTab({ namespace, name, containers }: { namespace: string; name: str
   const [container, setContainer] = useState(containers[0] ?? '')
   const [aiAssistRequest, setAiAssistRequest] = useState<AIAssistRequest | null>(null)
   const bottomRef = useRef<HTMLDivElement | null>(null)
+  const logRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
     let cancelled = false
@@ -822,7 +826,8 @@ function LogsTab({ namespace, name, containers }: { namespace: string; name: str
       if (cancelled) return
       setConnected(true)
       const html = String((e as MessageEvent).data ?? '').trim()
-      if (html) setLines((prev) => { const next = [...prev, html]; return next.length > 2000 ? next.slice(-2000) : next })
+      const entry = { id: logLineSeq++, html }
+      if (html) setLines((prev) => { const next = [...prev, entry]; return next.length > 2000 ? next.slice(-2000) : next })
     })
     src.addEventListener('error', (e: Event) => {
       if (cancelled) return
@@ -834,7 +839,7 @@ function LogsTab({ namespace, name, containers }: { namespace: string; name: str
 
   useEffect(() => { if (follow) bottomRef.current?.scrollIntoView({ behavior: 'smooth' }) }, [lines, follow])
 
-  const filtered = search ? lines.filter(l => l.toLowerCase().includes(search.toLowerCase())) : lines
+  const filtered = search ? lines.filter(l => l.html.toLowerCase().includes(search.toLowerCase())) : lines
 
   return (
     <div className="flex-1 overflow-hidden flex flex-col bg-[#0d1117]">
@@ -854,7 +859,7 @@ function LogsTab({ namespace, name, containers }: { namespace: string; name: str
             <button
               type="button"
               onClick={() => {
-                const snippet = lines.slice(-120).join('\n')
+                const snippet = lines.slice(-120).map(l => l.html).join('\n')
                 if (!snippet.trim()) {
                   uiNotify.info('No log lines yet')
                   return
@@ -876,9 +881,9 @@ function LogsTab({ namespace, name, containers }: { namespace: string; name: str
           className="text-[10px] text-muted-foreground hover:text-slate-300 px-1.5 py-0.5 rounded border border-border/30">↓</button>
         {error && <span className="text-[10px] text-red-400">{error}</span>}
       </div>
-      <div className="flex-1 overflow-y-auto px-3 py-2 font-mono text-[11px] leading-5" style={{ background: '#0d1117' }}>
+      <div ref={logRef} className="flex-1 overflow-y-auto px-3 py-2 font-mono text-[11px] leading-5" style={{ background: '#0d1117' }}>
         {filtered.length === 0 && !error && <span className="text-muted-foreground/40">Waiting for log stream…</span>}
-        {filtered.map((html, i) => <div key={i} dangerouslySetInnerHTML={{ __html: html }} />)}
+        {filtered.map((l) => <div key={l.id}><MemoHtml html={l.html} /></div>)}
         <div ref={bottomRef} />
       </div>
           <AiAssistModal

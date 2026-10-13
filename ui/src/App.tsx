@@ -3216,7 +3216,7 @@ function CreateResourceModal({ resource, label, onClose, onCreated }: { resource
             Cancel
           </button>
           <button type="button" onClick={() => void handleCreate()} disabled={busy || hasSyntaxError} className="px-4 py-1.5 rounded text-sm font-semibold lucid-button text-foreground border border-border disabled:opacity-50 transition-colors hover:opacity-90">
-            {busy ? 'Creating…' : 'Create Namespace'}
+            {busy ? 'Creating…' : `Create ${label}`}
           </button>
         </div>
       </div>
