@@ -1,11 +1,15 @@
 package services
 
 import (
+	"errors"
 	"fmt"
+	"io/fs"
 	"path/filepath"
 	"sort"
 	"strings"
 	"time"
+
+	"kubegui/internal/db"
 
 	"helm.sh/helm/v3/pkg/action"
 	"helm.sh/helm/v3/pkg/chart/loader"
@@ -80,7 +84,7 @@ func listHelmRepos() ([]HelmRepoInfo, error) {
 	settings := cli.New()
 	repoFile, err := repo.LoadFile(settings.RepositoryConfig)
 	if err != nil {
-		if strings.Contains(strings.ToLower(err.Error()), "no such file") {
+		if isNotExistErr(err) {
 			return []HelmRepoInfo{}, nil
 		}
 		return nil, err
@@ -100,8 +104,33 @@ func listHelmRepos() ([]HelmRepoInfo, error) {
 	return result, nil
 }
 
-func listHelmApps(namespace string) ([]HelmAppInfo, error) {
+// isNotExistErr detects missing-file errors across OSes (Windows messages differ from Unix).
+func isNotExistErr(err error) bool {
+	if errors.Is(err, fs.ErrNotExist) {
+		return true
+	}
+	msg := strings.ToLower(err.Error())
+	return strings.Contains(msg, "no such file") ||
+		strings.Contains(msg, "cannot find the file") ||
+		strings.Contains(msg, "cannot find the path")
+}
+
+// newHelmSettings points Helm at the app's active kubeconfig and context instead of the default one.
+func newHelmSettings() *cli.EnvSettings {
 	settings := cli.New()
+	if active, err := db.GetActiveClusterconfig(); err == nil {
+		if active.ConfigPath != "" {
+			settings.KubeConfig = active.ConfigPath
+		}
+		if active.Context != "" {
+			settings.KubeContext = active.Context
+		}
+	}
+	return settings
+}
+
+func listHelmApps(namespace string) ([]HelmAppInfo, error) {
+	settings := newHelmSettings()
 	actionConfig := new(action.Configuration)
 
 	helmNS := strings.TrimSpace(namespace)
@@ -200,7 +229,7 @@ func installHelmApp(releaseName, repoName, chartName, chartVersion, namespace st
 		return fmt.Errorf("releaseName, repoName, chartName, chartVersion and namespace are required")
 	}
 
-	settings := cli.New()
+	settings := newHelmSettings()
 	settings.SetNamespace(namespace)
 	actionConfig := new(action.Configuration)
 	if err := actionConfig.Init(settings.RESTClientGetter(), namespace, "secret", func(string, ...interface{}) {}); err != nil {
@@ -243,7 +272,7 @@ func uninstallHelmApp(namespace, releaseName string) error {
 		return fmt.Errorf("namespace is required")
 	}
 
-	settings := cli.New()
+	settings := newHelmSettings()
 	settings.SetNamespace(namespace)
 	actionConfig := new(action.Configuration)
 	if err := actionConfig.Init(settings.RESTClientGetter(), namespace, "secret", func(string, ...interface{}) {}); err != nil {
