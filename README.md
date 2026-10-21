@@ -1,6 +1,8 @@
 # KubeGUI - Kubernetes UI / admin desktop application
 Official website - https://kubegui.net  
 
+[![Buy Me A Coffee](https://img.shields.io/badge/Buy%20Me%20A%20Coffee-support-yellow.svg)](https://buymeacoffee.com/jurijskobex)
+
 [![Release](https://github.com/gerbil/kubegui/actions/workflows/release.yml/badge.svg)](https://github.com/gerbil/kubegui/actions/workflows/release.yml) [![CodeQL](https://github.com/gerbil/kubegui/actions/workflows/codeql.yml/badge.svg)](https://github.com/gerbil/kubegui/actions/workflows/codeql.yml)  
 
 ![kubegui](./web/images/kubegui.png)  
@@ -27,89 +29,44 @@ Official website - https://kubegui.net
 > - Helm respos+charts and releases (views)
 > - AI suggestions for issues/errors/warnings/etc
 
-# TODO:
+## TODO:
 
 - ArgoCD rollout/apps flow view
 
-## Scope:
-1. Application code
-2. Application releases
-3. Website src
-4. Issues/Bugs/Discussions hub
+## DEVELOPMENT
 
-# GUI / Backend
-- Wails application serves as GUI and backend RPC server
-- Backend logic organized into services with wails bindings
-- Services can call each other and share internal logic
-- Services expose methods to frontend via wails bindings
-- Frontend calls backend methods via wails bridge
-- Backend can also emit events to frontend for real-time updates
-
-## Wails bridge
-`internal/` - real backend implementations, not exposed to the frontend  
-`services/` - backend implementations exposed to the frontend, with wails bindings
-! services are thin bridge for real internal functions for the frontend
-
-# Frontend
-- React + TypeScript + Vite frontend
-- Mantine UI components for layout and styling
-- React Router for client-side routing
-- Tenstack query for data fetching and caching
-- Zustand (https://zustand.docs.pmnd.rs/) Toolkit for state management
-
-## State management
-- TanStack Virtual for Kubernetes resource lists and events
-- Tenstack Query for server state (data fetched from backend) and Zustand for client state (UI state, selections, etc.)
-- Zustand and TanStack Virtual (https://tanstack.com/virtual/latest) work great for displaying Kubernetes resource logs and events.
-  The Go backend streams these events to the frontend.
-  Zustand saves the resource list, and TanStack Virtual shows it on the screen without lagging.
-- Global state managed with Zustand Toolkit
-- Separate slices for different features (e.g., resources, navigation, namespaces)
-- Each slice manages its own state and actions
-- Components subscribe to relevant slices for data and actions
-- Use React context if needed for cross-cutting concerns (e.g., theme, user settings)
-- Persist current resource state in localStorage or similar for better UX
-  Debounce High-Traffic Events: If you are watching a busy cluster, hundreds of events can arrive every second. Use a small buffer loop in Go or debouncing in Zustand so React does not re-render 100 times a second.
-- State stores should have typed (table th) fields for each resource type, so the frontend only receives the data it needs to show in the UI. This reduces bandwidth and improves performance.
-
-### Best practices for UI
-- Use Object UIDs for Keys: Do not use array indexes for the React key attribute. Use resource.metadata.uid. Kubernetes guarantees this ID is unique.
-- Debounce High-Traffic Events: Use a small buffer loop in Go or debouncing in Zustand so React does not re-render 100 times a second.
-- Auto-Scroll to Bottom: If this list is a live Event stream or Log viewer, you can use rowVirtualizer.scrollToIndex(resources.length - 1) inside a useEffect to snap the view to the latest items.
-
-# DEV
-## Rebuild all & run app in dev mode
+- Rebuild all & run app in dev mode
 wails3 task dev:all
-## Rebuild react frontend app only
+- Rebuild react frontend app only
 wails3 task install:frontend:deps
-# Regenerate backend wails service bindings
+- Regenerate backend wails service bindings
 wails3 task generate:bindings
-## Run dev frontend (vite+react)
+- Run dev frontend (vite+react)
 wails3 task dev:frontend
-## Run dev wails app (backend)
+- Run dev wails app (backend)
 wails3 task dev:backend
 
-# Pre-release checks
+Pre-release checks:  
 - All tests passed
 - Windows and Mac prod versions built and tested
 - All release notesand changelog updated
 - Version bump - `version=x.x.x wails3 task release`
 
-# Post-release checks
+Post-release checks:  
 - Check and fix FOSSA license and security issues
 
-## Release builds:
+Release builds:  
 ```
 version=2.0.0 wails3 task build:windows:prod
 version=2.0.0 wails3 task build:mac:prod
 ```
 
-## Release for MAC (winlinx versions are released via GitHub actions):
+Release for MAC (winlinx versions are released via GitHub actions):  
 ```
 version=2.0.0 wails3 task release:mac:prod
 ```
 
-### Release sign (win): 
+Release sign (win):   
 ```
 (bash)
 cd ./bin
