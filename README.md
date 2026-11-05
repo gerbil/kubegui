@@ -28,10 +28,11 @@ Official website - https://kubegui.net
 > - Application auto update based on newer version from Github
 > - Helm respos+charts and releases (views)
 > - AI suggestions for issues/errors/warnings/etc
+> - ArgoCD rollout/apps flow view (list only)
 
-## TODO:
+## TODO
 
-- ArgoCD rollout/apps flow view
+>- More detailed GitOps view (components graph)
 
 ## DEVELOPMENT
 
