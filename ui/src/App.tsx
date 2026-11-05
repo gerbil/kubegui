@@ -79,6 +79,7 @@ import { INFORMER_RESOURCE_NAMES, getInformerResourceLabel } from './lib/menu.co
 import { CRDDefinitionsPage } from './features/crds/CRDDefinitionsPage'
 import { HelmReposPage } from './features/helm/HelmReposPage'
 import { HelmAppsPage } from './features/helm/HelmAppsPage'
+import { ArgoAppsPage } from './features/argocd/ArgoAppsPage'
 import { NamespaceSelect } from '@/components/ui/NamespaceSelect'
 import { useNamespaceOptions } from './hooks/useNamespaceOptions'
 import { useK8sResourceStore, type ResourceRow } from './store/useK8sResourceStore'
@@ -1999,6 +2000,7 @@ function RootView() {
   if (informerResourceFromPath) pageTitle = `Cluster / ${getInformerResourceLabel(informerResourceFromPath)}`
   if (currentPath === '/helm/repos') pageTitle = 'Cluster / Helm Repositories'
   if (currentPath === '/helm/apps') pageTitle = 'Cluster / Helm Apps'
+  if (currentPath === '/argocd/apps') pageTitle = 'Argo CD / Applications'
   if (currentPath === '/settings') pageTitle = 'Settings'
 
   let pageContent: ReactNode = (
@@ -2032,6 +2034,8 @@ function RootView() {
     pageContent = <HelmReposPage />
   } else if (currentPath === '/helm/apps') {
     pageContent = <HelmAppsPage />
+  } else if (currentPath === '/argocd/apps') {
+    pageContent = <ArgoAppsPage />
   } else {
     pageContent = (
       <DashboardPage

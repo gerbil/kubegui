@@ -114,6 +114,11 @@ func main() {
 						return
 					}
 
+					if strings.HasPrefix(req.URL.Path, "/api/v1/argocd/apps") {
+						services.ArgoAppsHandler(rw, req)
+						return
+					}
+
 					if req.URL.Path == "/api/v1/cve-db/refresh" {
 						services.CVEDBRefreshHandler(rw, req)
 						return

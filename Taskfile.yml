@@ -295,7 +295,6 @@ tasks:
     cmds:
       - npm install
       - npm ci
-      - npm audit fix
       - node -e "if(process.platform==='win32'){require('child_process').execSync('npm install @rolldown/binding-win32-x64-msvc --no-save --ignore-engines',{stdio:'inherit'})}"
       - npm run build
 

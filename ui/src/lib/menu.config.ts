@@ -1,4 +1,5 @@
 import {
+  GitBranch,
   Boxes,
   CheckCircle2,
   Container,
@@ -272,6 +273,18 @@ export const menuConfig: MenuSection[] = [
             href: '/helm/apps',
           },
         ],
+      },
+    ],
+  },
+  {
+    id: 'argocd',
+    label: 'Argo CD',
+    items: [
+      {
+        id: 'argocd-apps',
+        label: 'Applications',
+        icon: GitBranch,
+        href: '/argocd/apps',
       },
     ],
   },
