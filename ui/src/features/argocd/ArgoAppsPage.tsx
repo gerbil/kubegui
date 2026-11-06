@@ -1,13 +1,16 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { ColumnDef } from '@tanstack/react-table'
-import { Info, Search } from 'lucide-react'
+import { createPortal } from 'react-dom'
+import { Eye, GitBranch, History, Info, Layers, Pencil, RefreshCw, RotateCw, Search, Square, Trash2, Play, X, GitCompare } from 'lucide-react'
 import { DataTable } from '@/components/table/DataTable'
 import { ConfirmDialog } from '@/components/ui/Button'
 import { NamespaceSelect } from '@/components/ui/NamespaceSelect'
 import { UiTooltip } from '@/components/ui/UiTooltip'
+import { uiNotify } from '@/components/ui/UiNotify'
 import { useNamespaceOptions } from '@/hooks/useNamespaceOptions'
 import { formatAge } from '@/lib/utils'
+import { ArgoYamlEditor } from './ArgoYamlEditor'
 
 type ArgoApp = {
   name: string
@@ -352,10 +355,8 @@ export function ArgoAppsPage() {
       </div>
 
       {createOpen && (
-        <YamlModal
-          title="New Argo CD Application"
+        <CreateAppDrawer
           initialYaml={NEW_APP_TEMPLATE}
-          submitLabel="Create"
           onClose={() => setCreateOpen(false)}
           onSubmit={async (yaml) => {
             const created = await post('/api/v1/argocd/apps', { yaml }) as { name: string; namespace: string }
@@ -379,45 +380,50 @@ export function ArgoAppsPage() {
   )
 }
 
-function YamlModal({ title, initialYaml, submitLabel, onSubmit, onClose }: {
-  title: string
+function CreateAppDrawer({ initialYaml, onSubmit, onClose }: {
   initialYaml: string
-  submitLabel: string
   onSubmit: (yaml: string) => Promise<void>
   onClose: () => void
 }) {
-  const [yaml, setYaml] = useState(initialYaml)
-  const [busy, setBusy] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [visible, setVisible] = useState(false)
 
-  const submit = async () => {
-    setBusy(true)
-    setError(null)
-    try {
-      await onSubmit(yaml)
-    } catch (e) {
-      setError(errMsg(e, 'Request failed'))
-    } finally {
-      setBusy(false)
-    }
-  }
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => setVisible(true))
+    return () => cancelAnimationFrame(frame)
+  }, [])
 
-  return (
-    <Modal title={title} onClose={onClose} wide>
-      <textarea
-        value={yaml}
-        onChange={(event) => setYaml(event.target.value)}
-        spellCheck={false}
-        className="pods-glass-control rounded p-3 font-mono text-[12px] leading-5 w-full h-[60vh] resize-none"
+  return createPortal(
+    <>
+      <div
+        className={`fixed inset-0 bg-black/40 z-[999] transition-opacity duration-200 ${visible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+        onClick={onClose}
       />
-      {error && <p className="text-sm text-red-400 whitespace-pre-wrap">{error}</p>}
-      <div className="flex justify-end gap-2">
-        <button type="button" onClick={onClose} className={btnNeutral}>Cancel</button>
-        <button type="button" onClick={() => { void submit() }} disabled={busy || !yaml.trim()} className={btnPrimary}>
-          {busy ? 'Working...' : submitLabel}
-        </button>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="New Argo CD Application"
+        className={`fixed top-0 bottom-0 right-0 h-[100dvh] max-h-[100dvh] w-[760px] max-w-[100vw] z-[1000] flex flex-col overflow-hidden bg-card border-l border-border shadow-2xl transition-transform duration-200 ease-out ${visible ? 'translate-x-0' : 'translate-x-full'}`}
+      >
+        <div className="flex items-start justify-between px-5 py-4 border-b border-border bg-accent/20 shrink-0">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <GitBranch size={15} className="text-primary shrink-0" />
+              <span className="font-mono text-sm font-bold text-foreground">New Argo CD Application</span>
+            </div>
+            <p className="text-[10px] text-muted-foreground font-mono">Edit the YAML manifest and click Create</p>
+          </div>
+          <UiTooltip content="Close panel" side="bottom">
+            <button type="button" aria-label="Close panel" onClick={onClose} className="ml-4 text-muted-foreground hover:text-foreground shrink-0 cursor-pointer">
+              <X size={18} />
+            </button>
+          </UiTooltip>
+        </div>
+        <div className="flex-1 min-h-0 p-4 flex flex-col">
+          <ArgoYamlEditor initialYaml={initialYaml} onSubmit={onSubmit} submitLabel="Create Application" mode="create" onCancel={onClose} />
+        </div>
       </div>
-    </Modal>
+    </>,
+    document.body,
   )
 }
 
@@ -429,13 +435,20 @@ function AppDetailModal({ namespace, name, onClose, onChanged }: {
 }) {
   const [app, setApp] = useState<AnyObj | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [notice, setNotice] = useState<string | null>(null)
   const [tab, setTab] = useState<DetailTab>('summary')
   const [syncOpen, setSyncOpen] = useState(false)
   const [deleteOpen, setDeleteOpen] = useState(false)
   const [rollbackTarget, setRollbackTarget] = useState<AnyObj | null>(null)
   const [busy, setBusy] = useState(false)
   const [gone, setGone] = useState(false)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => setVisible(true))
+    const onKey = (event: KeyboardEvent) => { if (event.key === 'Escape') onClose() }
+    window.addEventListener('keydown', onKey)
+    return () => { window.cancelAnimationFrame(frame); window.removeEventListener('keydown', onKey) }
+  }, [onClose])
 
   const base = `namespace=${encodeURIComponent(namespace)}&name=${encodeURIComponent(name)}`
 
@@ -459,14 +472,15 @@ function AppDetailModal({ namespace, name, onClose, onChanged }: {
   const run = useCallback(async (label: string, action: () => Promise<unknown>) => {
     setBusy(true)
     setError(null)
-    setNotice(null)
     try {
       await action()
-      setNotice(label)
+      uiNotify.success(label)
       await reload()
       await onChanged()
     } catch (e) {
-      setError(errMsg(e, `${label} failed`))
+      const msg = errMsg(e, `${label} failed`)
+      setError(msg)
+      uiNotify.error(msg)
     } finally {
       setBusy(false)
     }
@@ -484,55 +498,69 @@ function AppDetailModal({ namespace, name, onClose, onChanged }: {
   const sources: AnyObj[] = Array.isArray(spec.sources) ? spec.sources : spec.source ? [spec.source] : []
   const conditions: AnyObj[] = Array.isArray(status.conditions) ? status.conditions : []
 
-  const tabs: { id: DetailTab; label: string }[] = [
-    { id: 'summary', label: 'Summary' },
-    { id: 'resources', label: `Resources (${resources.length})` },
-    { id: 'history', label: `History (${history.length})` },
-    { id: 'diff', label: 'Diff' },
-    { id: 'yaml', label: 'YAML' },
+  const tabs: { id: DetailTab; label: string; icon: ReactNode }[] = [
+    { id: 'summary', label: 'Summary', icon: <Eye size={13} /> },
+    { id: 'resources', label: `Resources (${resources.length})`, icon: <Layers size={13} /> },
+    { id: 'history', label: `History (${history.length})`, icon: <History size={13} /> },
+    { id: 'diff', label: 'Diff', icon: <GitCompare size={13} /> },
+    { id: 'yaml', label: 'YAML', icon: <Pencil size={13} /> },
   ]
 
-  return (
-    <Modal
-      wide
-      onClose={onClose}
-      title={
-        <span className="flex items-center gap-3 flex-wrap">
-          <span className="text-base">{name}</span>
-          <span className="text-xs text-muted-foreground font-normal">{namespace}</span>
-          <span className={`text-xs ${syncClass(syncStatus)}`}>{syncStatus}</span>
-          <span className={`text-xs ${healthClass(healthStatus)}`}>{healthStatus}</span>
-        </span>
-      }
-    >
-      <div className="flex gap-2 flex-wrap">
-        <button type="button" disabled={busy || !app || gone} onClick={() => setSyncOpen(true)} className={btnPrimary}>Sync</button>
-        <button type="button" disabled={busy || !app || gone} onClick={() => { void run('Refresh requested', () => post('/api/v1/argocd/apps/refresh', { namespace, name, hard: false })) }} className={btnNeutral}>Refresh</button>
-        <button type="button" disabled={busy || !app || gone} onClick={() => { void run('Hard refresh requested', () => post('/api/v1/argocd/apps/refresh', { namespace, name, hard: true })) }} className={btnNeutral}>Hard Refresh</button>
-        {running && (
-          <button type="button" disabled={busy} onClick={() => { void run('Termination requested', () => post('/api/v1/argocd/apps/terminate', { namespace, name })) }} className={btnDanger}>Terminate Sync</button>
-        )}
-        <div className="flex-1" />
-        <button type="button" disabled={busy || !app || gone} onClick={() => setDeleteOpen(true)} className={btnDanger}>Delete</button>
-      </div>
+  const drawer = (
+    <>
+      <div
+        className={`fixed inset-0 bg-black/40 z-[999] transition-opacity duration-200 ${visible ? 'opacity-100' : 'opacity-0'}`}
+        onClick={onClose}
+      />
+      <div
+        className={`fixed top-0 bottom-0 right-0 h-[100dvh] max-h-[100dvh] w-[860px] max-w-[100vw] z-[1000] flex flex-col overflow-hidden bg-card border-l border-border shadow-2xl transition-transform duration-200 ease-out ${visible ? 'translate-x-0' : 'translate-x-full'}`}
+      >
+        <div className="flex items-start justify-between px-5 py-4 border-b border-border bg-accent/20">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1">
+              <GitBranch size={15} className="text-primary shrink-0" />
+              <span className="font-mono text-sm font-bold text-foreground truncate">{name}</span>
+            </div>
+            <p className="text-[10px] text-muted-foreground font-mono">
+              <span>{namespace}</span> &nbsp;·&nbsp;
+              <span className={syncClass(syncStatus)}>{syncStatus}</span> &nbsp;·&nbsp;
+              <span className={healthClass(healthStatus)}>{healthStatus}</span>
+            </p>
+          </div>
+          <UiTooltip content="Close panel" side="bottom">
+            <button onClick={onClose} className="ml-4 text-muted-foreground hover:text-foreground shrink-0 cursor-pointer">
+              <X size={18} />
+            </button>
+          </UiTooltip>
+        </div>
 
-      {error && <p className="text-sm text-red-400 whitespace-pre-wrap">{error}</p>}
-      {notice && !error && <p className="text-sm text-emerald-400">{notice}</p>}
+        <div className="flex items-center gap-0 border-b border-border bg-accent/10 px-5">
+          {tabs.map((t) => (
+            <button
+              key={t.id}
+              onClick={() => setTab(t.id)}
+              className={`flex items-center gap-1.5 px-3 py-2.5 text-[11px] font-semibold border-b-2 transition-colors ${
+                tab === t.id ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              {t.icon}{t.label}
+            </button>
+          ))}
+          <div className="flex-1" />
+          <div className="flex items-center gap-2 py-2">
+            <ActionBtn icon={<Play size={13} />} label="Sync" onClick={() => setSyncOpen(true)} disabled={busy || !app || gone} primary />
+            <ActionBtn icon={<RefreshCw size={13} />} label="Refresh" onClick={() => { void run('Refresh requested', () => post('/api/v1/argocd/apps/refresh', { namespace, name, hard: false })) }} disabled={busy || !app || gone} />
+            <ActionBtn icon={<RotateCw size={13} />} label="Hard Refresh" onClick={() => { void run('Hard refresh requested', () => post('/api/v1/argocd/apps/refresh', { namespace, name, hard: true })) }} disabled={busy || !app || gone} />
+            {running && (
+              <ActionBtn icon={<Square size={13} />} label="Terminate" onClick={() => { void run('Termination requested', () => post('/api/v1/argocd/apps/terminate', { namespace, name })) }} disabled={busy} danger />
+            )}
+            <ActionBtn icon={<Trash2 size={13} />} label="Delete" onClick={() => setDeleteOpen(true)} disabled={busy || !app || gone} danger />
+          </div>
+        </div>
 
-      <div className="flex gap-1 border-b border-border">
-        {tabs.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => setTab(t.id)}
-            className={`px-3 py-1.5 text-[12px] font-semibold border-b-2 ${tab === t.id ? 'border-primary text-primary' : 'border-transparent text-muted-foreground hover:text-foreground'}`}
-          >
-            {t.label}
-          </button>
-        ))}
-      </div>
+        {error && <p className="px-5 pt-3 text-sm text-red-400 whitespace-pre-wrap">Error: {error}</p>}
 
-      <div className="flex-1 min-h-[300px] overflow-auto">
+        <div className="flex-1 min-h-0 overflow-auto p-5">
         {!app && !error && <p className="text-sm text-muted-foreground">Loading...</p>}
 
         {app && tab === 'summary' && (
@@ -610,6 +638,7 @@ function AppDetailModal({ namespace, name, onClose, onChanged }: {
         {app && tab === 'yaml' && (
           <YamlTab base={base} onSaved={() => run('Application updated', async () => undefined)} />
         )}
+        </div>
       </div>
 
       {syncOpen && (
@@ -657,7 +686,30 @@ function AppDetailModal({ namespace, name, onClose, onChanged }: {
           }}
         />
       )}
-    </Modal>
+    </>
+  )
+
+  if (typeof document === 'undefined') return null
+  return createPortal(drawer, document.body)
+}
+
+function ActionBtn({ icon, label, onClick, disabled = false, danger = false, primary = false }: {
+  icon: ReactNode; label: string; onClick: () => void; disabled?: boolean; danger?: boolean; primary?: boolean
+}) {
+  const tone = danger
+    ? 'border-red-500/30 text-red-400 hover:bg-red-500/10'
+    : primary
+      ? 'border-primary/40 text-primary hover:bg-primary/10'
+      : 'border-border text-muted-foreground hover:text-foreground hover:bg-accent/60'
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded text-[11px] font-semibold border transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${tone}`}
+    >
+      {icon}{label}
+    </button>
   )
 }
 
@@ -734,37 +786,25 @@ function DiffView({ base }: { base: string }) {
 function YamlTab({ base, onSaved }: { base: string; onSaved: () => void | Promise<void> }) {
   const [yaml, setYaml] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [busy, setBusy] = useState(false)
-
   useEffect(() => {
+    let cancelled = false
     api<{ yaml: string }>(`/api/v1/argocd/apps/yaml?${base}`)
-      .then((res) => setYaml(res.yaml))
-      .catch((e) => setError(errMsg(e, 'Failed to load YAML')))
+      .then((res) => { if (!cancelled) setYaml(res.yaml) })
+      .catch((e) => { if (!cancelled) setError(errMsg(e, 'Failed to load YAML')) })
+    return () => { cancelled = true }
   }, [base])
-
-  const save = async () => {
-    if (yaml === null) return
-    setBusy(true)
-    setError(null)
-    try {
-      await api('/api/v1/argocd/apps', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ yaml }) })
-      await onSaved()
-    } catch (e) {
-      setError(errMsg(e, 'Update failed'))
-    } finally {
-      setBusy(false)
-    }
-  }
 
   if (yaml === null) return error ? <p className="text-sm text-red-400">{error}</p> : <p className="text-sm text-muted-foreground">Loading...</p>
   return (
-    <div className="space-y-2">
-      <textarea value={yaml} onChange={(e) => setYaml(e.target.value)} spellCheck={false} className="pods-glass-control rounded p-3 font-mono text-[12px] leading-5 w-full h-[45vh] resize-none" />
-      {error && <p className="text-sm text-red-400 whitespace-pre-wrap">{error}</p>}
-      <div className="flex justify-end">
-        <button type="button" onClick={() => { void save() }} disabled={busy} className={btnPrimary}>{busy ? 'Saving...' : 'Apply changes'}</button>
-      </div>
-    </div>
+    <ArgoYamlEditor
+      initialYaml={yaml}
+      mode="edit"
+      submitLabel="Save Changes"
+      onSubmit={async (value) => {
+        await api('/api/v1/argocd/apps', { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ yaml: value }) })
+        await onSaved()
+      }}
+    />
   )
 }
 
