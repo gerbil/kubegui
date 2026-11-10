@@ -20,7 +20,6 @@ Official website - https://kubegui.net
 > - Portforwarding support  
 > - Network policy graph (native/cilium)
 > - Whoami/auth check view
-> - Whoami/auth check view
 > - Resource quota details visualisation
 > - RBAC roles/bindings graph/flow view
 > - Settings to change ui font/size
@@ -29,6 +28,10 @@ Official website - https://kubegui.net
 > - Helm respos+charts and releases (views)
 > - AI suggestions for issues/errors/warnings/etc
 > - ArgoCD rollout/apps flow view (list only)
+
+Error notifications include an **Ask AI** action. Clicking it sends the notification's
+error message to the configured AI provider for an explanation; review messages for
+sensitive information before using it. AI must be enabled and configured in settings.
 
 ## TODO
 

@@ -7,7 +7,7 @@ export type AISettings = {
 }
 
 export type AIAssistRequest = {
-  task: 'auto_detect' | 'explain_event' | 'suggest_fix' | 'generate_yaml' | 'explain_logs'
+  task: 'auto_detect' | 'explain_event' | 'explain_error' | 'suggest_fix' | 'generate_yaml' | 'explain_logs'
   resource?: string
   namespace?: string
   name?: string
@@ -67,4 +67,3 @@ export async function requestAIAssist(input: AIAssistRequest): Promise<AIAssistR
   }
   return payload
 }
-

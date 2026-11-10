@@ -210,7 +210,7 @@ export class ArgoAppInfo {
 
 export class CRDMenuResponse {
     "groups": crd$0.CategoryGroup[];
-    "uiMap": { [_ in string]?: string };
+    "uiMap": { [_: string]: string };
 
     /** Creates a new CRDMenuResponse instance. */
     constructor($$source: Partial<CRDMenuResponse> = {}) {

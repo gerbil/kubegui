@@ -42,6 +42,7 @@ let runtimePromise: Promise<NotifyRuntime> | null = null
 let resolvedRuntime: NotifyRuntime | null = null
 const recentlyShown = new Map<string, number>()
 const DEDUPE_WINDOW_MS = 1500
+export const ASK_AI_ERROR_EVENT = 'kubegui:ask-ai-error'
 
 function loadScript(src: string): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -109,12 +110,36 @@ async function getRuntime(): Promise<NotifyRuntime> {
 }
 
 function showOnRuntime(runtime: NotifyRuntime, type: NotifyType, message: string) {
-  if (type === 'success') {
-    runtime.success(message)
+  if (type === 'error' || type === 'danger') {
+    const existing = new Set(document.querySelectorAll('.notyf__toast'))
+    const text = document.createElement('span')
+    text.textContent = message
+    const escapedMessage = text.innerHTML
+    if (type === 'error') {
+      runtime.error(escapedMessage)
+    } else {
+      runtime.open({ type, message: escapedMessage })
+    }
+
+    const toast = Array.from(document.querySelectorAll('.notyf__toast')).find((element) => !existing.has(element))
+    const container = toast?.querySelector('.notyf__message')
+    if (!container) {
+      console.error('Unable to add Ask AI action to error notification')
+      return
+    }
+    const button = document.createElement('button')
+    button.type = 'button'
+    button.className = 'notyf-ask-ai'
+    button.textContent = 'Ask AI'
+    button.title = 'Send this error message to the configured AI provider'
+    button.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent<string>(ASK_AI_ERROR_EVENT, { detail: message }))
+    })
+    container.appendChild(button)
     return
   }
-  if (type === 'error') {
-    runtime.error(message)
+  if (type === 'success') {
+    runtime.success(message)
     return
   }
   runtime.open({ type, message })

@@ -297,6 +297,23 @@
   word-break: normal;
 }
 
+.notyf-ask-ai {
+  display: block;
+  margin-top: 8px;
+  padding: 3px 8px;
+  border: 1px solid currentColor;
+  border-radius: 4px;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.notyf-ask-ai:hover,
+.notyf-ask-ai:focus-visible {
+  background: rgba(0, 0, 0, 0.2);
+}
+
 /* Restore original full-height dismiss strip (undoes our broken overrides) */
 .notyf__dismiss {
   position: absolute;

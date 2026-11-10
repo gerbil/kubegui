@@ -23,6 +23,7 @@ const (
 	TaskSuggestFix   = "suggest_fix"
 	TaskGenerateYAML = "generate_yaml"
 	TaskExplainLogs  = "explain_logs"
+	TaskExplainError = "explain_error"
 	TaskAutoDetect   = "auto_detect"
 )
 
@@ -112,7 +113,6 @@ func (r *BifrostRouter) Ask(ctx context.Context, settings Settings, req Request)
 			{Role: "system", Content: defaultSystemPrompt},
 			{Role: "user", Content: prompt},
 		},
-		Temperature: 0.2,
 	}
 	body, err := json.Marshal(payload)
 	if err != nil {
@@ -181,6 +181,8 @@ func buildPrompt(req Request) string {
 		return base + "\nGenerate minimal Kubernetes YAML to fix this issue. Return YAML first, then short explanation bullets."
 	case TaskExplainLogs:
 		return base + "\nExplain this log snippet. Call out root cause and immediate checks to run."
+	case TaskExplainError:
+		return base + "\nExplain why this application or Kubernetes error may have occurred. Distinguish likely causes from uncertainties, and suggest safe checks and remedies."
 	default:
 		return base + "\nSuggest safe remediation steps. Include command examples and rollback warning if risky."
 	}
@@ -204,9 +206,8 @@ type chatMessage struct {
 }
 
 type chatRequest struct {
-	Model       string        `json:"model"`
-	Messages    []chatMessage `json:"messages"`
-	Temperature float64       `json:"temperature,omitempty"`
+	Model    string        `json:"model"`
+	Messages []chatMessage `json:"messages"`
 }
 
 type chatResponse struct {
@@ -214,4 +215,3 @@ type chatResponse struct {
 		Message chatMessage `json:"message"`
 	} `json:"choices"`
 }
-

@@ -7,6 +7,7 @@ import 'notyf/notyf.min.css'
 import './index.css'
 import App from './App'
 import { installNotificationBridge } from './components/ui/UiNotify'
+import { NotificationAiAssist } from './components/ui/NotificationAiAssist'
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -69,6 +70,7 @@ createRoot(document.getElementById('root')!).render(
         }}
       >
         <App />
+        <NotificationAiAssist />
       </MantineProvider>
     </QueryClientProvider>
   </StrictMode>,

@@ -14,6 +14,7 @@ type Props = {
 export function AiAssistModal({ open, onClose, request }: Props) {
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<string>('')
+  const [requestError, setRequestError] = useState<string>('')
   const [providerLabel, setProviderLabel] = useState<string>('')
   const requestKey = useMemo(() => {
     if (!request) return ''
@@ -23,6 +24,7 @@ export function AiAssistModal({ open, onClose, request }: Props) {
   useEffect(() => {
     if (!request) return
     setResult('')
+    setRequestError('')
     setProviderLabel('')
   }, [requestKey, request])
 
@@ -40,6 +42,7 @@ export function AiAssistModal({ open, onClose, request }: Props) {
       } catch (error) {
         if (cancelled) return
         const message = error instanceof Error ? error.message : 'AI request failed'
+        setRequestError(message)
         uiNotify.error(message)
       } finally {
         if (!cancelled) setLoading(false)
@@ -56,6 +59,7 @@ export function AiAssistModal({ open, onClose, request }: Props) {
     switch (request.task) {
       case 'auto_detect': return 'AI suggestion'
       case 'explain_event': return res ? `Explain${res}` : 'Explain event'
+      case 'explain_error': return 'Explain error'
       case 'generate_yaml': return 'Generate YAML fix'
       case 'explain_logs': return 'Explain logs'
       default: return res ? `Fix suggestions ·${res}` : 'Suggest fix'
@@ -96,6 +100,9 @@ export function AiAssistModal({ open, onClose, request }: Props) {
               <Markdown markdown={result} />
             </div>
           )}
+          {requestError && (
+            <p role="alert" className="rounded border border-red-500/40 bg-red-500/10 p-3 text-xs text-red-300">{requestError}</p>
+          )}
         </div>
 
         <div className="px-5 py-4 border-t border-border/60 flex items-center justify-end gap-2">
@@ -106,4 +113,3 @@ export function AiAssistModal({ open, onClose, request }: Props) {
     document.body,
   )
 }
-
