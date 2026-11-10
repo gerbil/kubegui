@@ -29,10 +29,6 @@ Official website - https://kubegui.net
 > - AI suggestions for issues/errors/warnings/etc
 > - ArgoCD rollout/apps flow view (list only)
 
-Error notifications include an **Ask AI** action. Clicking it sends the notification's
-error message to the configured AI provider for an explanation; review messages for
-sensitive information before using it. AI must be enabled and configured in settings.
-
 ## TODO
 
 >- More detailed GitOps view (components graph)
@@ -53,7 +49,7 @@ wails3 task dev:backend
 Pre-release checks:  
 - All tests passed
 - Windows and Mac prod versions built and tested
-- All release notesand changelog updated
+- Ensure commit and pull request titles are suitable for generated release notes
 - Version bump - `version=x.x.x wails3 task release`
 
 Post-release checks:  
@@ -65,12 +61,16 @@ version=2.0.0 wails3 task build:windows:prod
 version=2.0.0 wails3 task build:mac:prod
 ```
 
-Release for MAC (winlinx versions are released via GitHub actions):  
+Release for MAC (windows/linux versions are released via GitHub actions):
 ```
+# Builds and packages the macOS release, then creates the GitHub release
+# with automatically generated notes and uploads the macOS archive.
 version=2.0.0 wails3 task release:mac:prod
 ```
 
-Release sign (win):   
+No separate release-notes markdown file is needed; GitHub generates the notes from commits and merged pull requests.
+
+Release sign (win):
 ```
 (bash)
 cd ./bin

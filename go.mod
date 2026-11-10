@@ -66,7 +66,6 @@ require (
 	github.com/Microsoft/hcsshim v0.15.0-rc.4 // indirect
 	github.com/ProtonMail/go-crypto v1.5.2 // indirect
 	github.com/VividCortex/ewma v1.2.0 // indirect
-	github.com/adrg/xdg v0.5.3 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/agnivade/levenshtein v1.2.1 // indirect
 	github.com/alecthomas/chroma v0.10.0 // indirect
@@ -235,7 +234,6 @@ require (
 	github.com/in-toto/in-toto-golang v0.11.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/jbenet/go-context v0.0.0-20150711004518-d14ea06fba99 // indirect
-	github.com/jchv/go-winloader v0.0.0-20250406163304-c1995be93bd1 // indirect
 	github.com/jmoiron/sqlx v1.4.0 // indirect
 	github.com/josephburnett/jd/v2 v2.3.0 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
