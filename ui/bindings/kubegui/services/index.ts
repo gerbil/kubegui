@@ -10,6 +10,7 @@ export {
     AIAssistRequest,
     AIAssistResponse,
     AISettings,
+    ArgoAppInfo,
     CRDMenuResponse,
     ClusterInfo,
     HelmAppInfo,

@@ -116,9 +116,101 @@ export class AISettings {
     }
 }
 
+/**
+ * ArgoAppInfo is a compact row for the Argo CD applications list.
+ */
+export class ArgoAppInfo {
+    "name": string;
+    "namespace": string;
+    "project": string;
+    "syncStatus": string;
+    "healthStatus": string;
+    "repoUrl": string;
+    "path": string;
+    "chart": string;
+    "targetRevision": string;
+    "syncedRevision": string;
+    "destServer": string;
+    "destName": string;
+    "destNamespace": string;
+    "autoSync": boolean;
+    "sourceCount": number;
+    "operationPhase": string;
+    "reconciledAt": string;
+    "createdAt": string;
+
+    /** Creates a new ArgoAppInfo instance. */
+    constructor($$source: Partial<ArgoAppInfo> = {}) {
+        if (!("name" in $$source)) {
+            this["name"] = "";
+        }
+        if (!("namespace" in $$source)) {
+            this["namespace"] = "";
+        }
+        if (!("project" in $$source)) {
+            this["project"] = "";
+        }
+        if (!("syncStatus" in $$source)) {
+            this["syncStatus"] = "";
+        }
+        if (!("healthStatus" in $$source)) {
+            this["healthStatus"] = "";
+        }
+        if (!("repoUrl" in $$source)) {
+            this["repoUrl"] = "";
+        }
+        if (!("path" in $$source)) {
+            this["path"] = "";
+        }
+        if (!("chart" in $$source)) {
+            this["chart"] = "";
+        }
+        if (!("targetRevision" in $$source)) {
+            this["targetRevision"] = "";
+        }
+        if (!("syncedRevision" in $$source)) {
+            this["syncedRevision"] = "";
+        }
+        if (!("destServer" in $$source)) {
+            this["destServer"] = "";
+        }
+        if (!("destName" in $$source)) {
+            this["destName"] = "";
+        }
+        if (!("destNamespace" in $$source)) {
+            this["destNamespace"] = "";
+        }
+        if (!("autoSync" in $$source)) {
+            this["autoSync"] = false;
+        }
+        if (!("sourceCount" in $$source)) {
+            this["sourceCount"] = 0;
+        }
+        if (!("operationPhase" in $$source)) {
+            this["operationPhase"] = "";
+        }
+        if (!("reconciledAt" in $$source)) {
+            this["reconciledAt"] = "";
+        }
+        if (!("createdAt" in $$source)) {
+            this["createdAt"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new ArgoAppInfo instance from a string or object.
+     */
+    static createFrom($$source: any = {}): ArgoAppInfo {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new ArgoAppInfo($$parsedSource as Partial<ArgoAppInfo>);
+    }
+}
+
 export class CRDMenuResponse {
     "groups": crd$0.CategoryGroup[];
-    "uiMap": { [_ in string]?: string };
+    "uiMap": { [_: string]: string };
 
     /** Creates a new CRDMenuResponse instance. */
     constructor($$source: Partial<CRDMenuResponse> = {}) {

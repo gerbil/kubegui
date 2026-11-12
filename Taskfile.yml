@@ -131,7 +131,7 @@ tasks:
       - task: build:mac:prod:universal
 
   release:mac:prod:
-    summary: Release
+    summary: Release for macOS production
     env:
       version: '{{.version}}'
     cmds:
@@ -207,7 +207,7 @@ tasks:
   build:mac:prod:upload:
     summary: Upload to github
     cmds:
-      - gh release create "v{{.version}}" --title "v{{.version}}" --notes "..." -R gerbil/kubegui || true
+      - gh release create "v{{.version}}" --title "v{{.version}}" --generate-notes -R gerbil/kubegui
       - gh release upload v{{.version}} {{.BIN_DIR}}/{{.APP_NAME}}-macos.zip --clobber -R gerbil/kubegui
 
   #  MISC
@@ -295,7 +295,6 @@ tasks:
     cmds:
       - npm install
       - npm ci
-      - npm audit fix
       - node -e "if(process.platform==='win32'){require('child_process').execSync('npm install @rolldown/binding-win32-x64-msvc --no-save --ignore-engines',{stdio:'inherit'})}"
       - npm run build
 
