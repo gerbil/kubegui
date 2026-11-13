@@ -78,6 +78,7 @@ jobs:
           name: release-archives
           path: .bin/*.zip
           if-no-files-found: error
+          include-hidden-files: true
 
   publish:
     needs: build
